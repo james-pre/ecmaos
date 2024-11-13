@@ -1,0 +1,35 @@
+import type { DeviceDriver, DeviceFile, Ino } from '@zenfs/core'
+import type { Kernel } from '@ecmaos/kernel/kernel'
+import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/types/device.types.js'
+
+export const pkg = {
+  name: '{{ name }}',
+  version: '0.1.0',
+  description: '{{ description }}'
+}
+
+export async function cli(options: KernelDeviceCLIOptions) {
+  options.kernel.log?.debug(`${pkg.name} CLI`, options.args)
+  return 0
+}
+
+export async function getDrivers(kernel: Kernel): Promise<DeviceDriver<KernelDeviceData>[]> {
+  const drivers: DeviceDriver<KernelDeviceData>[] = []
+
+  // @see https://zenfs.dev/core/interfaces/DeviceDriver.html
+  drivers.push({
+    name: '{{ name }}-0',
+    init: (ino: Ino) => ({ major: Math.random() * 10, minor: Math.random() * 100, data: { version: pkg.version } }),
+    read: (file: DeviceFile, buffer: ArrayBufferView, offset: number, length: number, position: number) => 0,
+    write: (file: DeviceFile, buffer: ArrayBufferView, offset: number, length: number, position: number) => 0
+  })
+
+  drivers.push({
+    name: '{{ name }}-1',
+    init: (ino: Ino) => ({ major: Math.random() * 10, minor: Math.random() * 100, data: { version: pkg.version } }),
+    read: (file: DeviceFile, buffer: ArrayBufferView, offset: number, length: number, position: number) => 0,
+    write: (file: DeviceFile, buffer: ArrayBufferView, offset: number, length: number, position: number) => 0
+  })
+
+  return drivers
+}

@@ -1,0 +1,27 @@
+import { Kernel } from '#kernel.ts'
+
+export class Protocol {
+  private _kernel: Kernel
+
+  get kernel() { return this._kernel }
+
+  constructor(options: ProtocolOptions) {
+    this._kernel = options.kernel
+
+    globalThis.navigator.registerProtocolHandler(
+      import.meta.env.VITE_APP_PROTOCOL || options.schema || 'web+ecmaos',
+      `${import.meta.env.VITE_APP_URL || window.location.origin}?protocol=%s`
+    )
+  }
+
+  open(uri: string) {
+    this.kernel.terminal.writeln(`Opening ${uri}`)
+  }
+}
+
+// --- Types ---
+
+export interface ProtocolOptions {
+  kernel: Kernel
+  schema?: string
+}

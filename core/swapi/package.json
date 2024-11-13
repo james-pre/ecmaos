@@ -1,0 +1,23 @@
+{
+  "name": "@ecmaos/swapi",
+  "version": "0.1.0",
+  "description": "EcmaOS Service Worker API",
+  "author": "Jay Mathis <code@mathis.network>",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "install:kernel": "bun run build && cp dist/swapi.js ../kernel/public/"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "vite": "^5.4.10"
+  },
+  "peerDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.1.0",
+    "hono": "^4.6.7"
+  }
+}

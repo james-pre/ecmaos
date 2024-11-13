@@ -1,0 +1,10 @@
+{
+  "kernel": {
+    "madeBy": "Made with ❤️  by",
+    "panic": "Uh oh, kernel panic! Check the logs for more details.",
+    "permissionNotificationDenied": "Notification permission denied",
+    "modules": {
+      "blacklisted": "Skipping blacklisted module {{module}}"
+    }
+  }
+}

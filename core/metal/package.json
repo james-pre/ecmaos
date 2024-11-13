@@ -1,0 +1,34 @@
+{
+  "name": "@ecmaos/metal",
+  "description": "A backend for EcmaOS",
+  "version": "0.1.0",
+  "author": "Jay Mathis <code@mathis.network>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "node --no-warnings=ExperimentalWarning --experimental-strip-types src/server.ts"
+  },
+  "engines": {
+    "node": ">=23.1.0"
+  },
+  "nodemonConfig": {
+    "exec": "node --no-warnings=ExperimentalWarning --experimental-strip-types src/server.ts",
+    "ext": "ts"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.1.0",
+    "@hono/node-server": "^1.13.2",
+    "@hono/node-ws": "^1.0.4",
+    "hono": "^4.6.7",
+    "jose": "^5.9.6",
+    "node-gyp": "^10.2.0",
+    "node-pty": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

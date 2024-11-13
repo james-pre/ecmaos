@@ -1,0 +1,88 @@
+:root {
+  --figlet-font: Poison;
+  --figlet-color: green;
+}
+
+.winbox.ecmaos-window {
+  background: linear-gradient(90deg,#243D25,#357C3C);
+  border-radius: 12px 12px 0 0;
+}
+
+.winbox.ecmaos-window:not(.min):not(.focus) {
+  background: #333;
+}
+
+@media (hover: hover) {
+  .winbox.ecmaos-globalThis.min:not(:hover) {
+    background: #333;
+  }
+
+  .winbox.ecmaos-window .wb-icon * {
+    opacity: 0.65;
+  }
+
+  .winbox.ecmaos-window .wb-icon *:hover {
+    opacity: 1;
+  }
+}
+
+.winbox.ecmaos-window .wb-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.winbox.ecmaos-window .wb-body {
+  margin: 4px;
+  color: #fff;
+  background: #121212;
+  padding: 1rem;
+}
+
+.winbox.ecmaos-window .wb-body::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.winbox.ecmaos-window .wb-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.winbox.ecmaos-window .wb-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #263040;
+}
+
+.winbox.ecmaos-window .wb-body::-webkit-scrollbar-thumb:window-inactive {
+  background: #181f2a;
+}
+
+button {
+  background: #263040;
+  border: 1px solid #263040;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  width: 100%;
+  margin-top: 1rem;
+
+  &.btn-success {
+    background: #16a34a;
+  }
+
+  &.btn-cancel {
+    background: #8a1c1c;
+  }
+}
+
+button:hover {
+  background: #333;
+  border-color: #333;
+}
+
+button:active {
+  background: #263040;
+}

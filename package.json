@@ -1,0 +1,39 @@
+{
+  "name": "ecmaos",
+  "version": "0.1.0",
+  "author": "Jay Mathis <code@mathis.network>",
+  "repository": "https://github.com/ecmaos/ecmaos",
+  "devDependencies": {
+    "@turbo/gen": "^2.2.3",
+    "prettier": "^3.2.5",
+    "sherif": "^1.0.1",
+    "turbo": "^2.2.3",
+    "typescript": "^5.5.3"
+  },
+  "bugs": "https://github.com/ecmaos/ecmaos/issues",
+  "description": "ecmaOS: Micro-kernel and framework for web technologies",
+  "engines": {
+    "node": ">=18"
+  },
+  "homepage": "https://github.com/ecmaos/ecmaos#readme",
+  "license": "MIT",
+  "packageManager": "bun@1.1.29",
+  "private": true,
+  "scripts": {
+    "build": "npm run cp:readme && turbo run build",
+    "cp:readme": "cp README.md core/kernel/README.md",
+    "dev": "turbo run dev",
+    "fix": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "fix:repo": "sherif --fix",
+    "lint": "turbo run lint",
+    "lint:repo": "sherif",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch"
+  },
+  "workspaces": [
+    "apps/*",
+    "core/*",
+    "devices/*",
+    "utils/*"
+  ]
+}
