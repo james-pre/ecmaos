@@ -1075,7 +1075,7 @@ export const edit = async ({ kernel, shell, terminal, args }: CommandArgs) => {
               }
               
               cursorY += clipboardLines.length - 1
-              cursorX = clipboardLines[clipboardLines.length - 1].length
+              cursorX = clipboardLines[clipboardLines.length - 1]?.length ?? 0
             }
           }).catch(err => {
             message = chalk.red('Failed to paste: ' + err.message)
@@ -1198,6 +1198,11 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
   const packageName = versionMatch[1]
   const version = versionMatch[2] || 'latest'
   const repo = repoArg || 'https://unpkg.com'
+
+  if (!packageName) {
+    terminal.writeln(chalk.red('Invalid package name format'))
+    return 1
+  }
 
   const url = `${repo}/${packageName}${version === 'latest' ? '' : '@' + version}/package.json`
   const response = await globalThis.fetch(url)
@@ -1605,6 +1610,7 @@ export const passwd = async ({ kernel, terminal, args }: CommandArgs) => {
   }
 
   try {
+    if (!oldPass || !newPass) throw new Error('Missing password')
     await kernel.users.password(oldPass, newPass)
     terminal.writeln(chalk.green('Password updated successfully'))
     return 0
@@ -1671,7 +1677,7 @@ export const screensaver = async ({ kernel, terminal, args }: CommandArgs) => {
   terminal.blur()
   saver.default({ terminal })
 
-  if (set) kernel.storage.local.setItem('screensaver', screensaver)
+  if (set) kernel.storage.local.setItem('screensaver', saverName)
 }
 
 export const snake = ({ kernel, terminal }: CommandArgs) => {

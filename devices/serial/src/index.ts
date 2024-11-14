@@ -1,3 +1,5 @@
+/// <reference types="w3c-web-serial" />
+
 import type { DeviceDriver, DeviceFile } from '@zenfs/core'
 import type { Kernel } from '@ecmaos/kernel/kernel'
 import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
@@ -55,10 +57,10 @@ export async function cli(options: KernelDeviceCLIOptions) {
       const filter: any = {}
       
       if (vendorIndex !== -1 && args[vendorIndex + 1]) {
-        filter.usbVendorId = parseInt(args[vendorIndex + 1])
+        filter.usbVendorId = parseInt(args[vendorIndex + 1] || '')
       }
       if (productIndex !== -1 && args[productIndex + 1]) {
-        filter.usbProductId = parseInt(args[productIndex + 1])
+        filter.usbProductId = parseInt(args[productIndex + 1] || '')
       }
       
       try {

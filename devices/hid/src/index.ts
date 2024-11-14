@@ -1,3 +1,5 @@
+/// <reference types="w3c-web-hid" />
+
 import type { DeviceDriver, DeviceFile } from '@zenfs/core'
 import type { Kernel } from '@ecmaos/kernel/kernel'
 import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'

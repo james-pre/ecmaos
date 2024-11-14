@@ -8,6 +8,8 @@
  *
  */
 
+/// <reference types="../declarations/globalThis.d.ts" />
+
 import chalk from 'chalk'
 import figlet from 'figlet'
 import { Notyf } from 'notyf'
@@ -305,6 +307,7 @@ export class Kernel {
 
       // Log to /var/log/kernel.log
       this.log?.attachTransport((logObj) => {
+        if (!logObj._meta) return
         const formattedDate = new Date(logObj._meta.date).toLocaleString(this.memory.config.get('locale') as string || 'en-US', {
           year: 'numeric',
           month: '2-digit', 
@@ -318,7 +321,7 @@ export class Kernel {
 
         this.withRoot(() =>
           this.filesystem.fs.appendFile('/var/log/kernel.log',
-            `${formattedDate} [${logObj._meta.logLevelName}] ${logObj[0] || logObj.message}\n\n`
+            `${formattedDate} [${logObj._meta?.logLevelName}] ${logObj[0] || logObj.message}\n\n`
           )
         )
       })
@@ -407,7 +410,7 @@ export class Kernel {
         args: [],
         command: 'init',
         uid: user.uid,
-        gid: user.gid[0],
+        gid: user.gid?.[0] ?? 0,
         kernel: this,
         shell: this.shell,
         terminal: this.terminal,

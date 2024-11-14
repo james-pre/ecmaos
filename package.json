@@ -27,6 +27,7 @@
     "fix:repo": "sherif --fix",
     "lint": "turbo run lint",
     "lint:repo": "sherif",
+    "start:kernel": "turbo run start",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch"
   },

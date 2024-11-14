@@ -110,12 +110,12 @@ async function test(kernel: Kernel) {
   let offset = 0
   for (let i = 0; i < notes.length; i++) {
     const freq = notes[i]
-    const samples = Math.floor(sampleRate * durations[i])
+    const samples = Math.floor(sampleRate * (durations[i] || 0))
     
     // Generate note or rest
     for (let j = 0; j < samples; j++) {
       const t = j / sampleRate
-      const sample = freq === 0 ? 0 : Math.sin(2 * Math.PI * freq * t) * 0x7FFF
+      const sample = freq === 0 ? 0 : Math.sin(2 * Math.PI * (freq || 0) * t) * 0x7FFF
       audioView.setInt16(offset * 2, sample, true)
       offset++
     }

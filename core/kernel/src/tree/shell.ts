@@ -78,8 +78,8 @@ export class Shell {
   }
 
   async execute(line: string) {
-    const lineWithoutComments = line.split('#')[0].trim()
-    if (lineWithoutComments === '') return 0
+    const lineWithoutComments = line.split('#')[0]?.trim()
+    if (!lineWithoutComments || lineWithoutComments === '') return 0
 
     const commandGroups = lineWithoutComments.split(';').map(group => group.trim())
     let finalResult = 0
@@ -101,6 +101,8 @@ export class Shell {
         try {
           for (let i = 0; i < commands.length; i++) {
             const commandLine = commands[i]
+            if (!commandLine) continue
+
             const { command, redirections } = this.parseRedirection(commandLine)
             const [commandName, ...args] = shellQuote.parse(command, this.envObject) as string[]
             if (!commandName) return -1

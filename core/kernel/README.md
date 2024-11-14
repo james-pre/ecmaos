@@ -69,6 +69,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
   - Devices may also be directly read/written, and will behave accordingly
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
+- `Utils`
+  - Utilities used during development
 
 ## Command Examples
 

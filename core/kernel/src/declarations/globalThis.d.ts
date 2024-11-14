@@ -6,3 +6,5 @@ declare global {
     userAgentData: NavigatorUAData | null
   }
 }
+
+type Timer = ReturnType<typeof setInterval>

@@ -1,8 +1,12 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../utils/config-typescript/tsconfig.base.json",
   "include": ["src/**/*.ts"],
   "compilerOptions": {
     "baseUrl": "./",
+    "rootDir": "./src",
+    "types": [
+      "./src/declarations/globalThis.d.ts"
+    ],
 
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -15,7 +19,10 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "noEmit": true,
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationDir": "./dist",
 
     /* Linting */
     "strict": true,

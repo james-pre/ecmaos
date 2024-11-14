@@ -29,7 +29,7 @@ export const pkg = {
   description: 'Web Presentation API device driver'
 }
 
-// @ts-expect-error
+// @ts-ignore
 let activeRequest: PresentationRequest | null = null
 let activeConnection: PresentationConnection | null = null
 

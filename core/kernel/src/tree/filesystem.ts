@@ -184,6 +184,6 @@ export type FilesystemOptions<T extends ConfigMounts> = Configuration<T>
 
 export interface FileHeader {
   type: string
-  namespace: string
+  namespace?: string
   name?: string
 }

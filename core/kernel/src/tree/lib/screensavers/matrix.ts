@@ -31,6 +31,7 @@ export default async function ({ terminal }: { terminal: Terminal }) {
     for (const [x, y] of drops.entries()) {
       ctx.fillStyle = '#0f0'
       const char = chars[Math.floor(Math.random() * chars.length)]
+      if (!char) continue
       ctx.fillText(char, x * fontSize, y * fontSize)
       drops[x]++
       if (y * fontSize > canvas.height && Math.random() > 0.95) drops[x] = 0

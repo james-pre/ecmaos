@@ -1,3 +1,5 @@
+/// <reference types="w3c-web-usb" />
+
 import type { DeviceDriver, Ino } from '@zenfs/core'
 import { Kernel } from '@ecmaos/kernel/kernel'
 import type { KernelDeviceCLIOptions } from '@ecmaos/kernel/device'

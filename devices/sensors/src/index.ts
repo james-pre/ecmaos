@@ -1,3 +1,5 @@
+/// <reference types="w3c-generic-sensor" />
+
 import type { DeviceDriver } from '@zenfs/core'
 import type { Kernel } from '@ecmaos/kernel/kernel'
 import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'

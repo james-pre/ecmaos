@@ -139,7 +139,7 @@ export class Terminal extends XTerm {
     // Initialize broadcast streams
     const [stream1, stream2] = this._stdinStream.readable.tee()
     this._stdinBroadcast = [stream1, stream2]
-    this._stdin = this._stdinBroadcast[0]
+    this._stdin = this._stdinBroadcast[0] || new ReadableStream()
 
     // Create stdout stream that writes to the terminal
     this._stdout = new WritableStream({
@@ -365,7 +365,7 @@ export class Terminal extends XTerm {
     return this.ansi.style[this.options.theme?.promptColor || 'green'] + text
       .replace('{cwd}', this.cwd)
       .replace('{uid}', user?.uid.toString() || '')
-      .replace('{gid}', user?.gid[0].toString() || '')
+      .replace('{gid}', user?.gid?.[0]?.toString() || '')
       .replace('{user}', user?.username || '')
       + this.ansi.style.white
   }
@@ -557,7 +557,7 @@ export class Terminal extends XTerm {
         if (matches.length > 0) {
           this.write('\r' + ansi.erase.inLine())
           this._tabCompletionIndex = (this._tabCompletionIndex + 1) % matches.length
-          const newCmd = matches[this._tabCompletionIndex]
+          const newCmd = matches[this._tabCompletionIndex] || ''
           this._cmd = newCmd
           this._cursorPosition = newCmd.length
           const parts = newCmd.split('#')
@@ -619,9 +619,9 @@ export class Terminal extends XTerm {
 
   getInputStream(): ReadableStream<Uint8Array> {
     const { readable, writable } = new TransformStream()
-    const [newStream, extraStream] = this._stdinBroadcast[1].tee()
-    this._stdinBroadcast[1] = extraStream
-    newStream.pipeTo(writable).catch(() => {})
+    const [newStream, extraStream] = this._stdinBroadcast[1]?.tee() ?? []
+    if (extraStream) this._stdinBroadcast[1] = extraStream
+    newStream?.pipeTo(writable).catch(() => {})
     return readable
   }
 
@@ -647,6 +647,7 @@ export class Terminal extends XTerm {
   private getCompletionMatches(partial: string): string[] {
     const parts = partial.split(' ')
     const lastWord = parts[parts.length - 1]
+    if (!lastWord) return []
     
     const lastSlashIndex = lastWord.lastIndexOf('/')
     const searchDir = lastSlashIndex !== -1 ? 
@@ -658,11 +659,12 @@ export class Terminal extends XTerm {
 
     try {
       const entries = this._kernel.filesystem.fsSync.readdirSync(searchDir)
-      const matches = entries.filter((entry: string) => 
-        entry.toLowerCase().startsWith(searchTerm.toLowerCase())
-      )
+      const matches = entries.filter((entry: string) => {
+        if (!searchTerm) return true
+        return entry.toLowerCase().startsWith(searchTerm.toLowerCase())
+      })
 
-      const prefix = lastSlashIndex !== -1 ? lastWord.substring(0, lastSlashIndex + 1) : ''
+      const prefix = lastSlashIndex !== -1 ? (lastWord || '').substring(0, lastSlashIndex + 1) : ''
       return matches.map(match => {
         const fullPath = path.join(searchDir, match)
         const isDirectory = this._kernel.filesystem.fsSync.statSync(fullPath).isDirectory()
@@ -678,6 +680,10 @@ export class Terminal extends XTerm {
     }
   }
 }
+
+
+// --- Spinner ---
+type Timer = ReturnType<typeof setInterval>
 
 export class Spinner {
   terminal: Terminal

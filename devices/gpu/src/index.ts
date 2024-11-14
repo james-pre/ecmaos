@@ -1,3 +1,5 @@
+/// <reference types="@webgpu/types" />
+
 declare global {
   interface Navigator {
     readonly gpu: GPU;
@@ -91,7 +93,6 @@ async function test(kernel: Kernel) {
   const context = canvas.getContext('webgpu')
   if (!context) throw new Error('No context found')
   const format = navigator.gpu.getPreferredCanvasFormat()
-  // @ts-expect-error
   context.configure({ device, format })
 
   const vertexShaderCode = `
@@ -144,7 +145,6 @@ async function test(kernel: Kernel) {
   const commandEncoder = device.createCommandEncoder()
   const pass = commandEncoder.beginRenderPass({
     colorAttachments: [{
-      // @ts-expect-error
       view: context.getCurrentTexture().createView(),
       loadOp: 'clear',
       storeOp: 'store'
