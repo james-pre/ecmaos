@@ -1,7 +1,7 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "name": "ecmaOS",
-  "out": "./docs",
+  "out": "../../docs",
   "theme": "default-modern",
   "customCss": "./typedoc.css",
   "dmtFavicon": "./public/favicon.ico",
