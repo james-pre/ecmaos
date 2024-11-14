@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ecmaos/ecmaos#readme",
   "license": "MIT",
+  "packageManager": "npm@9.6.7",
   "private": true,
   "scripts": {
     "build": "npm run cp:readme && turbo run build",
