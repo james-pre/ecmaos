@@ -51,7 +51,6 @@ export default defineConfig({
       entry: {
         auth: './src/tree/auth.ts',
         components: './src/tree/components.ts',
-        container: './src/tree/container.ts',
         device: './src/tree/device.ts',
         dom: './src/tree/dom.ts',
         events: './src/tree/events.ts',
@@ -61,7 +60,6 @@ export default defineConfig({
         kernel: './src/tree/kernel.ts',
         log: './src/tree/log.ts',
         memory: './src/tree/memory.ts',
-        modules: './src/tree/modules.ts',
         processes: './src/tree/processes.ts',
         protocol: './src/tree/protocol.ts',
         service: './src/tree/service.ts',
@@ -70,6 +68,7 @@ export default defineConfig({
         terminal: './src/tree/terminal.ts',
         users: './src/tree/users.ts',
         wasm: './src/tree/wasm.ts',
+        windows: './src/tree/windows.ts',
         workers: './src/tree/workers.ts'
       }
     },
