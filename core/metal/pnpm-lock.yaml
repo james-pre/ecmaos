@@ -4,6 +4,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+pnpmfileChecksum: g5t73guyf72fmho4hxqmeb6yt4
+
 importers:
 
   .:
@@ -20,6 +22,9 @@ importers:
       hono:
         specifier: ^4.6.7
         version: 4.6.7
+      jose:
+        specifier: ^5.9.6
+        version: 5.9.6
       node-gyp:
         specifier: ^10.2.0
         version: 10.2.0
@@ -27,6 +32,9 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
     devDependencies:
+      '@ecmaos/config-typescript':
+        specifier: workspace:^
+        version: link:../../utils/config-typescript
       nodemon:
         specifier: ^3.1.7
         version: 3.1.7
@@ -277,6 +285,9 @@ packages:
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
+
+  jose@5.9.6:
+    resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
   jsbn@1.1.0:
     resolution: {integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==}
@@ -776,6 +787,8 @@ snapshots:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
+
+  jose@5.9.6: {}
 
   jsbn@1.1.0: {}
 

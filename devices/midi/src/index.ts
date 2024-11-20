@@ -1,6 +1,5 @@
 import type { DeviceDriver } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions } from '@ecmaos/kernel/device'
+import type { Kernel, KernelDeviceCLIOptions } from '@ecmaos/types'
 
 export const pkg = {
   name: 'midi',

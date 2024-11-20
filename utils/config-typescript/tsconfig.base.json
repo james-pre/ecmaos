@@ -1,7 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "types": ["node", "vite/client"],
+    "types": ["node"],
+    "outDir": "dist",
+    "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
@@ -15,6 +17,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2022"
+    "target": "ES2022",
   }
 }

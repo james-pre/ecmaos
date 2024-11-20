@@ -1,8 +1,8 @@
 import path from 'path'
 import shellQuote from 'shell-quote'
 import { credentials, Credentials } from '@zenfs/core'
-import type { Kernel } from '#kernel.ts'
-import type { Terminal } from '#terminal.ts'
+
+import type { Kernel, ShellOptions, Terminal } from '@ecmaos/types'
 
 const DefaultShellPath = '/bin:/usr/bin:/usr/local/bin'
 const DefaultShellOptions = {
@@ -235,15 +235,4 @@ export class Shell {
     this.clearPositionalParameters()
     for (const [index, arg] of args.entries()) this.env.set(`${index}`, arg)
   }
-}
-
-// --- Types ---
-
-export interface ShellOptions {
-  cwd?: string
-  env?: Record<string, string>
-  kernel: Kernel
-  terminal?: Terminal
-  uid: number
-  gid: number
 }

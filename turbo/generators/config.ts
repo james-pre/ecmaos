@@ -21,6 +21,11 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
         path: '{{ turbo.paths.root }}/devices/{{ dashCase name }}/src/index.ts',
         templateFile: 'templates/device/src/index.ts.hbs',
       },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/devices/{{ dashCase name }}/tsconfig.json',
+        templateFile: 'templates/device/tsconfig.json.hbs',
+      },
     ],
   })
 }

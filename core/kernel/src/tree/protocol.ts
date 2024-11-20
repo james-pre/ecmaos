@@ -1,4 +1,4 @@
-import { Kernel } from '#kernel.ts'
+import type { Kernel, ProtocolOptions } from '@ecmaos/types'
 
 export class Protocol {
   private _kernel: Kernel
@@ -17,11 +17,4 @@ export class Protocol {
   open(uri: string) {
     this.kernel.terminal.writeln(`Opening ${uri}`)
   }
-}
-
-// --- Types ---
-
-export interface ProtocolOptions {
-  kernel: Kernel
-  schema?: string
 }

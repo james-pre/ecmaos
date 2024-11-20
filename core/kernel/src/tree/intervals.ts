@@ -1,3 +1,5 @@
+import type { IntervalMap } from '@ecmaos/types'
+
 export class Intervals {
   private _intervals: IntervalMap = new Map()
 
@@ -19,7 +21,3 @@ export class Intervals {
     }
   }
 }
-
-// --- Types ---
-
-export type IntervalMap = Map<string, ReturnType<typeof setInterval>>

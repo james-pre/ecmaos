@@ -17,9 +17,9 @@ export const DefaultI18nOptions: InitOptions = {
 export class I18n {
   private _i18next: typeof i18next
 
-  get i18next() { return this._i18next }
+  get i18next() { return this._i18next as typeof i18next }
   get language() { return this._i18next.language }
-  get t() { return this._i18next.t }
+  get t() { return this._i18next.t as typeof i18next.t }
 
   constructor(_options?: InitOptions) {
     const options = { ...DefaultI18nOptions, ..._options }

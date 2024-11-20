@@ -1,16 +1,12 @@
-import type { Kernel } from '#kernel.ts'
+import type { Workers as IWorkers } from '@ecmaos/types'
 
-export class Workers {
-  private _kernel: Kernel
+export class Workers implements IWorkers {
   private _workers: {
     dedicated: Worker[]
     shared: SharedWorker[]
   }
 
-  get kernel() { return this._kernel }
-
-  constructor(options: WorkersOptions) {
-    this._kernel = options.kernel
+  constructor() {
     this._workers = {
       dedicated: [],
       shared: []
@@ -30,8 +26,4 @@ export class Workers {
     this._workers.shared.push(worker)
     return worker
   }
-}
-
-export interface WorkersOptions {
-  kernel: Kernel
 }

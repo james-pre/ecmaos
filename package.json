@@ -8,33 +8,27 @@
     "prettier": "^3.2.5",
     "sherif": "^1.0.1",
     "turbo": "^2.2.3",
-    "typescript": "^5.5.3"
+    "typescript": "^5.6.3"
   },
   "bugs": "https://github.com/ecmaos/ecmaos/issues",
   "description": "ecmaOS: Micro-kernel and framework for web technologies",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "homepage": "https://github.com/ecmaos/ecmaos#readme",
   "license": "MIT",
-  "packageManager": "npm@9.6.7",
+  "packageManager": "pnpm@9.13.2",
   "private": true,
   "scripts": {
-    "build": "npm run cp:readme && turbo run build",
+    "build": "turbo run build",
     "cp:readme": "cp README.md core/kernel/README.md",
-    "dev": "turbo run dev",
     "fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "fix:repo": "sherif --fix",
     "lint": "turbo run lint",
     "lint:repo": "sherif",
-    "start:kernel": "turbo run start",
+    "preinstall": "npx only-allow pnpm",
+    "start": "turbo run dev --filter=@ecmaos/kernel",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch"
-  },
-  "workspaces": [
-    "apps/*",
-    "core/*",
-    "devices/*",
-    "utils/*"
-  ]
+  }
 }

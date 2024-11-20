@@ -1,8 +1,10 @@
+import type { Components as IComponents, ComponentListener } from '@ecmaos/types'
+
 /**
  * The Components (plural) class provides a registry for custom elements (Web Components) within the kernel.
  * 
  */
-export class Components {
+export class Components implements IComponents {
   private _components: Map<string, CustomElementConstructor> = new Map()
 
   get components() { return this._components }
@@ -71,5 +73,3 @@ export class Component extends HTMLElement {
     for (const listener of this._listeners.get('disconnected') || []) listener(this)
   }
 }
-
-export type ComponentListener = (...args: unknown[]) => void

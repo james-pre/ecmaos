@@ -2,6 +2,10 @@
   "name": "@ecmaos/config-typescript",
   "version": "0.1.0",
   "license": "MIT",
+  "main": "./tsconfig.base.json",
+  "files": [
+    "tsconfig.base.json"
+  ],
   "publishConfig": {
     "access": "public"
   }

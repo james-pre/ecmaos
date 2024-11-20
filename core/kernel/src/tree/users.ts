@@ -1,4 +1,8 @@
-import { Kernel } from '#kernel.ts'
+import type {
+  AddUserOptions,
+  User,
+  UsersOptions
+} from '@ecmaos/types'
 
 export class Users {
   private _options: UsersOptions
@@ -104,7 +108,7 @@ export class Users {
       if (line.trim() === '' || line.trim() === '\n' || line.startsWith('#')) continue
       const [username, uid, gid, home, shell] = line.split(':')
       if (!username || !uid || !gid || !home || !shell) continue
-      const shadowEntry = shadow.split('\n').find(l => l.startsWith(username + ':'))
+      const shadowEntry = shadow.split('\n').find((l: string) => l.startsWith(username + ':'))
 
       if (shadowEntry) {
         const [,,, password, publicKey, encryptedPrivateKey] = shadowEntry.split(':')
@@ -177,29 +181,4 @@ export class Users {
       throw new Error(`User with UID ${uid} not found`);
     }
   }
-}
-
-// --- Types ---
-
-export interface UsersOptions {
-  kernel: Kernel
-}
-
-export interface User {
-  home: string
-  gid: number[]
-  username: string
-  shell: string
-  password: string
-  uid: number
-  keypair?: {
-    privateKey?: JsonWebKey | string
-    publicKey: JsonWebKey
-  }
-}
-
-export interface AddUserOptions {
-  noHash?: boolean
-  noHome?: boolean
-  noWrite?: boolean
 }

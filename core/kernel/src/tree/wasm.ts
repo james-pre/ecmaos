@@ -1,4 +1,4 @@
-import { Kernel } from '#kernel.ts'
+import type { Kernel, WasmOptions, Wasm as IWasm } from '@ecmaos/types'
 
 // TODO: I don't like how heavy wabt.js is, but I want to keep experimenting with it - move WASM support to a separate package
 // import wabt, { WasmFeatures, WasmModule, ReadWasmOptions } from 'wabt'
@@ -10,12 +10,9 @@ import { Kernel } from '#kernel.ts'
 //   readWasm(buffer: Uint8Array, options: ReadWasmOptions & WasmFeatures): WasmModule;
 // }
 
-export class Wasm {
+export class Wasm implements IWasm {
   private _kernel: Kernel
   // private _wabt?: WabtModule
-
-  get kernel() { return this._kernel }
-  // get wabt() { return this._wabt }
 
   constructor(options: WasmOptions) {
     this._kernel = options.kernel
@@ -26,15 +23,9 @@ export class Wasm {
    * Load an emscripten JS file compiled using -sSINGLE_FILE
    */
   async loadEmscripten(path: string) {
-    const contents = await this.kernel.filesystem.fs.readFile(path, 'utf-8')
+    const contents = await this._kernel.filesystem.fs.readFile(path, 'utf-8')
     const script = document.createElement('script')
     script.textContent = contents
     document.head.appendChild(script)
   }
-}
-
-// --- Types ---
-
-export interface WasmOptions {
-  kernel: Kernel
 }

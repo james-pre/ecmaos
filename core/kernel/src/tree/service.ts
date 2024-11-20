@@ -1,5 +1,5 @@
 import path from 'path'
-import { Kernel } from '#kernel.ts'
+import type { Kernel, ServiceOptions } from '@ecmaos/types'
 
 declare global {
   interface BackgroundFetchManager {
@@ -141,12 +141,4 @@ export class Service {
     if ('serviceWorker' in navigator) await this.registration?.update()
     else throw new Error('Service Worker API not supported in this browser.')
   }
-}
-
-// --- Types ---
-
-export interface ServiceOptions {
-  kernel?: Kernel
-  path?: string
-  register?: boolean
 }

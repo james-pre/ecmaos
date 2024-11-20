@@ -1,10 +1,12 @@
 import { ILogObj, Logger } from 'tslog'
 
+import type { Log as ILog, LogOptions } from '@ecmaos/types'
+
 export const DefaultLogOptions: LogOptions = {
   type: 'pretty'
 }
 
-export class Log extends Logger<ILogObj> {
+export class Log extends Logger<ILogObj> implements ILog {
   private _name: string
 
   get name() { return this._name }
@@ -60,12 +62,4 @@ export class Log extends Logger<ILogObj> {
     }
     /* v8 ignore end */
   }
-}
-
-// --- Types ---
-
-export interface LogOptions {
-  name?: string
-  silent?: boolean
-  type?: 'hidden' | 'json' | 'pretty'
 }

@@ -1,8 +1,8 @@
 /// <reference types="w3c-generic-sensor" />
 
+import ansi from 'ansi-escape-sequences'
 import type { DeviceDriver } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 export const pkg = {
   name: 'sensors',
@@ -15,7 +15,6 @@ type SensorType = 'accelerometer' | 'gyroscope' | 'linear' | 'orientation'
 
 export async function cli(options: KernelDeviceCLIOptions) {
   const { args, terminal } = options
-  const { ansi } = terminal
 
   const usage = `
 Usage: /dev/sensors <command>
@@ -287,7 +286,6 @@ async function createSensor(sensorType: SensorType) {
 }
 
 function displaySensorData(sensor: any, sensorType: SensorType, terminal: any) {
-  const { ansi } = terminal
   const timestamp = new Date().toISOString()
 
   switch (sensorType) {

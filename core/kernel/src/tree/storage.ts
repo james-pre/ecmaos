@@ -1,4 +1,4 @@
-import { Kernel } from '#kernel.ts'
+import type { Kernel, StorageOptions } from '@ecmaos/types'
 
 export class Storage {
   private _db: IDBDatabase | null = null
@@ -48,15 +48,5 @@ export class Storage {
         this._kernel.log?.silly(`IndexedDB schema ${event.newVersion === 1 ? 'created' : 'updated to version ${event.newVersion}'}`)
       }
     }
-  }
-}
-
-// --- Types ---
-
-export interface StorageOptions {
-  kernel: Kernel
-  indexed?: {
-    name: string
-    version: number
   }
 }

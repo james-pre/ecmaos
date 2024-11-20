@@ -1,6 +1,10 @@
-import type { DeviceDriver, DeviceFile, Ino } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+interface GeoCoordinates extends GeolocationCoordinates {
+  toJSON: () => string
+}
+
+import ansi from 'ansi-escape-sequences'
+import type { DeviceDriver, DeviceFile } from '@zenfs/core'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 export const pkg = {
   name: 'geo',
@@ -10,7 +14,6 @@ export const pkg = {
 
 export async function cli(options: KernelDeviceCLIOptions) {
   const { args, terminal } = options
-  const { ansi } = terminal
 
   const usage = `
 Usage: /dev/geo <command>
@@ -87,7 +90,7 @@ export async function getDrivers(kernel: Kernel): Promise<DeviceDriver<KernelDev
   const drivers: DeviceDriver<KernelDeviceData>[] = []
 
   if ('geolocation' in navigator) {
-    let lastPosition: GeolocationCoordinates = {
+    let lastPosition: GeoCoordinates = {
       latitude: 0,
       longitude: 0,
       accuracy: 0,
@@ -95,12 +98,14 @@ export async function getDrivers(kernel: Kernel): Promise<DeviceDriver<KernelDev
       altitudeAccuracy: null,
       heading: null,
       speed: null,
-      toJSON: () => JSON.stringify({
-        latitude: lastPosition.latitude,
-        longitude: lastPosition.longitude,
-        accuracy: lastPosition.accuracy,
-        altitude: lastPosition.altitude
-      })
+      toJSON: function() {
+        return JSON.stringify({
+          latitude: this.latitude,
+          longitude: this.longitude,
+          accuracy: this.accuracy,
+          altitude: this.altitude
+        })
+      }
     }
 
     // Only start watching if permission is already granted
@@ -108,7 +113,17 @@ export async function getDrivers(kernel: Kernel): Promise<DeviceDriver<KernelDev
     if (permission.state === 'granted') {
       navigator.geolocation.watchPosition(
         (position) => {
-          lastPosition = position.coords
+          lastPosition = {
+            ...position.coords,
+            toJSON: function() {
+              return JSON.stringify({
+                latitude: this.latitude,
+                longitude: this.longitude,
+                accuracy: this.accuracy,
+                altitude: this.altitude
+              })
+            }
+          }
         },
         (error) => {
           console.warn('Geolocation error:', error)
@@ -118,11 +133,10 @@ export async function getDrivers(kernel: Kernel): Promise<DeviceDriver<KernelDev
 
     drivers.push({
       name: 'geo',
-      init: (ino: Ino) => ({
+      init: () => ({
         major: 10,
         minor: 101,
         data: {
-          ino,
           kernelId: kernel.id,
           version: pkg.version
         }

@@ -18,6 +18,8 @@
  *
  */
 
+import type { Address, Config, Collection, Heap, Stack, StackFrame } from '@ecmaos/types'
+
 export class Memory {
   config: Config
   collection: Collection
@@ -126,12 +128,3 @@ export class Memory {
     return -1
   }
 }
-
-// --- Types ---
-
-export type Address = number
-export type Collection<T = unknown> = Set<T>
-export type Config<T = unknown> = Map<string, T>
-export type Heap<T = Uint8Array> = Map<Address, T>
-export type Stack<T = unknown> = Array<StackFrame<T>>
-export type StackFrame<T = unknown> = Record<string, T>

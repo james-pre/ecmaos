@@ -1,4 +1,6 @@
-export class Events {
+import type { Events as IEvents, EventCallback } from '@ecmaos/types'
+
+export class Events implements IEvents {
   private _callbacks: Map<string, EventCallback[]> = new Map()
   private _listeners: Map<string, EventListener> = new Map()
 
@@ -53,7 +55,3 @@ export class Events {
     this.off(event, callback)
   }
 }
-
-// --- Types ---
-
-export type EventCallback<T = unknown> = (data: T) => void

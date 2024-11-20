@@ -6,34 +6,41 @@ import { TFunction } from 'i18next'
 import { configure, fs, InMemory, DeviceFS, credentials } from '@zenfs/core'
 import { WebStorage } from '@zenfs/dom'
 
-import type { Configuration, ConfigMounts } from '@zenfs/core'
+import type { ConfigMounts } from '@zenfs/core'
 
-export const DefaultFilesystemOptionsTest: FilesystemOptions<ConfigMounts> = {
+import type {
+  FilesystemConfigMounts,
+  FilesystemOptions
+} from '@ecmaos/types'
+
+export const DefaultFilesystemOptionsTest: FilesystemOptions<FilesystemConfigMounts> = {
   uid: 0,
   gid: 0,
   addDevices: false,
   cacheStats: false,
+  cachePaths: false,
   disableAccessChecks: false,
   disableUpdateOnRead: false,
   onlySyncOnClose: false,
   mounts: {
     '/bin': { backend: InMemory, name: 'bin' },
-    '/etc': { backend: InMemory, name: 'etc' },
-    '/home': { backend: InMemory, name: 'home' },
-    '/lib': { backend: InMemory, name: 'lib' },
-    '/media': { backend: InMemory, name: 'media' },
-    '/mnt': { backend: InMemory, name: 'mnt' },
-    '/opt': { backend: InMemory, name: 'opt' },
-    '/proc': { backend: InMemory, name: 'proc' },
-    '/root': { backend: InMemory, name: 'root' },
-    '/tmp': { backend: InMemory, name: 'tmp' }
+    // '/etc': ({ backend: InMemory, name: 'etc' }),
+    // '/home': ({ backend: InMemory, name: 'home' }),
+    // '/lib': ({ backend: InMemory, name: 'lib' }),
+    // '/media': ({ backend: InMemory, name: 'media' }),
+    // '/mnt': ({ backend: InMemory, name: 'mnt' }),
+    // '/opt': ({ backend: InMemory, name: 'opt' }),
+    // '/proc': ({ backend: InMemory, name: 'proc' }),
+    // '/root': ({ backend: InMemory, name: 'root' }),
+    // '/tmp': ({ backend: InMemory, name: 'tmp' })
   }
 }
 
-export const DefaultFilesystemOptions: FilesystemOptions<ConfigMounts> = {
+export const DefaultFilesystemOptions: FilesystemOptions<FilesystemConfigMounts> = {
   uid: 0,
   gid: 0,
   addDevices: true,
+  cachePaths: false,
   cacheStats: false,
   disableAccessChecks: false,
   disableUpdateOnRead: false,
@@ -175,15 +182,4 @@ export class Filesystem {
       ['.wat', t('WebAssembly Text Format')]
     ])
   }
-}
-
-// --- Types ---
-
-export type Path = string
-export type FilesystemOptions<T extends ConfigMounts> = Configuration<T>
-
-export interface FileHeader {
-  type: string
-  namespace?: string
-  name?: string
 }

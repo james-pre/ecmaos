@@ -1,8 +1,7 @@
 /// <reference types="@types/web-bluetooth" />
 
 import type { DeviceDriver } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 export const pkg = {
   name: 'bluetooth',
@@ -35,6 +34,8 @@ export async function cli(options: KernelDeviceCLIOptions) {
         `
       })
 
+      // TODO: Proper fix
+      // @ts-expect-error
       win.dom.querySelector('.request-permission-bluetooth').addEventListener('click', async () => {
         try {
           await navigator.bluetooth.requestDevice({ acceptAllDevices: true })
@@ -57,11 +58,15 @@ export async function cli(options: KernelDeviceCLIOptions) {
             `
           })
 
+          // TODO: Proper fix
+          // @ts-expect-error
           dialog.dom.querySelector('.request-permission-bluetooth-error-close').addEventListener('click', () => dialog.close())
           resolve(false)
         }
       })
 
+      // TODO: Proper fix
+      // @ts-expect-error
       win.dom.querySelector('.request-permission-bluetooth-cancel').addEventListener('click', () => {
         win.close()
         resolve(false)

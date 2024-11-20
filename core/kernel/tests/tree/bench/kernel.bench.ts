@@ -18,6 +18,6 @@ describe('Kernel', () => {
   // })
 
   bench('Execute command', async () => {
-    await kernel.execute('/bin/about')
+    await kernel.execute({ command: '/bin/echo', shell: kernel.shell })
   })
 })

@@ -6,7 +6,7 @@ import spinners from 'cli-spinners'
 // import * as textCanvas from '@thi.ng/text-canvas'
 // import * as textFormat from '@thi.ng/text-format'
 import * as emoji from '@thi.ng/emoji'
-import { IDisposable, Terminal as XTerm } from '@xterm/xterm'
+import { IDisposable, ITerminalAddon, Terminal as XTerm } from '@xterm/xterm'
 import { AttachAddon } from '@xterm/addon-attach'
 import { FitAddon } from '@xterm/addon-fit'
 import { ImageAddon } from '@xterm/addon-image'
@@ -16,14 +16,32 @@ import { WebLinksAddon } from '@xterm/addon-web-links'
 import { credentials } from '@zenfs/core'
 
 import '@xterm/xterm/css/xterm.css'
-import { Events } from '#events.ts'
-import { Kernel } from '#kernel.ts'
 import { TerminalCommand, TerminalCommands } from '#lib/commands/index.js' // TODO: new approach
-import type { Shell } from '#shell.ts'
 
-declare global {
-  var kernel: Kernel | undefined // eslint-disable-line no-var
-}
+import { Events } from '#events.ts'
+
+import { TerminalEvents } from '@ecmaos/types'
+
+import type {
+  Kernel,
+  Shell,
+  Terminal as ITerminal,
+  TerminalOptions,
+  TerminalResizeEvent,
+  TerminalMessageEvent,
+  TerminalAttachEvent,
+  TerminalCreatedEvent,
+  TerminalMountEvent,
+  TerminalListenEvent,
+  TerminalUnlistenEvent,
+  TerminalKeyEvent,
+  TerminalInputEvent,
+  TerminalInterruptEvent,
+  TerminalExecuteEvent,
+  TerminalWriteEvent,
+  TerminalWritelnEvent,
+  TerminalPasteEvent
+} from '@ecmaos/types'
 
 export enum CommandPath {
   KERNEL = 'kernel'
@@ -82,7 +100,7 @@ export const DefaultTerminalOptions: TerminalOptions = {
   }
 }
 
-export class Terminal extends XTerm {
+export class Terminal extends XTerm implements ITerminal {
   private _addons: TerminalOptions['addons'] = new Map()
   private _ansi: typeof ansi = ansi
   private _cmd: string = ''
@@ -109,11 +127,11 @@ export class Terminal extends XTerm {
   private _lastTabCommand: string = ''
   private _isTabCycling: boolean = false
 
-  get addons() { return this._addons }
+  get addons() { return this._addons as Map<string, ITerminalAddon> }
+  get ansi() { return this._ansi }
   get commands() { return this._commands }
   get cmd() { return this._cmd }
   get cwd() { return this._shell.cwd }
-  get ansi() { return this._ansi }
   get emojis() { return emoji }
   get events() { return this._events }
   get socket() { return this._socket }
@@ -665,7 +683,7 @@ export class Terminal extends XTerm {
       })
 
       const prefix = lastSlashIndex !== -1 ? (lastWord || '').substring(0, lastSlashIndex + 1) : ''
-      return matches.map(match => {
+      return matches.map((match: string) => {
         const fullPath = path.join(searchDir, match)
         const isDirectory = this._kernel.filesystem.fsSync.statSync(fullPath).isDirectory()
         const escapedMatch = match.includes(' ') ? match.replace(/ /g, '\\ ') : match
@@ -734,100 +752,4 @@ export class Spinner {
     clearInterval(this.loop)
     this.terminal.write(ansi.cursor.show)
   }
-}
-
-// --- Types ---
-
-import type { ITerminalAddon, ITerminalOptions } from '@xterm/xterm'
-
-export interface TerminalOptions extends ITerminalOptions {
-  addons?: Map<string, ITerminalAddon>
-  kernel?: Kernel
-  shell?: Shell
-  socket?: WebSocket,
-  theme?: {
-    background?: string
-    foreground?: string
-    promptColor?: string
-  }
-}
-
-export enum TerminalEvents {
-  ATTACH = 'terminal:attach',
-  CREATED = 'terminal:created',
-  EXECUTE = 'terminal:execute',
-  INPUT = 'terminal:input',
-  INTERRUPT = 'terminal:interrupt',
-  KEY = 'terminal:key',
-  LISTEN = 'terminal:listen',
-  MESSAGE = 'terminal:message',
-  MOUNT = 'terminal:mount',
-  PASTE = 'terminal:paste',
-  RESIZE = 'terminal:resize',
-  UNLISTEN = 'terminal:unlisten',
-  WRITE = 'terminal:write',
-  WRITELN = 'terminal:writeln'
-}
-
-export interface TerminalAttachEvent {
-  terminal: Terminal
-  socket: WebSocket
-}
-
-export interface TerminalCreatedEvent {
-  terminal: Terminal
-}
-
-export interface TerminalExecuteEvent {
-  terminal: Terminal
-  command: string
-}
-
-export interface TerminalInputEvent {
-  terminal: Terminal
-  data: string
-}
-
-export interface TerminalInterruptEvent {
-  terminal: Terminal
-}
-
-export interface TerminalKeyEvent {
-  key: string
-  domEvent: KeyboardEvent
-}
-
-export interface TerminalListenEvent {
-  terminal: Terminal
-}
-
-export interface TerminalMessageEvent {
-  terminal: Terminal
-  message: MessageEvent
-}
-
-export interface TerminalMountEvent {
-  terminal: Terminal
-  element: HTMLElement
-}
-
-export interface TerminalPasteEvent {
-  text: string
-}
-
-export interface TerminalResizeEvent {
-  cols: number
-  rows: number
-}
-
-export interface TerminalUnlistenEvent {
-  terminal: Terminal
-}
-
-export interface TerminalWriteEvent {
-  text: string
-}
-
-export interface TerminalWritelnEvent {
-  text: string
 }

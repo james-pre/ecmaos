@@ -1,6 +1,5 @@
 import type { DeviceDriver, DeviceFile } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 interface AudioDeviceData extends KernelDeviceData {
   context?: AudioContext

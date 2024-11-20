@@ -3,6 +3,8 @@ import 'winbox/dist/css/winbox.min.css'
 // @ts-expect-error
 import WinBox from 'winbox/src/js/winbox.js'
 
+import type { WindowId, Windows as IWindows } from '@ecmaos/types'
+
 declare const WinBox: WinBox.WinBoxConstructor;
 
 declare module 'winbox' {
@@ -29,7 +31,7 @@ const DefaultDialogOptions: WinBox.Params = {
   height: 200,
 }
 
-export class Windows {
+export class Windows implements IWindows {
   private _manager: Map<WindowId, WinBox> = new Map()
   get stack() { return WinBox.stack() }
 
@@ -42,7 +44,7 @@ export class Windows {
     this.remove(id)
   }
   
-  create(_options: WinBox.Params = DefaultWindowOptions) {
+  create(_options: WinBox.Params = DefaultWindowOptions): WinBox {
     const options = { ...DefaultWindowOptions, ..._options }
     const id = options.id || Math.random().toString(36).substring(2, 8)
     const win = new WinBox(options)
@@ -61,17 +63,4 @@ export class Windows {
   remove(id: WindowId) {
     this._manager.delete(id)
   }
-}
-
-// --- Types ---
-
-export type WindowId = string | number
-
-export interface WindowOptions {
-  id?: WindowId
-  html?: string
-  width?: number
-  height?: number
-  maximized?: boolean
-  title?: string
 }

@@ -27,14 +27,19 @@ import { credentials, Fetch, InMemory, resolveMountConfig, Stats } from '@zenfs/
 import { IndexedDB } from '@zenfs/dom'
 import { Zip } from '@zenfs/zip'
 
-import type { Kernel } from '#kernel.ts'
-import type { Process } from '#processes.ts'
-import type { Shell } from '#shell.ts'
-import type { Terminal } from '#terminal.ts'
-import type { User } from '#users.ts'
+import {
+  KernelEvents,
+  TerminalCommand as ITerminalCommand,
+  TerminalEvents
+} from '@ecmaos/types'
 
-import { KernelEvents } from '#kernel.ts'
-import { TerminalEvents } from '#terminal.ts'
+import type {
+  Kernel,
+  Process,
+  Shell,
+  Terminal,
+  User
+} from '@ecmaos/types'
 
 /**
  * The arguments passed to a command.
@@ -53,7 +58,7 @@ export interface CommandArgs {
 /**
  * The TerminalCommand class sets up a common interface for builtin terminal commands
  */
-export class TerminalCommand {
+export class TerminalCommand implements ITerminalCommand {
   command: string = ''
   description: string = ''
   kernel: Kernel
@@ -856,7 +861,7 @@ export const edit = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   const renderScreen = () => {
     terminal.write(ansi.erase.display(2) + ansi.cursor.position(0, 0))
     const visibleLines = lines.slice(startLine, startLine + terminal.rows - 1)
-    visibleLines.forEach(line => terminal.writeln(line))
+    visibleLines.forEach((line: string) => terminal.writeln(line))
 
     let modeColor = chalk.gray
     switch (mode) {
@@ -1328,7 +1333,7 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   const target = (args as string[])[0]
   const fullPath = target ? path.resolve(shell.cwd, target === '' ? '.' : target) : shell.cwd
   const stats = await kernel.filesystem.fs.stat(fullPath)
-  const entries = stats.isDirectory() ? await kernel.filesystem.fs.readdir(fullPath) : [fullPath]
+  const entries: string[] = stats.isDirectory() ? await kernel.filesystem.fs.readdir(fullPath) : [fullPath]
   const descriptions = kernel.filesystem.descriptions(kernel.i18n.t)
 
   const getModeType = (stats: Stats) => {
@@ -1372,7 +1377,7 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     else return chalk.gray(`${owner?.username || stats.uid}:${owner?.username || stats.gid}`)
   }
 
-  const mounts = Array.from(kernel.filesystem.fsSync.mounts.entries())
+  const mounts = Array.from(kernel.filesystem.fsSync.mounts.entries() as [string, FileSystem][])
     .filter(([target]) => path.dirname(target) === fullPath && target !== '/')
 
   const files = entries
@@ -1428,7 +1433,6 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
           const ext = file.name.split('.').pop()
           if (ext && descriptions.has('.' + ext)) return descriptions.get('.' + ext)
           if (file.stats.isBlockDevice() || file.stats.isCharacterDevice()) {
-            // @ts-expect-error devices is private, but we can access it here
             const device = kernel.filesystem.devfs.devices.get(`/${file.name}`)
             const kdevice = kernel.devices.get(file.name)
             const description = kdevice?.device.pkg?.description || ''
@@ -1472,7 +1476,7 @@ export const mount = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     terminal.writeln(chalk.red('Usage: mount -t <type> <source> <target>'))
 
     // @ts-expect-error store does not exist on FileSystem (but we can access it here)
-    const currentMounts = Array.from(kernel.filesystem.fsSync.mounts.entries()).map(([target, mount]) => `${chalk.blue(target)} (${mount.store?.constructor.name || mount.constructor.name}/${mount.metadata().name})`)
+    const currentMounts: string[] = Array.from(kernel.filesystem.fsSync.mounts.entries()).map(([target, mount]) => `${chalk.blue(target)} (${mount.store?.constructor.name || mount.constructor.name}/${mount.metadata().name})`)
     const maxTargetLength = Math.max(...currentMounts.map(mount => mount.split(' ')[0]?.length ?? 0))
     for (const mount of currentMounts) {
       const [target, name] = mount.split(' ')
@@ -2063,8 +2067,8 @@ export const user = async ({ kernel, shell, terminal, args }: CommandArgs) => {
 
       try {
         await kernel.users.remove(user.uid)
-        await kernel.filesystem.fs.writeFile('/etc/passwd', (await kernel.filesystem.fs.readFile('/etc/passwd', 'utf8')).split('\n').filter(line => !line.startsWith(`${username}:`)).join('\n'))
-        await kernel.filesystem.fs.writeFile('/etc/shadow', (await kernel.filesystem.fs.readFile('/etc/shadow', 'utf8')).split('\n').filter(line => !line.startsWith(`${username}:`)).join('\n'))
+        await kernel.filesystem.fs.writeFile('/etc/passwd', (await kernel.filesystem.fs.readFile('/etc/passwd', 'utf8')).split('\n').filter((line: string) => !line.startsWith(`${username}:`)).join('\n'))
+        await kernel.filesystem.fs.writeFile('/etc/shadow', (await kernel.filesystem.fs.readFile('/etc/shadow', 'utf8')).split('\n').filter((line: string) => !line.startsWith(`${username}:`)).join('\n'))
         terminal.writeln(chalk.green(`User ${username} deleted successfully`))
         return 0
       } catch (error) {

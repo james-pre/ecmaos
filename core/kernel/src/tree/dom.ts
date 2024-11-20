@@ -1,3 +1,5 @@
+import type { DomOptions } from '@ecmaos/types'
+
 export const DefaultDomOptions: DomOptions = { topbar: true }
 
 export class Dom {
@@ -18,13 +20,8 @@ export class Dom {
     if (!this._topbar) return
     const { default: topbar } = await import('topbar')
     this._topbarShow = show ?? !this._topbarShow
+    // @ts-ignore
     if (this._topbarShow) topbar.show()
     else topbar.hide()
   }
-}
-
-// --- Types ---
-
-export interface DomOptions {
-  topbar?: boolean
 }

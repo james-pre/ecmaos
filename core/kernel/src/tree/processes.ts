@@ -1,8 +1,20 @@
 import { Events } from '#events.ts'
-import { Kernel } from '#kernel.ts'
 
-import type { Shell } from '#shell.ts'
-import type { Terminal } from '#terminal.ts'
+import { ProcessEvents, ProcessStatus } from '@ecmaos/types'
+import type {
+  Kernel,
+  Shell,
+  Terminal,
+  Process as IProcess,
+  ProcessEntryParams,
+  ProcessOptions,
+  ProcessesMap,
+  ProcessExitEvent,
+  ProcessPauseEvent,
+  ProcessResumeEvent,
+  ProcessStartEvent,
+  ProcessStopEvent
+} from '@ecmaos/types'
 
 export class ProcessManager {
   private _processes: ProcessesMap = new Map()
@@ -32,7 +44,7 @@ export class ProcessManager {
   }
 }
 
-export class Process {
+export class Process implements IProcess {
   private _args: string[]
   private _code?: number
   private _command: string
@@ -150,74 +162,4 @@ export class Process {
     this.stop()
     this.start()
   }
-}
-
-// --- Types ---
-
-export type ProcessesMap = Map<number, Process>
-export type ProcessStatus = 'running' | 'paused' | 'stopped' | 'exited'
-
-export interface ProcessOptions {
-  uid: number
-  gid: number
-
-  args?: string[]
-  code?: number
-  command?: string
-  cwd?: string
-  entry?: (params: ProcessEntryParams) => Promise<number | void>
-  kernel?: Kernel
-  parent?: number
-  shell?: Shell
-  status?: ProcessStatus
-  stderr?: WritableStream<Uint8Array>
-  stdin?: ReadableStream<Uint8Array>
-  stdout?: WritableStream<Uint8Array>
-  terminal?: Terminal
-}
-
-export interface ProcessEntryParams {
-  pid: number
-  uid: number
-  gid: number
-
-  args: string[]
-  command: string
-  cwd: string
-  instance: Process
-  kernel: Kernel
-  shell: Shell
-  terminal: Terminal
-  stdin?: ReadableStream<Uint8Array>
-  stdout?: WritableStream<Uint8Array>
-  stderr?: WritableStream<Uint8Array>
-}
-
-export enum ProcessEvents {
-  EXIT = 'exit',
-  PAUSE = 'pause',
-  RESUME = 'resume',
-  START = 'start',
-  STOP = 'stop'
-}
-
-export interface ProcessExitEvent {
-  pid: number
-  code: number
-}
-
-export interface ProcessStartEvent {
-  pid: number
-}
-
-export interface ProcessStopEvent {
-  pid: number
-}
-
-export interface ProcessPauseEvent {
-  pid: number
-}
-
-export interface ProcessResumeEvent {
-  pid: number
 }

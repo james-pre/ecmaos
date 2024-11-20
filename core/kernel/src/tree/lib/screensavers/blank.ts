@@ -1,4 +1,4 @@
-import type { Terminal } from '@ecmaos/kernel/terminal'
+import type { Terminal } from '@ecmaos/types'
 
 export default async function ({ terminal }: { terminal: Terminal }) {
   if (document.getElementById('screensaver')) return false

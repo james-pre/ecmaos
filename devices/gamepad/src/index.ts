@@ -1,6 +1,6 @@
+import ansi from 'ansi-escape-sequences'
 import type { DeviceDriver } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 export const pkg = {
   name: 'gamepad',
@@ -10,8 +10,6 @@ export const pkg = {
 
 export async function cli(options: KernelDeviceCLIOptions) {
   const { args, terminal } = options
-  const { ansi } = terminal
-
   const usage = `
 Usage: /dev/gamepad <command>
 

@@ -7,10 +7,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "install:kernel": "bun run build && cp dist/swapi.js ../kernel/public/"
+    "install:kernel": "npm run build && cp dist/swapi.js ../kernel/public/"
   },
   "devDependencies": {
-    "@types/bun": "latest",
+    "@ecmaos/config-typescript": "workspace:^",
     "vite": "^5.4.10"
   },
   "peerDependencies": {

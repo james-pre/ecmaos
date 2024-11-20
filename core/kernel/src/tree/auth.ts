@@ -3,15 +3,9 @@
  * Handles authentication features
  */
 
-export type PasswordCredentialInit = {
-  iconUrl?: string
-  id: string
-  name?: string
-  origin: string
-  password: string
-}
+import type { Auth as IAuth, PasswordCredentialInit } from '@ecmaos/types'
 
-export class Auth {
+export class Auth implements IAuth {
   passkey = {
     // Create a new credential
     create: async (options: PublicKeyCredentialCreationOptions): Promise<Credential | null> => {

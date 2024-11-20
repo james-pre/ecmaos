@@ -6,9 +6,8 @@ declare global {
   }
 }
 
-import type { DeviceDriver, Ino } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+import type { DeviceDriver } from '@zenfs/core'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 export const pkg = {
   name: 'gpu',
@@ -58,13 +57,12 @@ export async function getDrivers(kernel: Kernel): Promise<DeviceDriver<KernelDev
 
       drivers.push({
         name: 'gpu',
-        init: (ino: Ino) => ({
+        init: () => ({
           major: adapter.info?.vendor === 'nvidia' ? 195 : 10,
           minor: 0,
           data: { 
             adapter,
             device,
-            ino, 
             kernelId: kernel.id,
             features: Array.from(adapter.features),
             limits: Object.fromEntries(
@@ -158,6 +156,7 @@ async function test(kernel: Kernel) {
 
   device.queue.submit([commandEncoder.finish()])
 
+  // @ts-ignore
   if (kernel.terminal?.element) kernel.terminal.element.style.display = 'none'
 
   canvas.style.position = 'absolute'
@@ -167,6 +166,7 @@ async function test(kernel: Kernel) {
   document.body.appendChild(canvas)
 
   setTimeout(() => {
+    // @ts-ignore
     if (kernel.terminal?.element) kernel.terminal.element.style.display = ''
     canvas.remove()
     kernel.terminal.focus()

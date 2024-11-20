@@ -1,6 +1,5 @@
 import type { DeviceDriver } from '@zenfs/core'
-import type { Kernel } from '@ecmaos/kernel/kernel'
-import type { KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/kernel/device'
+import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
 export const pkg = {
   name: 'webgl',
@@ -121,6 +120,7 @@ async function test(kernel: Kernel) {
     throw new Error('WebGL not available')
   }
 
+  // @ts-ignore
   if (kernel.terminal?.element) kernel.terminal.element.style.display = 'none'
 
   canvas.width = window.innerWidth
@@ -135,6 +135,7 @@ async function test(kernel: Kernel) {
   await runWebGLTest(context as WebGLRenderingContext)
 
   setTimeout(() => {
+    // @ts-ignore
     if (kernel.terminal?.element) kernel.terminal.element.style.display = ''
     canvas.remove()
     kernel.terminal?.focus()

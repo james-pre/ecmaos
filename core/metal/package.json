@@ -26,6 +26,7 @@
     "node-pty": "^1.0.0"
   },
   "devDependencies": {
+    "@ecmaos/config-typescript": "workspace:^",
     "nodemon": "^3.1.7"
   },
   "publishConfig": {

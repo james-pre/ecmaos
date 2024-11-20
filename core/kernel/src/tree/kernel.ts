@@ -1,5 +1,5 @@
 /**
- * @ecmaos/kernel
+ * @alpha
  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
  *
  * @remarks
@@ -7,8 +7,6 @@
  * It manages the system's resources and provides a framework for system services.
  *
  */
-
-/// <reference types="../declarations/globalThis.d.ts" />
 
 import chalk from 'chalk'
 import figlet from 'figlet'
@@ -41,11 +39,28 @@ import { Workers } from '#workers.ts'
 
 import { TerminalCommands } from '#lib/commands/index.js'
 
-import type { InitOptions } from 'i18next'
-import type { KernelDevice } from '#device.ts'
-import type { EventCallback } from '#events.ts'
-import type { FileHeader } from '#filesystem.ts'
-import type { ProcessEntryParams } from '#processes.ts'
+import {
+  KernelEvents,
+  KernelState
+} from '@ecmaos/types'
+
+import type {
+  BootOptions,
+  Kernel as IKernel,
+  KernelDevice,
+  KernelExecuteEvent,
+  KernelExecuteOptions,
+  KernelOptions,
+  KernelPanicEvent,
+  Terminal as ITerminal,
+  Wasm as IWasm,
+  Windows as IWindows,
+  Workers as IWorkers,
+  EventCallback,
+  ProcessEntryParams,
+  FileHeader,
+  KernelShutdownEvent
+} from '@ecmaos/types'
 
 const DefaultKernelOptions: KernelOptions = {
   dom: DefaultDomOptions,
@@ -97,7 +112,7 @@ const DefaultFigletFonts = [
  * await kernel.boot()
  * ```
  */
-export class Kernel {
+export class Kernel implements IKernel {
   public readonly id: string = crypto.randomUUID()
   public readonly name: string = import.meta.env['NAME']
   public readonly version: string = import.meta.env['VERSION']
@@ -118,17 +133,17 @@ export class Kernel {
   private _packages: Map<string, unknown> = new Map()
   private _processes: ProcessManager
   private _protocol: Protocol
-  private _screensavers: Map<string, { default: (options: { terminal: Terminal }) => Promise<void>, exit: () => Promise<void> }>
+  private _screensavers: Map<string, { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }>
   private _service: Service
   private _shell: Shell
   private _state: KernelState = KernelState.BOOTING
   private _storage: Storage
-  private _terminal: Terminal
+  private _terminal: ITerminal
   private _toast: Notyf
   private _users: Users
-  private _wasm: Wasm
-  private _windows: Windows
-  private _workers: Workers
+  private _wasm: IWasm
+  private _windows: IWindows
+  private _workers: IWorkers
 
   get addEventListener() { return this.on }
   get removeEventListener() { return this.off }
@@ -187,7 +202,7 @@ export class Kernel {
     this._users = new Users({ kernel: this })
     this._windows = new Windows()
     this._wasm = new Wasm({ kernel: this })
-    this._workers = new Workers({ kernel: this })
+    this._workers = new Workers()
 
     this._shell.attach(this._terminal)
   }
@@ -340,7 +355,7 @@ export class Kernel {
       for (const [key, saver] of Object.entries(screensavers)) {
         this._screensavers.set(
           key.replace('./lib/terminal/screensavers/', '').replace('.ts', ''),
-          saver as { default: (options: { terminal: Terminal }) => Promise<void>, exit: () => Promise<void> }
+          saver as { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }
         )
       }
 
@@ -450,22 +465,22 @@ export class Kernel {
    * @param {KernelExecuteOptions} options - The options to execute the command with.
    * @returns {Promise<number>} A promise that resolves to the exit code of the command.
    */
-  async execute({ command, args, shell, stdin, stdout, stderr }: KernelExecuteOptions) {
+  async execute(options: KernelExecuteOptions) {
     try {
-      if (!await this.filesystem.exists(command)) {
-        this.log?.error(`File not found for execution: ${command}`)
+      if (!await this.filesystem.exists(options.command)) {
+        this.log?.error(`File not found for execution: ${options.command}`)
         return -1
       }
 
-      if (command.startsWith('/dev/')) {
+      if (options.command.startsWith('/dev/')) {
         const device = Array.from(this.devices.values())
-          .find(d => d.drivers?.some(driver => driver.name === command.replace(/^\/dev\//, '')))
+          .find(d => d.drivers?.some(driver => driver.name === options.command.replace(/^\/dev\//, '')))
 
-        if (device) return await this.executeDevice(device.device, args)
+        if (device) return await this.executeDevice(device.device, options.args)
       }
 
-      const header = await this.readFileHeader(command)
-      if (!header) return
+      const header = await this.readFileHeader(options.command)
+      if (!header) return -1
 
       let exitCode: number | void = -1
       switch (header.type) {
@@ -473,22 +488,22 @@ export class Kernel {
           switch (header.namespace) {
             case 'terminal': {
               if (!header.name) return -1
-              exitCode = await this.executeCommand(header.name, args, shell, { stdin, stdout, stderr })
+              exitCode = await this.executeCommand({ ...options, command: header.name })
               break
             }
           }; break
         case 'script':
-          exitCode = await this.executeScript(command, shell)
+          exitCode = await this.executeScript(options)
       }
 
       exitCode = exitCode ?? 0
-      shell.env.set('?', exitCode.toString())
-      this.events.dispatch<KernelExecuteEvent>(KernelEvents.EXECUTE, { command, args, shell, exitCode })
+      options.shell.env.set('?', exitCode.toString())
+      this.events.dispatch<KernelExecuteEvent>(KernelEvents.EXECUTE, { command: options.command, args: options.args, exitCode })
       return exitCode
     } catch (error) {
       console.error(error)
       this.log?.error(error)
-      shell.env.set('?', '-1')
+      options.shell.env.set('?', '-1')
       return -1
     }
   }
@@ -500,27 +515,22 @@ export class Kernel {
    * @param {Shell} shell - The shell to execute the command in.
    * @returns {Promise<number>} A promise that resolves to the exit code of the command.
    */
-  async executeCommand(
-    cmd: string,
-    args: string[] = [],
-    shell: Shell = this.shell,
-    { stdin, stdout, stderr }: Pick<KernelExecuteOptions, 'stdin' | 'stdout' | 'stderr'> = { stdin: undefined, stdout: undefined, stderr: undefined }
-  ): Promise<number> {
-    const command = this.terminal.commands[cmd as keyof typeof this.terminal.commands]
+  async executeCommand(options: KernelExecuteOptions): Promise<number> {
+    const command = this.terminal.commands[options.command as keyof typeof this.terminal.commands]
     if (!command) return -1
 
     const process = new Process({
-      uid: shell.credentials.uid,
-      gid: shell.credentials.gid,
-      args,
-      command: command.command,
-      kernel: this,
-      shell,
-      terminal: this.terminal,
+      uid: options.shell.credentials.uid,
+      gid: options.shell.credentials.gid,
+      args: options.args,
+      command: options.command,
+      kernel: options.kernel || this,
+      shell: options.shell || this.shell,
+      terminal: options.terminal || this.terminal,
       entry: async (params: ProcessEntryParams) => await command.run.call(params, params.pid, params.args),
-      stdin,
-      stdout,
-      stderr
+      stdin: options.stdin,
+      stdout: options.stdout,
+      stderr: options.stderr
     })
 
     return await process.start()
@@ -575,24 +585,24 @@ export class Kernel {
    * @param {Shell} shell - The shell to execute the script file in.
    * @returns {Promise<number>} A promise that resolves to the exit code of the script file.
    */
-  async executeScript(name: string, shell: Shell = this.shell): Promise<number> {
-    const header = await this.readFileHeader(name)
+  async executeScript(options: KernelExecuteOptions): Promise<number> {
+    const header = await this.readFileHeader(options.command)
     if (!header) return -1
 
     if (header.type !== 'script') {
-      this.log?.error(`File is not a script: ${name}`)
+      this.log?.error(`File is not a script: ${options.command}`)
       return -1
     }
 
-    const script = await this.filesystem.fs.readFile(name, 'utf-8')
+    const script = await this.filesystem.fs.readFile(options.command, 'utf-8')
     if (script) {
       for (const line of script.split('\n')) {
         if (line.startsWith('#') || line.trim() === '') continue
-        await shell.execute(line)
+        await options.shell.execute(line)
       }
 
       return 0
-    } else this.log?.error(`Script ${name} not found`)
+    } else this.log?.error(`Script ${options.command} not found`)
 
     return -1
   }
@@ -603,9 +613,9 @@ export class Kernel {
    * @param {object} options - The options for the notification.
    * @returns {Promise<Notification>} A promise that resolves to the notification.
    */
-  notify(title: string, options: object = {}) {
+  async notify(title: string, options: object = {}): Promise<void | Notification> {
     if (Notification?.permission === 'granted') return new Notification(title, options)
-    else return Notification.requestPermission()
+    await Notification.requestPermission()
   }
 
   /**
@@ -843,143 +853,4 @@ export class Kernel {
       Object.assign(credentials, currentCredentials)
     }
   }
-}
-
-// --- Types ---
-
-import { INotyfOptions } from 'notyf'
-import { ConfigMounts } from '@zenfs/core'
-
-import type { ColorName } from 'chalk'
-import type { DomOptions } from '#dom.ts'
-import type { FilesystemOptions } from '#filesystem.ts'
-import type { LogOptions } from '#log.ts'
-import type { ServiceOptions } from '#service.ts'
-
-/**
- * Represents the possible states of the kernel.
- */
-export enum KernelState {
-  /** The kernel is in the process of booting up. */
-  BOOTING = 'booting',
-  /** The kernel has encountered a critical error. */
-  PANIC = 'panic',
-  /** The kernel is running normally. */
-  RUNNING = 'running',
-  /** The kernel is in the process of shutting down. */
-  SHUTDOWN = 'shutdown',
-}
-
-/**
- * Configuration options for the kernel.
- */
-export interface KernelOptions {
-  /** Credentials to automatically login */
-  credentials?: {
-    username: string
-    password: string
-  }
-  /** Dom-related options. */
-  dom?: DomOptions
-  /** Internationalization options. */
-  i18n?: InitOptions
-  /** Logging options. Set to false to disable logging. */
-  log?: LogOptions | false
-  /** Toast configuration options. */
-  toast?: INotyfOptions
-  /** Filesystem configuration options. */
-  filesystem?: FilesystemOptions<ConfigMounts>
-  /** Service Worker configuration options. */
-  service?: ServiceOptions
-  /** WebSocket to connect to the terminal. */
-  socket?: WebSocket
-  /** Lists of components to exclude from loading. */
-  blacklist?: {
-    /** Array of terminal command names to exclude. */
-    commands?: string[]
-    /** Array of builtin app names to exclude. */
-    builtins?: string[]
-    /** Array of device names to exclude. */
-    devices?: string[]
-    /** Array of kernel modules to exclude. */
-    modules?: string[]
-  }
-}
-
-/**
- * Options for the kernel boot process.
- */
-export interface BootOptions {
-  /** If true, suppresses boot messages. */
-  silent?: boolean
-  /** Specific figlet font to use for boot message. */
-  figletFont?: keyof typeof figlet.fonts
-  /** Color of the figlet boot message. */
-  figletColor?: ColorName
-  /** Array of figlet fonts to choose from. */
-  figletFonts?: (keyof typeof figlet.fonts)[]
-  /** If true, selects a random font from figletFonts. */
-  figletFontRandom?: boolean
-}
-
-/**
- * Options for the kernel execute method.
- */
-export interface KernelExecuteOptions {
-  command: string
-  args?: string[]
-  shell: Shell
-  stdin?: ReadableStream<Uint8Array>
-  stdout?: WritableStream<Uint8Array>
-  stderr?: WritableStream<Uint8Array>
-}
-
-/**
- * Enumeration of kernel-related events.
- */
-export enum KernelEvents {
-  /** Emitted when the kernel starts booting. */
-  BOOT = 'kernel:boot',
-  /** Emitted when a command is executed. */
-  EXECUTE = 'kernel:execute',
-  /** Emitted when the kernel encounters a critical error. */
-  PANIC = 'kernel:panic',
-  /** Emitted when the kernel begins shutdown. */
-  SHUTDOWN = 'kernel:shutdown',
-  /** Emitted when a new process is spawned. */
-  SPAWN = 'kernel:spawn',
-  /** Emitted when a file is uploaded. */
-  UPLOAD = 'kernel:upload',
-}
-
-/**
- * Enumeration of *some* POSIX signals.
- */
-export enum KernelSignals {
-  HUP = 1,
-  INT = 2,
-  QUIT = 3,
-  ILL = 4,
-  ABRT = 6,
-  FPE = 8,
-  KILL = 9,
-  SEGV = 11,
-  PIPE = 13,
-  ALRM = 14,
-  TERM = 15
-}
-
-export interface KernelPanicEvent {
-  error: Error
-}
-
-export interface KernelShutdownEvent {
-  data: object
-}
-
-export interface KernelExecuteEvent {
-  command: string
-  args?: string[]
-  shell: Shell
-  exitCode: number
 }
