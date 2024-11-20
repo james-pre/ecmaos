@@ -43,36 +43,6 @@ export default defineConfig({
       }
     }
   },
-  build: {
-    target: 'esnext',
-    chunkSizeWarningLimit: 1500,
-    lib: {
-      formats: ['es', 'cjs'],
-      entry: {
-        auth: './src/tree/auth.ts',
-        components: './src/tree/components.ts',
-        device: './src/tree/device.ts',
-        dom: './src/tree/dom.ts',
-        events: './src/tree/events.ts',
-        filesystem: './src/tree/filesystem.ts',
-        i18n: './src/tree/i18n.ts',
-        intervals: './src/tree/intervals.ts',
-        kernel: './src/tree/kernel.ts',
-        log: './src/tree/log.ts',
-        memory: './src/tree/memory.ts',
-        processes: './src/tree/processes.ts',
-        protocol: './src/tree/protocol.ts',
-        service: './src/tree/service.ts',
-        shell: './src/tree/shell.ts',
-        storage: './src/tree/storage.ts',
-        terminal: './src/tree/terminal.ts',
-        users: './src/tree/users.ts',
-        wasm: './src/tree/wasm.ts',
-        windows: './src/tree/windows.ts',
-        workers: './src/tree/workers.ts'
-      }
-    },
-  },
   test: {
     globals: true,
     environment: 'jsdom',

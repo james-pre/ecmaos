@@ -1,6 +1,6 @@
 {
   "extends": "@ecmaos/config-typescript/tsconfig.base.json",
-  "include": ["src/**/*.ts"],
+  "include": ["src/*.ts", "src/**/*.ts"],
   "compilerOptions": {
     "baseUrl": "./",
     "rootDir": "./src",
@@ -23,9 +23,6 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "declaration": true,
-    "emitDeclarationOnly": false,
-    "declarationDir": "./dist/types",
 
     /* Linting */
     "strict": true,
