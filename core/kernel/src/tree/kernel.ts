@@ -262,7 +262,7 @@ export class Kernel implements IKernel {
 
         const logoFiglet = figlet.textSync(import.meta.env['FIGLET_TEXT'] || 'ECMAOS', { font: figletFont as keyof typeof figlet.fonts })
         this.terminal.writeln(colorFiglet(figletColor, logoFiglet))
-        this.terminal.writeln(`${this.terminal.createSpecialLink('ecmaos://kernel.execute?command=/bin/about', import.meta.env['NAME'] || 'ecmaOS')} v${import.meta.env['VERSION']}`)
+        this.terminal.writeln(`${this.terminal.createSpecialLink(import.meta.env['HOMEPAGE'], import.meta.env['NAME'] || 'ecmaOS')} v${import.meta.env['VERSION']}`)
         this.terminal.writeln(`${t('kernel.madeBy')} ${this.terminal.createSpecialLink(
           import.meta.env['AUTHOR']?.url || 'https://github.com/mathiscode',
           `${import.meta.env['AUTHOR']?.name} <${import.meta.env['AUTHOR']?.email}>`

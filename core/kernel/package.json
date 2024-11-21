@@ -3,7 +3,7 @@
   "description": "ecmaOS: Micro-kernel and framework for web technologies",
   "version": "0.1.0",
   "license": "MIT",
-  "homepage": "https://github.com/ecmaos/ecmaos",
+  "homepage": "https://ecmaos.sh",
   "repository": "https://github.com/ecmaos/ecmaos",
   "author": {
     "name": "Jay Mathis",
