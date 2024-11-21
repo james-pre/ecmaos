@@ -59,11 +59,11 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Workers (Web Workers)
 
 - `Apps`
-  - These are full applications that are developed alongside ecmaOS
+  - These are full applications that are developed to work with ecmaOS
 - `Core`
   - Core modules provide the system's essential functionality; this includes the kernel itself
 - `Commands`
-  - Commands are small utilities that aren't quite full Apps
+  - Commands are small utilities that aren't quite full Apps, provided by the shell
 - `Devices`
   - Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
@@ -157,9 +157,6 @@ git clone https://github.com/ecmaos/ecmaos.git
 
 # Install dependencies
 cd ecmaos && pnpm install
-
-# We're going to focus on the kernel for now
-cd core/kernel
 
 # Run the dev server
 pnpm run dev
