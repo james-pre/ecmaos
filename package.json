@@ -15,7 +15,9 @@
   "scripts": {
     "build": "turbo run build",
     "build:docs": "typedoc",
+    "build:kernel": "turbo run build --filter=@ecmaos/kernel",
     "cp:readme": "cp README.md core/kernel/README.md",
+    "dev:kernel": "turbo run dev --filter=@ecmaos/kernel",
     "dev:docs": "pnpm cp:readme && concurrently nodemon \"serve -l 30444 docs\"",
     "fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "fix:repo": "sherif --fix",
@@ -24,6 +26,9 @@
     "preinstall": "npx only-allow pnpm",
     "start": "turbo run dev --filter=@ecmaos/kernel",
     "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "test:bench": "turbo run test:bench",
+    "test:ui": "turbo run test:ui",
     "test:watch": "turbo run test:watch"
   },
   "dependencies": {

@@ -147,7 +147,7 @@ Things to keep in mind:
 
 ## Development
 
-[Turborepo](https://turbo.build/repo) is used to manage the monorepo, and [bun](https://bun.sh) is used for package management.
+[Turborepo](https://turbo.build/repo) is used to manage the monorepo, and [pnpm](https://pnpm.io) is used for package management.
 
 A good place to start is viewing the `scripts` property of [package.json](./package.json) in the root of the repository.
 
@@ -156,26 +156,26 @@ A good place to start is viewing the `scripts` property of [package.json](./pack
 git clone https://github.com/ecmaos/ecmaos.git
 
 # Install dependencies
-cd ecmaos && bun install
+cd ecmaos && pnpm install
 
 # We're going to focus on the kernel for now
 cd core/kernel
 
 # Run the dev server
-bun run dev
+pnpm run dev
 
 # Run the docs server
-bun run dev:docs
+pnpm run dev:docs
 
 # Build
-bun run build
+pnpm run build
 
 # Run tests
-bun run test
-bun run test:watch
-bun run test:coverage
-bun run test:bench
-bun run test:ui
+pnpm run test
+pnpm run test:watch
+pnpm run test:coverage
+pnpm run test:bench
+pnpm run test:ui
 
 # Generate modules
 turbo gen device # generate a new device template
