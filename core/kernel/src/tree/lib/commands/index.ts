@@ -392,6 +392,20 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
         return await observe({ kernel, shell, terminal, process, args: [] })
       }
     }),
+    open: new TerminalCommand({
+      command: 'open',
+      description: 'Open a file or URL',
+      kernel,
+      shell,
+      terminal,
+      options: [
+        HelpOption,
+        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to the file or URL to open' }
+      ],
+      run: async (argv: CommandLineOptions) => {
+        return await open({ kernel, shell, terminal, args: [argv.path] })
+      }
+    }),
     passwd: new TerminalCommand({
       command: 'passwd',
       description: 'Change user password',
@@ -1588,6 +1602,17 @@ export const observe = async ({ process, terminal }: CommandArgs) => {
   }
 
   return 0
+}
+
+export const open = async ({ terminal, args }: CommandArgs) => {
+  const [path] = (args as string[])
+  if (!path) return 1
+  const isURL = !path.startsWith('/') || !path.startsWith('.')
+  if (isURL) window.open(path, '_blank')
+  else {
+    // TODO: handle files
+    terminal.writeln(chalk.red('Unsupported path'))
+  }
 }
 
 export const passwd = async ({ kernel, terminal, args }: CommandArgs) => {
