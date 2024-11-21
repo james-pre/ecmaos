@@ -1,3 +1,7 @@
+/**
+ * I'm second-guessing the choice to make this a device rather than a command, but it's fine for now.
+ */
+
 import type { DeviceDriver } from '@zenfs/core'
 import type { Kernel, KernelDeviceCLIOptions, KernelDeviceData } from '@ecmaos/types'
 
