@@ -351,10 +351,10 @@ export class Kernel implements IKernel {
       this.intervals.set('/proc', this.registerProc.bind(this), import.meta.env['KERNEL_INTERVALS_PROC'] ?? 1000)
 
       // Setup screensavers
-      const screensavers = import.meta.glob('./lib/terminal/screensavers/*.ts', { eager: true })
+      const screensavers = import.meta.glob('./lib/screensavers/*.ts', { eager: true })
       for (const [key, saver] of Object.entries(screensavers)) {
         this._screensavers.set(
-          key.replace('./lib/terminal/screensavers/', '').replace('.ts', ''),
+          key.replace('./lib/screensavers/', '').replace('.ts', ''),
           saver as { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }
         )
       }
