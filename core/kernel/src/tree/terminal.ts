@@ -315,6 +315,12 @@ export class Terminal extends XTerm implements ITerminal {
   async shortcutKeyHandler({ domEvent }: { domEvent: KeyboardEvent }) {
     this.events.dispatch<TerminalKeyEvent>(TerminalEvents.KEY, { key: domEvent.key, domEvent })
 
+    if (!domEvent.ctrlKey && !domEvent.shiftKey) {
+      switch (domEvent.key) {
+        case 'F11': document.documentElement.requestFullscreen(); break
+      }
+    }
+
     if (domEvent.ctrlKey && domEvent.shiftKey) {
       switch (domEvent.key) {
         case 'F1': this.listen(); break
