@@ -208,9 +208,9 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Boots the kernel with the given options.
-   * @param {BootOptions} options - The options to boot the kernel with.
-   * @returns {Promise<void>} A promise that resolves when the kernel is booted.
+   * Boots the kernel and initializes all core services.
+   * @param options - Boot configuration options
+   * @throws {Error} If boot process fails
    */
   async boot(options: BootOptions = DefaultBootOptions) {
     let spinner
@@ -334,7 +334,7 @@ export class Kernel implements IKernel {
           hour12: false
         }).replace(',', '')
 
-        this.withRoot(() =>
+        this.sudo(() =>
           this.filesystem.fs.appendFile('/var/log/kernel.log',
             `${formattedDate} [${logObj._meta?.logLevelName}] ${logObj[0] || logObj.message}\n\n`
           )
@@ -413,7 +413,7 @@ export class Kernel implements IKernel {
       if (user.uid !== 0) {
         this.terminal.promptTemplate = `{user}:{cwd}$ `
 
-        // TODO: find a way to freeze credentials without breaking withRoot for the kernel's own use
+        // TODO: find a way to freeze credentials without breaking sudo for the kernel's own use
         // Object.freeze(credentials)
       }
 
@@ -429,7 +429,7 @@ export class Kernel implements IKernel {
         kernel: this,
         shell: this.shell,
         terminal: this.terminal,
-        entry: async () => await this.withRoot(async () => await this.execute({ command: '/boot/init', shell: this.shell }))
+        entry: async () => await this.sudo(async () => await this.execute({ command: '/boot/init', shell: this.shell }))
       })
 
       initProcess.start()
@@ -452,18 +452,17 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Configures the kernel with the given options.
-   * @param {KernelOptions} options - The options to configure the kernel with.
-   * @returns {Promise<void>} A promise that resolves when the kernel is configured.
+   * Configures kernel subsystems with the provided options
+   * @param options - Configuration options for kernel subsystems
    */
   async configure(options: KernelOptions) {
     await this._filesystem.configure(options.filesystem ?? {})
   }
 
   /**
-   * Executes a command in the kernel.
-   * @param {KernelExecuteOptions} options - The options to execute the command with.
-   * @returns {Promise<number>} A promise that resolves to the exit code of the command.
+   * Executes a command in the kernel environment
+   * @param options - Execution options containing command, args, and shell
+   * @returns Exit code of the command
    */
   async execute(options: KernelExecuteOptions) {
     try {
@@ -509,11 +508,9 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Executes a terminal command.
-   * @param {string} cmd - The command to execute.
-   * @param {string[]} args - The arguments to pass to the command.
-   * @param {Shell} shell - The shell to execute the command in.
-   * @returns {Promise<number>} A promise that resolves to the exit code of the command.
+   * Executes a terminal command
+   * @param options - Execution options containing command name, args, shell, and terminal
+   * @returns Exit code of the command
    */
   async executeCommand(options: KernelExecuteOptions): Promise<number> {
     const command = this.terminal.commands[options.command as keyof typeof this.terminal.commands]
@@ -537,11 +534,11 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Executes a device command.
-   * @param {string} name - The name of the device command to execute.
-   * @param {string[]} args - The arguments to pass to the device command.
-   * @param {Shell} shell - The shell to execute the device command in.
-   * @returns {Promise<number>} A promise that resolves to the exit code of the device command.
+   * Executes a device command
+   * @param {KernelDevice} device - Device to execute command on
+   * @param {string[]} args - Command arguments
+   * @param {Shell} shell - Shell instance
+   * @returns {Promise<number>} Exit code of the device command
    */
   async executeDevice(device: KernelDevice, args: string[] = [], shell: Shell = this.shell): Promise<number> {
     if (!device || !device.cli) {
@@ -579,11 +576,9 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Executes a script file.
-   * @param {string} name - The name of the script file to execute.
-   * @param {string[]} args - The arguments to pass to the script file.
-   * @param {Shell} shell - The shell to execute the script file in.
-   * @returns {Promise<number>} A promise that resolves to the exit code of the script file.
+   * Executes a script file
+   * @param options - Execution options containing script path and shell
+   * @returns Exit code of the script
    */
   async executeScript(options: KernelExecuteOptions): Promise<number> {
     const header = await this.readFileHeader(options.command)
@@ -608,12 +603,12 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Displays a notification using the native Notification API.
-   * @param {string} title - The title of the notification.
-   * @param {object} options - The options for the notification.
-   * @returns {Promise<Notification>} A promise that resolves to the notification.
+   * Shows a system notification if permissions are granted
+   * @param {string} title - Notification title
+   * @param {NotificationOptions} options - Notification options
+   * @returns {Promise<Notification|void>} The created notification or void if permissions denied
    */
-  async notify(title: string, options: object = {}): Promise<void | Notification> {
+  async notify(title: string, options: NotificationOptions = {}): Promise<void | Notification> {
     if (Notification?.permission === 'granted') return new Notification(title, options)
     await Notification.requestPermission()
   }
@@ -639,9 +634,9 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Reads the header of a file.
-   * @param {string} filePath - The path to the file to read.
-   * @returns {Promise<FileHeader | null>} A promise that resolves to the file header or null if the file is not a script.
+   * Reads and parses a file header to determine its type
+   * @param {string} filePath - Path to the file
+   * @returns {Promise<FileHeader|null>} Parsed header information or null if invalid
    */
   async readFileHeader(filePath: string): Promise<FileHeader | null> {
     const parseHeader = (header: string): FileHeader | null => {
@@ -667,8 +662,7 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Reboots the kernel.
-   * @returns {Promise<void>} A promise that resolves when the kernel is rebooted.
+   * Reboots the kernel by performing a shutdown and page reload
    */
   async reboot() {
     this.log?.warn(this.i18n.t('Rebooting'))
@@ -837,11 +831,12 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Executes an operation with elevated privileges.
-   * @param {() => Promise<T>} operation - The operation to execute.
-   * @returns {Promise<T>} A promise that resolves to the result of the operation.
+   * Executes an operation with root (or other) privileges
+   * @param {() => Promise<T>} operation - Operation to execute
+   * @param {Partial<Credentials>} cred - Optional credentials to use
+   * @returns {Promise<T>} Result of the operation
    */
-  private async withRoot<T>(
+  private async sudo<T>(
     operation: () => Promise<T>,
     cred: Partial<Credentials> = { uid: 0, gid: 0 }
   ): Promise<T> {

@@ -122,7 +122,6 @@ export class Filesystem {
   }
 
   /**
-   * @static
    * Returns the default filesystem options with the given extensions.
    * @param {Partial<FilesystemOptions>} extensions - The extensions to apply to the default options.
    * @returns {FilesystemOptions} The filesystem options with the given extensions.

@@ -5,11 +5,11 @@
   "author": "Jay Mathis",
   "license": "MIT",
   "type": "module",
-  "scripts": {
-    "build": "tsc"
-  },
   "exports": {
     ".": "./dist/index.d.ts"
+  },
+  "scripts": {
+    "build": "tsc"
   },
   "dependencies": {
     "@xterm/xterm": "^5.5.0",

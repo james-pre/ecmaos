@@ -29,7 +29,7 @@ export interface ProcessOptions {
   /** Working directory */
   cwd?: string
   /** Process entry point */
-  entry?: (params: ProcessEntryParams) => Promise<number | void>
+  entry?: (params: ProcessEntryParams) => Promise<number | undefined | void>
   /** Reference to kernel instance */
   kernel?: Kernel
   /** Parent process ID */
@@ -128,7 +128,7 @@ export interface Process {
   /** Get working directory */
   readonly cwd: string
   /** Get process entry point */
-  readonly entry: (params: ProcessEntryParams) => Promise<number | void>
+  readonly entry: (params: ProcessEntryParams) => Promise<number | undefined | void>
   /** Get event emitter */
   readonly events: any
   /** Get group ID */

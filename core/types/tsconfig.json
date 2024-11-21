@@ -1,5 +1,6 @@
 {
   "extends": "@ecmaos/config-typescript/tsconfig.base.json",
+  "includes": ["*.ts"],
   "compilerOptions": {
     "declaration": true,
     "outDir": "./dist"

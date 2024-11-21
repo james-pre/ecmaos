@@ -247,7 +247,7 @@ export interface TerminalCommand {
   description: string
   kernel: Kernel
   options: OptionDefinition[]
-  run: (pid: number, argv: string[]) => Promise<number | void>
+  run: (pid: number, argv: string[]) => Promise<number | undefined | void>
   shell: Shell
   terminal: Terminal
   stdin?: ReadableStream<Uint8Array>

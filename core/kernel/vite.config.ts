@@ -49,6 +49,7 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.ts'],
     coverage: {
+      provider: 'v8',
       include: ['src/**/*.ts'],
       reporter: ['text', 'html', 'json-summary', 'json'],
     },

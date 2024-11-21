@@ -49,7 +49,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Log Manager (tslog)
   - Memory Manager (Abstractions)
   - Process Manager
-  - Protocol Handlers (ecmaos+web://...)
+  - Protocol Handlers (web+ecmaos://...)
   - Service Worker Manager
   - Shell
   - Storage (IndexedDB, localStorage, sessionStorage, etc.)

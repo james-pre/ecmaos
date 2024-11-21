@@ -1,6 +1,7 @@
 import { Events } from '#events.ts'
 
 import { ProcessEvents, ProcessStatus } from '@ecmaos/types'
+
 import type {
   Kernel,
   Shell,
@@ -49,7 +50,7 @@ export class Process implements IProcess {
   private _code?: number
   private _command: string
   private _cwd: string
-  private _entry: (params: ProcessEntryParams) => Promise<number | void>
+  private _entry: (params: ProcessEntryParams) => Promise<number | undefined | void>
   private _events: Events
   private _gid: number
   private _kernel: Kernel
@@ -103,7 +104,7 @@ export class Process implements IProcess {
     this._stdout = options.stdout || this.terminal.stdout || new WritableStream()
     this._stderr = options.stderr || this.terminal.stderr || new WritableStream()
 
-    this.kernel.processes.add(this)
+    this.kernel.processes.add(this as IProcess)
   }
 
   async cleanup() {
@@ -136,7 +137,7 @@ export class Process implements IProcess {
       args: this.args,
       command: this.command,
       cwd: this.cwd,
-      instance: this,
+      instance: this as IProcess,
       gid: this.gid,
       kernel: this.kernel,
       pid: this.pid,
@@ -148,14 +149,14 @@ export class Process implements IProcess {
       uid: this.uid
     })
 
-    await this.stop(exitCode ?? 0)
-    return exitCode ?? 0
+    await this.stop(exitCode || 0)
+    return exitCode || 0
   }
 
-  async stop(exitCode: number = 0) {
+  async stop(exitCode?: number) {
     this._status = 'stopped'
     this.events.emit<ProcessStopEvent>(ProcessEvents.STOP, { pid: this.pid })
-    await this.exit(exitCode)
+    await this.exit(exitCode ?? 0)
   }
 
   restart() {

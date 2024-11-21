@@ -1,11 +1,11 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "name": "ecmaOS",
-  "out": "../../docs",
+  "out": "./docs",
   "theme": "default-modern",
   "customCss": "./typedoc.css",
-  "dmtFavicon": "./public/favicon.ico",
-  "exclude": ["**/node_modules"],
+  "dmtFavicon": "./core/kernel/public/favicon.ico",
+  "exclude": ["**/node_modules/**/*"],
   "plugin": [
     "@typhonjs-typedoc/typedoc-theme-dmt",
     "@typhonjs-typedoc/ts-lib-docs/typedoc/ts-links/dom/2024",
@@ -13,7 +13,8 @@
   ],
   "entryPointStrategy": "expand",
   "entryPoints": [
-    "./src/tree"
+    "./core/kernel/src/tree",
+    "./core/types"
   ],
   "dmtLinksService": {
     "GitHub": "https://github.com/ecmaos/ecmaos",

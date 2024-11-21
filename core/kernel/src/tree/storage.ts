@@ -14,12 +14,7 @@ export class Storage {
   constructor(options: StorageOptions) {
     this._kernel = options.kernel
 
-    if (navigator.storage && navigator.storage.persist) {
-      navigator.storage.persist().then((persistent) => {
-        if (persistent) this._kernel.log?.silly('Storage is persistent')
-        else this._kernel.log?.warn('Storage is not persistent')
-      })
-    }
+    navigator.storage?.persist?.()
 
     if (this.indexed) {
       const name = options.indexed?.name || 'ecmaos:storage'

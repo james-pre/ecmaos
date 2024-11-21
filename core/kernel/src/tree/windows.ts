@@ -1,6 +1,6 @@
 import 'winbox'
 import 'winbox/dist/css/winbox.min.css'
-// @ts-expect-error
+// @ts-ignore
 import WinBox from 'winbox/src/js/winbox.js'
 
 import type { WindowId, Windows as IWindows } from '@ecmaos/types'

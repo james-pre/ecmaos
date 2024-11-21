@@ -1415,7 +1415,8 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
         getOwnerString(directory.stats),
         (() => {
           const mount = mounts.find(([target]) => target.endsWith(`/${directory.name}`))
-          // @ts-expect-error store does not exist on FileSystem (but we can access it here)
+          // TODO: store does not exist on FileSystem (but we can access it here)
+          // @ts-ignore
           if (mount) return chalk.white(`(${mount[1].store?.constructor.name || mount[1].constructor.name}/${mount[1].metadata().name})`)
           return descriptions.get(path.resolve(fullPath, directory.name)) || ''
         })()
@@ -1475,7 +1476,8 @@ export const mount = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   if (!points || !type || points.length !== 2) {
     terminal.writeln(chalk.red('Usage: mount -t <type> <source> <target>'))
 
-    // @ts-expect-error store does not exist on FileSystem (but we can access it here)
+    // TODO: store does not exist on FileSystem (but we can access it here)
+    // @ts-ignore
     const currentMounts: string[] = Array.from(kernel.filesystem.fsSync.mounts.entries()).map(([target, mount]) => `${chalk.blue(target)} (${mount.store?.constructor.name || mount.constructor.name}/${mount.metadata().name})`)
     const maxTargetLength = Math.max(...currentMounts.map(mount => mount.split(' ')[0]?.length ?? 0))
     for (const mount of currentMounts) {

@@ -62,9 +62,7 @@
   },
   "scripts": {
     "build": "tsc && vite build",
-    "build:docs": "typedoc",
     "dev": "vite",
-    "dev:docs": "concurrently nodemon \"serve -l 30444 docs\"",
     "lint": "eslint src",
     "preview": "vite preview",
     "test": "vitest run",
