@@ -1266,12 +1266,12 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
   for (const dir of packageDirs) {
     if (!dir) continue
     currentPath += '/' + dir
-    try { await kernel.filesystem.fs.mkdir(currentPath) }
+    try { await kernel.filesystem.fs.mkdir(currentPath, 0o755) }
     catch {}
   }
 
   // Save package.json
-  await kernel.filesystem.fs.writeFile(`${packagePath}/package.json`, JSON.stringify(data, null, 2))
+  await kernel.filesystem.fs.writeFile(`${packagePath}/package.json`, JSON.stringify(data, null, 2), { mode: 0o755 })
   terminal.writeln(chalk.green(`Downloaded package.json to ${packagePath}/package.json`))
 
   // Track processed files to avoid duplicates
@@ -1297,7 +1297,7 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
     for (const part of filePathParts) {
       if (!part) continue
       dirPath += '/' + part
-      try { await kernel.filesystem.fs.mkdir(dirPath) }
+      try { await kernel.filesystem.fs.mkdir(dirPath, 0o755) }
       catch {}
     }
 
@@ -1316,7 +1316,7 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
         continue
       }
       const fileData = await fileResponse.text()
-      await kernel.filesystem.fs.writeFile(filePath, fileData)
+      await kernel.filesystem.fs.writeFile(filePath, fileData, { mode: 0o755 })
     } catch (error) {
       terminal.writeln(chalk.red(`Failed to download ${targetFile}: ${error instanceof Error ? error.message : 'Unknown error'}`))
     }
