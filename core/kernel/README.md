@@ -1,19 +1,19 @@
 # The Web Kernel
 
-[ecmaOS](https://github.com/ecmaos) is a browser-based operating system kernel and suite of applications written in TypeScript. It's the successor of [web3os](https://github.com/web3os-org/kernel).
+[ecmaOS](https://github.com/ecmaos) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written in TypeScript. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
 The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be used as a platform for custom applications, games, and more.
 
 [![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
 [![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://ecmaos.sh)
 [![Site Status](https://img.shields.io/website?url=https%3A%2F%2Fecmaos.sh)](https://ecmaos.sh)
-[![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/master)
+[![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/main)
 [![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues)
 [![Closed issues](https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed)
 
 [![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red)](https://github.com/sponsors/mathiscode)
 [![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow)](https://github.com/ecmaos/ecmaos/graphs/contributors)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/ecmaos/ecmaos/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/ecmaos/ecmaos/compare)
 
 ## Features
@@ -59,11 +59,11 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Workers (Web Workers)
 
 - `Apps`
-  - These are full applications that are developed alongside ecmaOS
+  - These are full applications that are developed to work with ecmaOS
 - `Core`
   - Core modules provide the system's essential functionality; this includes the kernel itself
 - `Commands`
-  - Commands are small utilities that aren't quite full Apps
+  - Commands are small utilities that aren't quite full Apps, provided by the shell
 - `Devices`
   - Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
@@ -147,7 +147,7 @@ Things to keep in mind:
 
 ## Development
 
-[Turborepo](https://turbo.build/repo) is used to manage the monorepo, and [bun](https://bun.sh) is used for package management.
+[Turborepo](https://turbo.build/repo) is used to manage the monorepo, and [pnpm](https://pnpm.io) is used for package management.
 
 A good place to start is viewing the `scripts` property of [package.json](./package.json) in the root of the repository.
 
@@ -156,26 +156,23 @@ A good place to start is viewing the `scripts` property of [package.json](./pack
 git clone https://github.com/ecmaos/ecmaos.git
 
 # Install dependencies
-cd ecmaos && bun install
-
-# We're going to focus on the kernel for now
-cd core/kernel
+cd ecmaos && pnpm install
 
 # Run the dev server
-bun run dev
+pnpm run dev
 
 # Run the docs server
-bun run dev:docs
+pnpm run dev:docs
 
 # Build
-bun run build
+pnpm run build
 
 # Run tests
-bun run test
-bun run test:watch
-bun run test:coverage
-bun run test:bench
-bun run test:ui
+pnpm run test
+pnpm run test:watch
+pnpm run test:coverage
+pnpm run test:bench
+pnpm run test:ui
 
 # Generate modules
 turbo gen device # generate a new device template

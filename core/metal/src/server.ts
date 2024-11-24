@@ -150,5 +150,8 @@ app.get('/socket', upgradeWebSocket(() => {
 }))
 
 // Don't expose to any network
-const server = serve({ hostname: 'localhost', port: Number(process.env.PORT) || 30445, fetch: app.fetch })
+const port = Number(process.env.PORT) || 30445
+const server = serve({ hostname: 'localhost', port, fetch: app.fetch })
 injectWebSocket(server)
+
+console.log(`*** ${pkg.name}:${pkg.version} running on port ${port} ***`)

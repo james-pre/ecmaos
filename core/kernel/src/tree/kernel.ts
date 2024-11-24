@@ -10,6 +10,7 @@
 
 import chalk from 'chalk'
 import figlet from 'figlet'
+import Module from 'node:module'
 import { Notyf } from 'notyf'
 import { Credentials, credentials, DeviceDriver, DeviceFS } from '@zenfs/core'
 
@@ -130,7 +131,7 @@ export class Kernel implements IKernel {
   private _log: Log | null
   private _memory: Memory
   private _options: KernelOptions
-  private _packages: Map<string, unknown> = new Map()
+  private _packages: Map<string, Module> = new Map()
   private _processes: ProcessManager
   private _protocol: Protocol
   private _screensavers: Map<string, { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }>
@@ -419,7 +420,7 @@ export class Kernel implements IKernel {
 
       // Init doesn't exit; tradition - init should become a more full-featured init system in the future
       class InitProcess extends Process { override async exit() {} }
-      if (!await this.filesystem.fs.exists('/boot/init')) await this.filesystem.fs.writeFile('/boot/init', '#!ecmaos:script:init')
+      if (!await this.filesystem.fs.exists('/boot/init')) await this.filesystem.fs.writeFile('/boot/init', '#!ecmaos:script:init\n\n')
 
       const initProcess = new InitProcess({
         args: [],
@@ -754,7 +755,8 @@ export class Kernel implements IKernel {
           try {
             this.log?.debug(`Loading package ${pkg.name} v${pkg.version}`)
             const imports = await import(/* @vite-ignore */ url)
-            this._packages.set(pkg.name, imports)
+
+            this._packages.set(pkg.name, imports as Module)
           } catch (err) {
             this.log?.error(`Failed to load package ${pkg.name} v${pkg.version}: ${err}`)
           } finally {
