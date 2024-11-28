@@ -1,7 +1,18 @@
 {
   "name": "ecmaos",
   "version": "0.1.0",
-  "author": "Jay Mathis <code@mathis.network>",
+  "author": {
+    "name": "Jay Mathis",
+    "email": "code@mathis.network",
+    "url": "https://github.com/mathiscode"
+  },
+  "contributors": [
+    {
+      "name": "James Prevett",
+      "email": "jp@jamespre.dev",
+      "url": "https://github.com/james-pre"
+    }
+  ],
   "repository": "https://github.com/ecmaos/ecmaos",
   "bugs": "https://github.com/ecmaos/ecmaos/issues",
   "description": "ecmaOS: Micro-kernel and framework for web technologies",

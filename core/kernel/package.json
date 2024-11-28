@@ -10,6 +10,13 @@
     "email": "code@mathis.network",
     "url": "https://github.com/mathiscode"
   },
+  "contributors": [
+    {
+      "name": "James Prevett",
+      "email": "jp@jamespre.dev",
+      "url": "https://github.com/james-pre"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/ecmaos/ecmaos/issues",
     "email": "code@mathis.network"
