@@ -18,113 +18,95 @@
  *
  */
 
-import type { Address, Config, Collection, Heap, Stack, StackFrame } from '@ecmaos/types'
+import type { Address, Config, Collection, Heap, Stack, StackFrame } from '@ecmaos/types';
 
-export class Memory {
-  config: Config
-  collection: Collection
-  heap: Heap
-  stack: Stack
+export const config: Config = new Map<string, unknown>();
+export const collection: Collection = new Set();
+export const heap: Heap = new Map<Address, Uint8Array>();
+export const stack: Stack = new Array<StackFrame>();
 
-  private _memory: {
-    config: Config
-    collection: Collection
-    heap: Heap
-    stack: Stack
-  }
+export function init() {
+	config.set('bootTime', Date.now());
+}
 
-  constructor() {
-    this._memory = {
-      config: new Map<string, unknown>(),
-      collection: new Set(),
-      heap: new Map<Address, Uint8Array>(),
-      stack: new Array<StackFrame>()
-    }
+// Stack
+export function push(value: StackFrame) {
+	stack.push(value);
+}
 
-    this.config = this._memory.config
-    this.collection = this._memory.collection
-    this.heap = this._memory.heap
-    this.stack = this._memory.stack
+export function pop() {
+	return stack.pop();
+}
 
-    this.config.set('bootTime', Date.now())
-  }
+export function peek() {
+	return stack[stack.length - 1];
+}
 
-  // Stack
-  push(value: StackFrame) {
-    this._memory.stack.push(value)
-  }
+// Heap
+export function allocate(size: number) {
+	const memory = new Uint8Array(size);
+	const address = heap.size;
+	heap.set(address, memory);
+	return address;
+}
 
-  pop() {
-    return this._memory.stack.pop()
-  }
+export function free(address: Address) {
+	heap.delete(address);
+}
 
-  peek() {
-    return this._memory.stack[this._memory.stack.length - 1]
-  }
+export function read(address: Address) {
+	return heap.get(address);
+}
 
-  // Heap
-  allocate(size: number) {
-    const memory = new Uint8Array(size)
-    const address = this._memory.heap.size
-    this._memory.heap.set(address, memory)
-    return address
-  }
+export function write(address: Address, value: Uint8Array) {
+	heap.set(address, value);
+}
 
-  free(address: Address) {
-    this._memory.heap.delete(address)
-  }
+export function copy(source: Address, destination: Address) {
+	const sourceMemory = read(source);
+	const destinationMemory = read(destination);
+	if (sourceMemory && destinationMemory) {
+		destinationMemory.set(sourceMemory);
+	} else {
+		throw new Error('Invalid memory addresses');
+	}
+}
 
-  read(address: Address) {
-    return this._memory.heap.get(address)
-  }
+export function move(source: Address, destination: Address) {
+	copy(source, destination);
+	free(source);
+}
 
-  write(address: Address, value: Uint8Array) {
-    this._memory.heap.set(address, value)
-  }
+export function compare(address1: Address, address2: Address) {
+	const memory1 = read(address1);
+	const memory2 = read(address2);
+	if (memory1 && memory2) {
+		return memory1.every((value: number, index: number) => value === memory2[index]);
+	} else {
+		throw new Error('Invalid memory addresses');
+	}
+}
 
-  copy(source: Address, destination: Address) {
-    const sourceMemory = this.read(source)
-    const destinationMemory = this.read(destination)
-    if (sourceMemory && destinationMemory) {
-      destinationMemory.set(sourceMemory)
-    } else {
-      throw new Error('Invalid memory addresses')
-    }
-  }
+export function search(value: Uint8Array): number {
+	function findPattern(array1: Uint8Array, array2: Uint8Array) {
+		for (let i = 0; i <= array1.length - array2.length; i++) {
+			let match = true;
+			for (let j = 0; j < array2.length; j++) {
+				if (array1[i + j] !== array2[j]) {
+					match = false;
+					break;
+				}
+			}
 
-  move(source: Address, destination: Address) {
-    this.copy(source, destination)
-    this.free(source)
-  }
+			if (match) return true;
+		}
 
-  compare(address1: Address, address2: Address) {
-    const memory1 = this.read(address1)
-    const memory2 = this.read(address2)
-    if (memory1 && memory2) {
-      return memory1.every((value: number, index: number) => value === memory2[index])
-    } else {
-      throw new Error('Invalid memory addresses')
-    }
-  }
+		return false;
+	}
 
-  search(value: Uint8Array): number {
-    function findPattern(array1: Uint8Array, array2: Uint8Array) {
-      for (let i = 0; i <= array1.length - array2.length; i++) {
-        let match = true
-        for (let j = 0; j < array2.length; j++) {
-          if (array1[i + j] !== array2[j]) { match = false; break }
-        }
+	for (const [address, memory] of heap.entries()) {
+		if (findPattern(memory, new Uint8Array(value))) return address;
+	}
 
-        if (match) return true
-      }
-
-      return false
-    }
-
-    for (const [address, memory] of this._memory.heap.entries()) {
-      if (findPattern(memory, new Uint8Array(value))) return address
-    }
-
-    return -1
-  }
+	return -1;
 }

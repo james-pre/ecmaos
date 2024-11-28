@@ -1,27 +1,24 @@
-import type { DomOptions } from '@ecmaos/types'
+import type { DomOptions } from '@ecmaos/types';
 
-export const DefaultDomOptions: DomOptions = { topbar: true }
+export const defaultOptions: DomOptions = { topbar: true };
 
-export class Dom {
-  private _document: Document = globalThis.document
-  private _window: Window = globalThis.window
-  private _topbar: boolean = false
-  private _topbarShow: boolean = false
+export const document = globalThis.document;
 
-  get document() { return this._document }
-  get window() { return this._window }
+export const window = globalThis.window;
 
-  constructor(_options: DomOptions = DefaultDomOptions) {
-    const options = { ...DefaultDomOptions, ..._options }
-    this._topbar = options.topbar ?? true
-  }
+let _topbar: boolean = false;
+let _topbarShow: boolean = false;
 
-  async topbar(show?: boolean) {
-    if (!this._topbar) return
-    const { default: topbar } = await import('topbar')
-    this._topbarShow = show ?? !this._topbarShow
-    // @ts-ignore
-    if (this._topbarShow) topbar.show()
-    else topbar.hide()
-  }
+export function init(_options: DomOptions = defaultOptions) {
+	const options = { ...defaultOptions, ..._options };
+	_topbar = options.topbar ?? true;
+}
+
+export async function topbar(show?: boolean) {
+	if (!_topbar) return;
+	const { default: topbar } = await import('topbar');
+	_topbarShow = show ?? !_topbarShow;
+	// @ts-ignore
+	if (_topbarShow) topbar.show();
+	else topbar.hide();
 }

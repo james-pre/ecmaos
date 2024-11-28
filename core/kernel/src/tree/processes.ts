@@ -1,166 +1,146 @@
-import { Events } from '#events.ts'
+import { Events } from '#events.ts';
 
-import { ProcessEvents, ProcessStatus } from '@ecmaos/types'
+import { ProcessEvents, ProcessStatus } from '@ecmaos/types';
 
 import type {
-  Kernel,
-  Shell,
-  Terminal,
-  Process as IProcess,
-  ProcessEntryParams,
-  ProcessOptions,
-  ProcessesMap,
-  ProcessExitEvent,
-  ProcessPauseEvent,
-  ProcessResumeEvent,
-  ProcessStartEvent,
-  ProcessStopEvent
-} from '@ecmaos/types'
+	Kernel,
+	Shell,
+	Terminal,
+	Process as IProcess,
+	ProcessEntryParams,
+	ProcessOptions,
+	ProcessesMap,
+	ProcessExitEvent,
+	ProcessPauseEvent,
+	ProcessResumeEvent,
+	ProcessStartEvent,
+	ProcessStopEvent,
+} from '@ecmaos/types';
 
-export class ProcessManager {
-  private _processes: ProcessesMap = new Map()
+export const all: ProcessesMap = new Map();
 
-  get all() { return this._processes }
+export function add(process: Process) {
+	all.set(process.pid, process);
+	return process.pid;
+}
 
-  add(process: Process) {
-    this._processes.set(process.pid, process)
-    return process.pid
-  }
+export function get(pid: number) {
+	return all.get(pid);
+}
 
-  get(pid: number) {
-    return this._processes.get(pid)
-  }
+export function pid() {
+	return all.size;
+}
 
-  pid() {
-    return this._processes.size
-  }
+export function remove(pid: number) {
+	all.delete(pid);
+}
 
-  remove(pid: number) {
-    this._processes.delete(pid)
-  }
-
-  spawn(parent: number, process: Process) {
-    process.parent = parent
-    return this.add(process)
-  }
+export function spawn(parent: number, process: Process) {
+	process.parent = parent;
+	return add(process);
 }
 
 export class Process implements IProcess {
-  private _args: string[]
-  private _code?: number
-  private _command: string
-  private _cwd: string
-  private _entry: (params: ProcessEntryParams) => Promise<number | undefined | void>
-  private _events: Events
-  private _gid: number
-  private _kernel: Kernel
-  private _pid: number
-  private _parent?: number
-  private _shell: Shell
-  private _status: ProcessStatus = 'stopped'
-  private _stderr: WritableStream<Uint8Array>
-  private _stdin: ReadableStream<Uint8Array>
-  private _stdout: WritableStream<Uint8Array>
-  private _terminal: Terminal
-  private _uid: number
+	public readonly args: string[];
+	public readonly code?: number;
+	public readonly command: string;
+	public readonly cwd: string;
+	public readonly entry: (params: ProcessEntryParams) => Promise<number | undefined | void>;
+	public readonly events: Events;
+	public readonly gid: number;
+	public readonly kernel: Kernel;
+	public readonly pid: number;
+	public parent?: number;
+	public readonly shell: Shell;
+	public _status: ProcessStatus = 'stopped';
+	public readonly stderr: WritableStream<Uint8Array>;
+	public readonly stdin: ReadableStream<Uint8Array>;
+	public readonly stdout: WritableStream<Uint8Array>;
+	public readonly terminal: Terminal;
+	public readonly uid: number;
 
-  get args() { return this._args }
-  get code() { return this._code }
-  get command() { return this._command }
-  get cwd() { return this._cwd }
-  get entry() { return this._entry }
-  get events() { return this._events }
-  get gid() { return this._gid }
-  get kernel() { return this._kernel }
-  get pid() { return this._pid }
-  get shell() { return this._shell }
-  get status() { return this._status }
-  get stderr() { return this._stderr }
-  get stdin() { return this._stdin }
-  get stdout() { return this._stdout }
-  get terminal() { return this._terminal }
-  get uid() { return this._uid }
+	constructor(options: ProcessOptions) {
+		if (!options.kernel) throw new Error('Kernel is required');
+		this.args = options.args || [];
+		this.command = options.command || '';
+		this.cwd = options.cwd || options.shell?.cwd || '/';
+		this.entry =
+			options.entry ||
+			((params: ProcessEntryParams) => {
+				options.kernel?.log?.silly(params);
+				return Promise.resolve(0);
+			});
+		this.events = new Events();
+		this.gid = options.gid;
+		this.kernel = options.kernel;
+		this.pid = this.kernel.processes.pid();
+		this.parent = options.parent;
+		this.shell = options.shell || this.kernel.shell;
+		this.terminal = options.terminal || this.kernel.terminal;
+		this.uid = options.uid;
 
-  get parent() { return this._parent }
-  set parent(parent: number | undefined) { this._parent = parent }
+		this.stdin = options.stdin || this.terminal.getInputStream();
+		this.stdout = options.stdout || this.terminal.stdout || new WritableStream();
+		this.stderr = options.stderr || this.terminal.stderr || new WritableStream();
 
-  constructor(options: ProcessOptions) {
-    if (!options.kernel) throw new Error('Kernel is required')
-    this._args = options.args || []
-    this._command = options.command || ''
-    this._cwd = options.cwd || options.shell?.cwd || '/'
-    this._entry = options.entry || ((params: ProcessEntryParams) => { options.kernel?.log?.silly(params); return Promise.resolve(0) })
-    this._events = new Events()
-    this._gid = options.gid
-    this._kernel = options.kernel
-    this._pid = this._kernel.processes.pid()
-    this._parent = options.parent
-    this._shell = options.shell || this.kernel.shell
-    this._terminal = options.terminal || this.kernel.terminal
-    this._uid = options.uid
+		this.kernel.processes.add(this as IProcess);
+	}
 
+	async cleanup() {
+		this.events.clear();
+		this.kernel.processes.remove(this.pid);
+	}
 
-    this._stdin = options.stdin || this.terminal.getInputStream()
-    this._stdout = options.stdout || this.terminal.stdout || new WritableStream()
-    this._stderr = options.stderr || this.terminal.stderr || new WritableStream()
+	async exit(exitCode: number = 0) {
+		this.code = exitCode;
+		this._status = 'exited';
+		await this.cleanup();
+		this.events.emit<ProcessExitEvent>(ProcessEvents.EXIT, { pid: this.pid, code: exitCode });
+	}
 
-    this.kernel.processes.add(this as IProcess)
-  }
+	pause() {
+		this._status = 'paused';
+		this.events.emit<ProcessPauseEvent>(ProcessEvents.PAUSE, { pid: this.pid });
+	}
 
-  async cleanup() {
-    this.events.clear()
-    this.kernel.processes.remove(this.pid)
-  }
+	resume() {
+		this._status = 'running';
+		this.events.emit<ProcessResumeEvent>(ProcessEvents.RESUME, { pid: this.pid });
+	}
 
-  async exit(exitCode: number = 0) {
-    this._code = exitCode
-    this._status = 'exited'
-    await this.cleanup()
-    this.events.emit<ProcessExitEvent>(ProcessEvents.EXIT, { pid: this.pid, code: exitCode })
-  }
+	async start() {
+		this._status = 'running';
+		this.events.emit<ProcessStartEvent>(ProcessEvents.START, { pid: this.pid });
 
-  pause() {
-    this._status = 'paused'
-    this.events.emit<ProcessPauseEvent>(ProcessEvents.PAUSE, { pid: this.pid })
-  }
+		const exitCode = await this.entry({
+			args: this.args,
+			command: this.command,
+			cwd: this.cwd,
+			instance: this as IProcess,
+			gid: this.gid,
+			kernel: this.kernel,
+			pid: this.pid,
+			shell: this.shell,
+			terminal: this.terminal,
+			stdin: this.stdin,
+			stdout: this.stdout,
+			stderr: this.stderr,
+			uid: this.uid,
+		});
 
-  resume() {
-    this._status = 'running'
-    this.events.emit<ProcessResumeEvent>(ProcessEvents.RESUME, { pid: this.pid })
-  }
+		await this.stop(exitCode || 0);
+		return exitCode || 0;
+	}
 
-  async start() {
-    this._status = 'running'
-    this.events.emit<ProcessStartEvent>(ProcessEvents.START, { pid: this.pid })
+	async stop(exitCode?: number) {
+		this._status = 'stopped';
+		this.events.emit<ProcessStopEvent>(ProcessEvents.STOP, { pid: this.pid });
+		await this.exit(exitCode ?? 0);
+	}
 
-    const exitCode = await this.entry({
-      args: this.args,
-      command: this.command,
-      cwd: this.cwd,
-      instance: this as IProcess,
-      gid: this.gid,
-      kernel: this.kernel,
-      pid: this.pid,
-      shell: this.shell,
-      terminal: this.terminal,
-      stdin: this._stdin,
-      stdout: this._stdout,
-      stderr: this._stderr,
-      uid: this.uid
-    })
-
-    await this.stop(exitCode || 0)
-    return exitCode || 0
-  }
-
-  async stop(exitCode?: number) {
-    this._status = 'stopped'
-    this.events.emit<ProcessStopEvent>(ProcessEvents.STOP, { pid: this.pid })
-    await this.exit(exitCode ?? 0)
-  }
-
-  restart() {
-    this.stop()
-    this.start()
-  }
+	restart() {
+		this.stop();
+		this.start();
+	}
 }
