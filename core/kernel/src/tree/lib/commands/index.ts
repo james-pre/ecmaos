@@ -20,7 +20,7 @@ import { openai, streamText } from 'modelfusion' // modelfusion is a little heav
 import path from 'path'
 // import * as textCanvas from '@thi.ng/text-canvas'
 // import * as textFormat from '@thi.ng/text-format'
-import * as jose from 'jose'
+// import * as jose from 'jose'
 import * as zipjs from '@zip.js/zip.js'
 
 import { credentials, Fetch, InMemory, resolveMountConfig, Stats } from '@zenfs/core'
@@ -518,8 +518,9 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
         { name: 'command', type: String, defaultOption: true, description: 'The command to send to the terminal socket' },
         { name: 'args', type: String, multiple: true, description: 'The arguments to send to the command' }
       ],
-      run: async (argv: CommandLineOptions) => {
-        return await socket({ kernel, shell, terminal, args: [argv.command, argv.args] })
+      run: async () => {
+        return await socket()
+        // return await socket({ kernel, shell, terminal, args: [argv.command, argv.args] })
       }
     }),
     stat: new TerminalCommand({
@@ -1803,83 +1804,84 @@ export const snake = ({ kernel, terminal }: CommandArgs) => {
   })
 }
 
-export const socket = async ({ kernel, terminal, args }: CommandArgs) => {
-  const [command, ...commandArgs] = (args as string[])
+export const socket = async () => {
+// export const socket = async ({ kernel, terminal, args }: CommandArgs) => {
+  // const [command, ...commandArgs] = (args as string[])
 
-  const user = kernel.users.get(kernel.shell.credentials.uid)
-  if (!user?.keypair) throw new Error(kernel.i18n.t('User not found or missing keypair'))
+  // const user = kernel.users.get(kernel.shell.credentials.uid)
+  // if (!user?.keypair) throw new Error(kernel.i18n.t('User not found or missing keypair'))
 
-  if (typeof user.keypair.privateKey === 'string') {
-    // Decrypt the private key
-    const pass = await terminal.readline(kernel.i18n.t('Your private key is locked, please enter your password to unlock it: '), true)
+  // if (typeof user.keypair.privateKey === 'string') {
+  //   // Decrypt the private key
+  //   const pass = await terminal.readline(kernel.i18n.t('Your private key is locked, please enter your password to unlock it: '), true)
     
-    try {
-      // Pad password to 32 bytes for AES-256
-      const paddedPassword = new TextEncoder().encode(pass.padEnd(32, '\0')).slice(0, 32)
+  //   try {
+  //     // Pad password to 32 bytes for AES-256
+  //     const paddedPassword = new TextEncoder().encode(pass.padEnd(32, '\0')).slice(0, 32)
       
-      // Create AES key from password
-      const aesKey = await crypto.subtle.importKey(
-        'raw',
-        paddedPassword,
-        'AES-GCM',
-        false,
-        ['encrypt', 'decrypt']
-      )
+  //     // Create AES key from password
+  //     const aesKey = await crypto.subtle.importKey(
+  //       'raw',
+  //       paddedPassword,
+  //       'AES-GCM',
+  //       false,
+  //       ['encrypt', 'decrypt']
+  //     )
 
-      // Decode base64 encrypted private key
-      const encryptedData = new Uint8Array(
-        atob(user.keypair.privateKey)
-          .split('')
-          .map(c => c.charCodeAt(0))
-      )
+  //     // Decode base64 encrypted private key
+  //     const encryptedData = new Uint8Array(
+  //       atob(user.keypair.privateKey)
+  //         .split('')
+  //         .map(c => c.charCodeAt(0))
+  //     )
 
-      // Extract IV and encrypted data
-      const iv = encryptedData.slice(0, 12)
-      const encryptedPrivateKey = encryptedData.slice(12)
+  //     // Extract IV and encrypted data
+  //     const iv = encryptedData.slice(0, 12)
+  //     const encryptedPrivateKey = encryptedData.slice(12)
 
-      // Decrypt the private key
-      const decryptedPrivateKeyText = new TextDecoder().decode(
-        await crypto.subtle.decrypt(
-          { name: 'AES-GCM', iv },
-          aesKey,
-          encryptedPrivateKey
-        )
-      )
+  //     // Decrypt the private key
+  //     const decryptedPrivateKeyText = new TextDecoder().decode(
+  //       await crypto.subtle.decrypt(
+  //         { name: 'AES-GCM', iv },
+  //         aesKey,
+  //         encryptedPrivateKey
+  //       )
+  //     )
 
-      // Parse the decrypted JWK
-      const privateKeyJWK = JSON.parse(decryptedPrivateKeyText)
-      user.keypair.privateKey = privateKeyJWK
-    } catch (error) {
-      kernel.log?.error(error)
-      terminal.writeln(chalk.red(kernel.i18n.t('Failed to decrypt private key')))
-      return 1
-    }
-  }
+  //     // Parse the decrypted JWK
+  //     const privateKeyJWK = JSON.parse(decryptedPrivateKeyText)
+  //     user.keypair.privateKey = privateKeyJWK
+  //   } catch (error) {
+  //     kernel.log?.error(error)
+  //     terminal.writeln(chalk.red(kernel.i18n.t('Failed to decrypt private key')))
+  //     return 1
+  //   }
+  // }
 
-  const payloadObject = {
-    'urn:ecmaos:metal:command': command,
-    'urn:ecmaos:metal:args': commandArgs[0],
-    'urn:ecmaos:metal:rows': kernel.terminal.rows,
-    'urn:ecmaos:metal:cols': kernel.terminal.cols,
-    'urn:ecmaos:metal:user': kernel.shell.username,
-    'urn:ecmaos:metal:key': kernel.users.get(kernel.shell.credentials.uid)?.keypair?.publicKey,
-    'urn:ecmaos:metal:timestamp': Date.now()
-  }
+  // const payloadObject = {
+  //   'urn:ecmaos:metal:command': command,
+  //   'urn:ecmaos:metal:args': commandArgs[0],
+  //   'urn:ecmaos:metal:rows': kernel.terminal.rows,
+  //   'urn:ecmaos:metal:cols': kernel.terminal.cols,
+  //   'urn:ecmaos:metal:user': kernel.shell.username,
+  //   'urn:ecmaos:metal:key': kernel.users.get(kernel.shell.credentials.uid)?.keypair?.publicKey,
+  //   'urn:ecmaos:metal:timestamp': Date.now()
+  // }
 
   // Import the private key for signing
-  const userKey = await jose.importJWK(user.keypair.privateKey as jose.JWK, 'ES384')
+  // const userKey = await jose.importJWK(user.keypair.privateKey as jose.JWK, 'ES384')
 
   // Create and sign the JWT
-  const jwt = await new jose.SignJWT(payloadObject)
-    .setProtectedHeader({ alg: 'ES384' })
-    .setIssuedAt()
-    .setIssuer(`urn:ecmaos:kernel:${kernel.id}`)
-    .setAudience(`urn:ecmaos:user:${kernel.shell.username}`)
-    .setExpirationTime('2m')
-    .sign(userKey)
+  // const jwt = await new jose.SignJWT(payloadObject)
+  //   .setProtectedHeader({ alg: 'ES384' })
+  //   .setIssuedAt()
+  //   .setIssuer(`urn:ecmaos:kernel:${kernel.id}`)
+  //   .setAudience(`urn:ecmaos:user:${kernel.shell.username}`)
+  //   .setExpirationTime('2m')
+  //   .sign(userKey)
 
   // Import server's public key for encryption
-  const serverPublicKey = await jose.importJWK(kernel.terminal.socketKey as jose.JWK, 'ECDH-ES+A256KW')
+  // const serverPublicKey = await jose.importJWK(kernel.terminal.socketKey as jose.JWK, 'ECDH-ES+A256KW')
 
   // Encrypt the JWT using the server's public key
   // const encryptedJwt = await new jose.CompactEncrypt(
