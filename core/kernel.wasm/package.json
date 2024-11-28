@@ -30,5 +30,8 @@
   "devDependencies": {
     "nodemon": "^3.1.7",
     "serve": "^14.2.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

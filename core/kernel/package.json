@@ -78,7 +78,7 @@
     "test:ui": "vitest --coverage --ui",
     "test:bench": "vitest bench"
   },
-  "accessConfig": {
+  "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
