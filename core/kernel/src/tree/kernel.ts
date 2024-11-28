@@ -804,9 +804,9 @@ export class Kernel implements IKernel {
 
     if ('deviceMemory' in navigator) contents.memory = `>= ${navigator.deviceMemory}GB`
 
-    for (const [key, value] of Object.entries(contents)) {
+    for (const [key, value] of Object.entries(contents) as [string, string | null][]) {
       try {
-        await this.filesystem.fs.writeFile(`/proc/${key}`, value as string, { flag: 'w+', mode: 0o777 })
+        await this.filesystem.fs.writeFile(`/proc/${key}`, value ?? new Uint8Array(), { flag: 'w+', mode: 0o777 })
       } catch (error) {
         this.log?.warn(`Failed to write proc data: ${key}`, error)
       }
