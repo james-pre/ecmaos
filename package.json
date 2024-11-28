@@ -35,6 +35,7 @@
     "lint": "turbo run lint",
     "lint:repo": "sherif",
     "preinstall": "npx only-allow pnpm",
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish",
     "start": "turbo run dev --filter=@ecmaos/kernel",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
