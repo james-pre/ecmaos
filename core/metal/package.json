@@ -8,13 +8,13 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "node --no-warnings=ExperimentalWarning --experimental-strip-types src/server.ts"
+    "start": "tsx src/server.ts"
   },
   "engines": {
     "node": ">=22.11.0"
   },
   "nodemonConfig": {
-    "exec": "tsx src/server.ts",
+    "exec": "tsx --inspect=127.0.0.1:30229 src/server.ts",
     "ext": "ts"
   },
   "dependencies": {

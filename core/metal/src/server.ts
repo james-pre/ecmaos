@@ -1,26 +1,28 @@
 import fs from 'fs'
+import { cors } from 'hono/cors'
 import { createNodeWebSocket } from '@hono/node-ws'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { Hono } from 'hono'
 import { serve } from '@hono/node-server'
-import { cors } from 'hono/cors'
 import { spawn } from 'node-pty'
 import * as jose from 'jose'
 
 import pkg from '../package.json' with { type: 'json' }
 
-const versions = ['v1']
+const versions = fs.readdirSync(dirname(fileURLToPath(import.meta.url))).filter(entry => entry.startsWith('v'))
 const latestVersion = versions[versions.length - 1]
 
-const authorizedKeys = JSON.parse(fs.readFileSync('./authorized_keys.json', 'utf8'))
-
 if (!fs.existsSync('./server.key')) {
-  const serverPrivateKey = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-384' }, true, ['sign', 'verify'])
-  const serverPublicKey = await crypto.subtle.exportKey('jwk', serverPrivateKey.publicKey)
-  fs.writeFileSync('./server.key', JSON.stringify({ privateKey: serverPrivateKey, publicKey: serverPublicKey }))
+  const privateKey = await jose.generateKeyPair('ES384')
+  const publicKey = await jose.exportJWK(privateKey.publicKey)
+  const privateKeyJWK = await jose.exportJWK(privateKey.privateKey)
+  
+  fs.writeFileSync('./server.key', JSON.stringify({ privateKey: privateKeyJWK, publicKey }))
 }
 
+const authorizedKeys = JSON.parse(fs.readFileSync('./authorized_keys.json', 'utf8'))
 const serverKey = JSON.parse(fs.readFileSync('./server.key', 'utf8'))
-
 const app = new Hono()
 const processes = new Map<string, any>()
 const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app })
@@ -42,49 +44,18 @@ app.get('/socket', upgradeWebSocket(() => {
       console.log(`${ws.id} closed`)
       processes.delete(ws.id)
     },
-    onMessage: (message: MessageEvent, ws: WebSocket & { id: string }) => {
+    onMessage: async (message: MessageEvent, ws: WebSocket & { id: string }) => {
       if (processes.has(ws.id)) return processes.get(ws.id).write(message.data)
 
       const encryptedJWT = message.data
       
       try {
-        jose.importJWK(serverKey.privateKey, 'ES384')
-          .then(async privateKey => {
-            const decryptedResult = await jose.compactDecrypt(encryptedJWT, privateKey)
-            console.log(decryptedResult)
-          })
-
-        // const decryptionKey = await crypto.subtle.generateKey(
-        //   { name: 'AES-GCM', length: 256 },
-        //   true,
-        //   ['encrypt', 'decrypt']
-        // )
-
-        // const decryptedJWT = await new jose.CompactDecrypt(
-        //   encryptedJWT,
-        //   decryptionKey
-        // ).decrypt()
-
-        // const jwt = new TextDecoder().decode(decryptedJWT.plaintext)
-
-        // const publicKey = await jose.importJWK(serverKey.publicKey, 'ES384')
-        // const { payload } = await jose.jwtVerify(jwt, publicKey, {
-        //   issuer: /^urn:ecmaos:kernel:.+$/,
-        //   audience: /^urn:ecmaos:user:.+$/
-        // })
-
-        // const command = payload['urn:ecmaos:metal:command']
-        // const args = payload['urn:ecmaos:metal:args']
-        // const rows = payload['urn:ecmaos:metal:rows'] 
-        // const cols = payload['urn:ecmaos:metal:cols']
-        // const username = payload['urn:ecmaos:metal:user']
-        // const userKey = payload['urn:ecmaos:metal:key']
-        // const timestamp = payload['urn:ecmaos:metal:timestamp']
-
-        // // TODO: Handle the decrypted command
-        // console.log('Decrypted command:', { command, args, rows, cols, username, userKey, timestamp })
-
-      } catch {}
+        const privateKey = await jose.importJWK(serverKey.privateKey, 'ES384')
+        const decryptedResult = await jose.compactDecrypt(encryptedJWT, privateKey)
+        console.log(decryptedResult)
+      } catch (error) {
+        console.error(error)
+      }
     },
     onMessageOld: (message: MessageEvent, ws: WebSocket & { id: string }) => {
       if (processes.has(ws.id)) return processes.get(ws.id).write(message.data)
@@ -151,7 +122,8 @@ app.get('/socket', upgradeWebSocket(() => {
 
 // Don't expose to any network
 const port = Number(process.env.PORT) || 30445
-const server = serve({ hostname: 'localhost', port, fetch: app.fetch })
+const hostname = process.env.HOSTNAME || 'localhost'
+const server = serve({ hostname, port, fetch: app.fetch })
 injectWebSocket(server)
 
-console.log(`*** ${pkg.name}:${pkg.version} running on port ${port} ***`)
+console.log(`*** ${pkg.name}:${pkg.version} running on ${hostname}:${port} ***`)

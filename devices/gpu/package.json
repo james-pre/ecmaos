@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@ecmaos/config-typescript": "workspace:^",
-    "@ecmaos/types": "workspace:*",
+    "@ecmaos/types": "workspace:^",
     "@types/ansi-escape-sequences": "^4.0.4",
     "@webgpu/types": "^0.1.51",
     "@zenfs/core": "^1.3.3",

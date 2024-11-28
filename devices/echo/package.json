@@ -9,8 +9,8 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "@ecmaos/config-typescript": "workspace:*",
-    "@ecmaos/types": "workspace:*",
+    "@ecmaos/config-typescript": "workspace:^",
+    "@ecmaos/types": "workspace:^",
     "@zenfs/core": "^1.3.3"
   }
 }

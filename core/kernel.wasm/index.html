@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WASM Kernel Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+        }
+
+        #console {
+            background: #000;
+            border: 1px solid #333;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            white-space: pre;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+        button:hover {
+            background: #444;
+        }
+
+        input {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px;
+            font-family: monospace;
+            flex-grow: 1;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #222;
+        }
+
+        .status-item {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-label {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="status">
+        <div class="status-item">
+            <span class="status-label">State:</span>
+            <span id="kernel-state">Not initialized</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Version:</span>
+            <span id="kernel-version">-</span>
+        </div>
+    </div>
+
+    <div id="console"></div>
+
+    <div class="controls">
+        <input type="text" id="command-input" placeholder="Enter command...">
+        <button onclick="executeCommand()">Execute</button>
+    </div>
+
+    <div class="controls">
+        <button onclick="initializeKernel()">Initialize Kernel</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 20px;">
+        <h3 style="color: #00ff00">File Operations</h3>
+        
+        <div class="controls">
+            <input type="text" id="file-path" placeholder="File path...">
+            <textarea id="file-content" placeholder="File content..." 
+                      style="background: #333; color: #00ff00; border: 1px solid #00ff00; padding: 8px; font-family: monospace; height: 100px; width: 100%;"></textarea>
+        </div>
+        
+        <div class="controls">
+            <button onclick="writeFile()">Write File</button>
+            <button onclick="readFile()">Read File</button>
+            <button onclick="deleteFile()">Delete File</button>
+            <button onclick="checkFileExists()">Check File</button>
+            <button onclick="listFiles()">List Files</button>
+        </div>
+    </div>
+
+    <script>
+        let kwasm
+        const consoleElement = document.getElementById('console')
+        const stateElement = document.getElementById('kernel-state')
+        const versionElement = document.getElementById('kernel-version')
+        const commandInput = document.getElementById('command-input')
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString()
+            const colorMap = {
+                info: '#00ff00',
+                error: '#ff0000',
+                warning: '#ffff00'
+            }
+            
+            consoleElement.innerHTML += `<span style="color: ${colorMap[type]}">[${timestamp}] ${message}</span>\n`
+            consoleElement.scrollTop = consoleElement.scrollHeight
+        }
+
+        async function initializeKernel() {
+            try {
+                log('Initializing kernel...')
+                const module = await import('./build/dist/kernel.js')
+                globalThis.kwasm = kwasm = await module.default({
+                    name: 'kernel.wasm'
+                })
+
+                const state = kwasm._init()
+                const version = kwasm.ccall('get_version', 'string', [], [])
+
+                stateElement.textContent = ['BOOTING', 'RUNNING', 'PANIC', 'SHUTDOWN'][state]
+                versionElement.textContent = version
+
+                log('Kernel initialized successfully')
+            } catch (err) {
+                log(`Failed to initialize kernel: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+
+        async function executeCommand() {
+            if (!kwasm) {
+                log('Kernel not initialized!', 'error')
+                return
+            }
+
+            const command = commandInput.value
+            if (!command || !command.trim()) {
+                log('Empty command', 'error')
+                return
+            }
+
+            try {
+                log(`> ${command}`)
+                
+                const result = kwasm.ccall(
+                    'execute',           // C function name
+                    'number',           // Return type
+                    ['string'],         // Argument types
+                    [command.trim()]    // Arguments
+                )
+                
+                commandInput.value = ''
+            } catch (err) {
+                log(`Command execution failed: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+
+        function clearConsole() {
+            consoleElement.innerHTML = ''
+        }
+
+        // Handle Enter key in command input
+        commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                executeCommand()
+            }
+        })
+
+        // Initial log
+        log('WASM Kernel Test Interface Ready')
+        log('Click "Initialize Kernel" to begin')
+
+        async function writeFile() {
+            if (!kwasm) {
+                log('Kernel not initialized!', 'error')
+                return
+            }
+
+            const path = document.getElementById('file-path').value
+            const content = document.getElementById('file-content').value
+
+            if (!path || !content) {
+                log('Please provide both path and content', 'error')
+                return
+            }
+
+            try {
+                const result = kwasm.ccall('write_file', 'number', 
+                    ['string', 'string'], [path, content])
+                
+                if (result === 0) {
+                    log(`File written successfully: ${path}`)
+                } else {
+                    log(`Failed to write file: ${path}`, 'error')
+                }
+            } catch (err) {
+                log(`File operation failed: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+
+        async function readFile() {
+            if (!kwasm) {
+                log('Kernel not initialized!', 'error')
+                return
+            }
+
+            const path = document.getElementById('file-path').value
+            if (!path) {
+                log('Please provide a file path', 'error')
+                return
+            }
+
+            try {
+                const content = kwasm.ccall('read_file', 'string', ['string'], [path])
+                if (content) {
+                    document.getElementById('file-content').value = content
+                    log(`File read successfully: ${path}`)
+                } else {
+                    log(`Failed to read file: ${path}`, 'error')
+                }
+            } catch (err) {
+                log(`File operation failed: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+
+        async function deleteFile() {
+            if (!kwasm) {
+                log('Kernel not initialized!', 'error')
+                return
+            }
+
+            const path = document.getElementById('file-path').value
+            if (!path) {
+                log('Please provide a file path', 'error')
+                return
+            }
+
+            try {
+                const result = kwasm.ccall('delete_file', 'number', ['string'], [path])
+                if (result === 0) {
+                    log(`File deleted successfully: ${path}`)
+                    document.getElementById('file-content').value = ''
+                } else {
+                    log(`Failed to delete file: ${path}`, 'error')
+                }
+            } catch (err) {
+                log(`File operation failed: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+
+        async function checkFileExists() {
+            if (!kwasm) {
+                log('Kernel not initialized!', 'error')
+                return
+            }
+
+            const path = document.getElementById('file-path').value
+            if (!path) {
+                log('Please provide a file path', 'error')
+                return
+            }
+
+            try {
+                const exists = kwasm.ccall('file_exists', 'number', ['string'], [path])
+                log(`File ${path} ${exists ? 'exists' : 'does not exist'}`)
+            } catch (err) {
+                log(`File operation failed: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+
+        async function listFiles() {
+            if (!kwasm) {
+                log('Kernel not initialized!', 'error')
+                return
+            }
+
+            try {
+                const files = kwasm.ccall('list_directory', 'string', ['string'], ['/'])
+                if (files) {
+                    log('Directory listing:')
+                    files.split('\n').forEach(file => {
+                        if (file) log(`  ${file}`)
+                    })
+                } else {
+                    log('Failed to list directory', 'error')
+                }
+            } catch (err) {
+                log(`File operation failed: ${err.message}`, 'error')
+                console.error(err)
+            }
+        }
+    </script>
+</body>
+</html> 

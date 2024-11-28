@@ -1,0 +1,34 @@
+{
+  "name": "@ecmaos/kernel.wasm",
+  "description": "ecmaOS: Micro-kernel and framework for web technologies",
+  "version": "0.1.0",
+  "license": "MIT",
+  "homepage": "https://ecmaos.sh",
+  "repository": "https://github.com/ecmaos/ecmaos",
+  "author": {
+    "name": "Jay Mathis",
+    "email": "code@mathis.network",
+    "url": "https://github.com/mathiscode"
+  },
+  "bugs": {
+    "url": "https://github.com/ecmaos/ecmaos/issues",
+    "email": "code@mathis.network"
+  },
+  "main": "dist/kernel.js",
+  "scripts": {
+    "build": "./build.sh",
+    "serve": "serve -s",
+    "dev": "nodemon"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src/**/*",
+      "index.html"
+    ],
+    "exec": "npm run build"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "serve": "^14.2.3"
+  }
+}

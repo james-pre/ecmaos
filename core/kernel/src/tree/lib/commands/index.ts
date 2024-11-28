@@ -1866,8 +1866,10 @@ export const socket = async ({ kernel, terminal, args }: CommandArgs) => {
     'urn:ecmaos:metal:timestamp': Date.now()
   }
 
+  // Import the private key for signing
   const userKey = await jose.importJWK(user.keypair.privateKey as jose.JWK, 'ES384')
 
+  // Create and sign the JWT
   const jwt = await new jose.SignJWT(payloadObject)
     .setProtectedHeader({ alg: 'ES384' })
     .setIssuedAt()
@@ -1876,15 +1878,19 @@ export const socket = async ({ kernel, terminal, args }: CommandArgs) => {
     .setExpirationTime('2m')
     .sign(userKey)
 
+  // Import server's public key for encryption
+  const serverPublicKey = await jose.importJWK(kernel.terminal.socketKey as jose.JWK, 'ECDH-ES+A256KW')
+
+  // Encrypt the JWT using the server's public key
   const encryptedJwt = await new jose.CompactEncrypt(
     new TextEncoder().encode(jwt)
   )
-    .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
-    .encrypt(await crypto.subtle.generateKey(
-      { name: 'AES-GCM', length: 256 },
-      true,
-      ['encrypt', 'decrypt']
-    ))
+    .setProtectedHeader({ 
+      alg: 'ECDH-ES+A256KW', 
+      enc: 'A256GCM',
+      kid: kernel.terminal.socketKey?.kid
+    })
+    .encrypt(serverPublicKey)
 
   kernel.terminal.socket?.send(encryptedJwt)
   return 0

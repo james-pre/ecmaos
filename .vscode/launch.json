@@ -12,6 +12,14 @@
       "url": "https://localhost:30443",
       "webRoot": "${workspaceFolder}/core/kernel/src",
       "sourceMaps": true
+    },
+
+    {
+      "type": "node",
+      "request": "attach",
+      "port": 30229,
+      "name": "Debug Metal (Node:30229)",
+      "sourceMaps": true
     }
   ]
 }
