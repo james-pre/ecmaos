@@ -1882,17 +1882,17 @@ export const socket = async ({ kernel, terminal, args }: CommandArgs) => {
   const serverPublicKey = await jose.importJWK(kernel.terminal.socketKey as jose.JWK, 'ECDH-ES+A256KW')
 
   // Encrypt the JWT using the server's public key
-  const encryptedJwt = await new jose.CompactEncrypt(
-    new TextEncoder().encode(jwt)
-  )
-    .setProtectedHeader({ 
-      alg: 'ECDH-ES+A256KW', 
-      enc: 'A256GCM',
-      kid: kernel.terminal.socketKey?.kid
-    })
-    .encrypt(serverPublicKey)
+  // const encryptedJwt = await new jose.CompactEncrypt(
+  //   new TextEncoder().encode(jwt)
+  // )
+  //   .setProtectedHeader({ 
+  //     alg: 'ECDH-ES+A256KW', 
+  //     enc: 'A256GCM',
+  //     kid: kernel.terminal.socketKey?.kid
+  //   })
+  //   .encrypt(serverPublicKey)
 
-  kernel.terminal.socket?.send(encryptedJwt)
+  // kernel.terminal.socket?.send(encryptedJwt)
   return 0
 }
 

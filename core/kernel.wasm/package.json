@@ -16,7 +16,7 @@
   },
   "main": "dist/kernel.js",
   "scripts": {
-    "build": "./build.sh",
+    "build:wasm": "./build.sh",
     "serve": "serve -s",
     "dev": "nodemon"
   },
@@ -25,7 +25,7 @@
       "src/**/*",
       "index.html"
     ],
-    "exec": "npm run build"
+    "exec": "npm run build:wasm"
   },
   "devDependencies": {
     "nodemon": "^3.1.7",

@@ -5,7 +5,8 @@
     "**/dist/**/*",
     "**/tests/**/*",
     "core/metal",
-    "core/swapi"
+    "core/swapi",
+    "core/kernel.wasm"
   ],
   "compilerOptions": {
     "strict": true,
