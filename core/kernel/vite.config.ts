@@ -8,13 +8,10 @@ import pkg from './package.json'
 
 export default defineConfig({
   plugins: [
-    i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] }),
     nodePolyfills({
-      include: ['buffer', 'module', 'os', 'path'],
-      globals: {
-        Buffer: true
-      }
-    })
+      include: ['module', 'os', 'path']
+    }),
+    i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] })
   ],
   define: {
     'import.meta.env.NAME': JSON.stringify(pkg.name),
