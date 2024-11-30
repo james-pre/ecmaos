@@ -62,9 +62,9 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Workers (Web Workers)
 
 - `BIOS`
-  - The BIOS is a WebAssembly module providing performance-critical functionality
+  - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
   - The BIOS has its own filesystem, located at `/bios`
-  - The main idea is that data and custom applications can be loaded into it for WASM-native performance
+  - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
   - Confusingly, the Kernel loads the BIOS - not the other way around
 
 - `Apps`
