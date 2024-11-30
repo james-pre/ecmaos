@@ -39,7 +39,7 @@ import { Wasm } from '#wasm.ts'
 import { Windows } from '#windows.ts'
 import { Workers } from '#workers.ts'
 
-import bios, { BIOSModule } from '@ecmaos/bios'
+import createBIOS, { BIOSModule } from '@ecmaos/bios'
 import { TerminalCommands } from '#lib/commands/index.js'
 
 import {
@@ -183,7 +183,7 @@ export class Kernel implements IKernel {
     this.workers = new Workers()
 
     this.shell.attach(this.terminal)
-    bios().then((biosModule: BIOSModule) => {
+    createBIOS().then((biosModule: BIOSModule) => {
       this.bios = biosModule
       resolveMountConfig({ backend: Emscripten, FS: biosModule.FS })
         .then(config => this.filesystem.fsSync.mount('/bios', config))

@@ -16,7 +16,7 @@ importers:
         specifier: workspace:^
         version: link:../../utils/config-typescript
       '@ecmaos/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/types
       '@types/ansi-escape-sequences':
         specifier: ^4.0.4

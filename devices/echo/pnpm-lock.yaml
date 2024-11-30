@@ -9,10 +9,10 @@ importers:
   .:
     devDependencies:
       '@ecmaos/config-typescript':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../utils/config-typescript
       '@ecmaos/types':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../../core/types
       '@zenfs/core':
         specifier: ^1.3.3
