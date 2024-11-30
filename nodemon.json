@@ -1,8 +1,9 @@
 {
   "watch": [
     "core/kernel/src",
-    "core/kernel/typedoc.json",
-    "README.md"
+    "core/types",
+    "README.md",
+    "typedoc.*"
   ],
   "ext": "ts,json,md",
   "exec": "pnpm build:docs"

@@ -57,8 +57,15 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Storage (IndexedDB, localStorage, sessionStorage, etc.)
   - Terminal (xterm.js)
   - User Manager
+  - WASM Loader
   - Window Manager (WinBox)
   - Workers (Web Workers)
+
+- `BIOS`
+  - The BIOS is a WebAssembly module providing performance-critical functionality
+  - The BIOS has its own filesystem, located at `/bios`
+  - The main idea is that data and custom applications can be loaded into it for WASM-native performance
+  - Confusingly, the Kernel loads the BIOS - not the other way around
 
 - `Apps`
   - These are full applications that are developed to work with ecmaOS

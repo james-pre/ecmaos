@@ -7,12 +7,10 @@ if [ -z "$EMSDK" ]; then
     exit 1
 fi
 
-# Create build directory
 mkdir -p build
 cd build
 
-# Configure and build
 emcmake cmake ..
 emmake make
 
-echo "Build complete! Output files in build/dist/" 
+echo "Build complete! Output files in build/dist/"

@@ -1,7 +1,7 @@
 /// <reference types="vitest/config" />
+import i18nextLoader from 'vite-plugin-i18next-loader'
 import path from 'path'
 import { defineConfig } from 'vite'
-import i18nextLoader from 'vite-plugin-i18next-loader'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import pkg from './package.json'
@@ -9,7 +9,12 @@ import pkg from './package.json'
 export default defineConfig({
   plugins: [
     i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] }),
-    nodePolyfills({ include: ['os', 'path'] })
+    nodePolyfills({
+      include: ['buffer', 'module', 'os', 'path'],
+      globals: {
+        Buffer: true
+      }
+    })
   ],
   define: {
     'import.meta.env.NAME': JSON.stringify(pkg.name),
@@ -41,6 +46,17 @@ export default defineConfig({
       scss: {
         api: 'modern-compiler'
       }
+    }
+  },
+  build: {
+    sourcemap: true,
+    minify: false,
+    rollupOptions: {
+      external: [
+        'async_hooks',
+        'vite-plugin-node-polyfills/shims/buffer',
+        'vite-plugin-node-polyfills/shims/process'
+      ]
     }
   },
   test: {

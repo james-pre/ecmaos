@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@ecmaos/bios':
+        specifier: workspace:^
+        version: link:../bios
       '@xterm/xterm':
         specifier: ^5.5.0
         version: 5.5.0
@@ -33,6 +36,9 @@ importers:
       '@types/command-line-args':
         specifier: ^5.2.3
         version: 5.2.3
+      '@types/emscripten':
+        specifier: ^1.39.13
+        version: 1.39.13
       '@types/winbox':
         specifier: ^0.2.5
         version: 0.2.5
@@ -57,6 +63,9 @@ packages:
 
   '@types/command-line-args@5.2.3':
     resolution: {integrity: sha512-uv0aG6R0Y8WHZLTamZwtfsDLVRnOa+n+n5rEvFWL5Na5gZ8V2Teab/duDPFzIIIhs9qizDpcavCusCLJZu62Kw==}
+
+  '@types/emscripten@1.39.13':
+    resolution: {integrity: sha512-cFq+fO/isvhvmuP/+Sl4K4jtU6E23DoivtbO4r50e3odaxAiVdbfSYRDdJ4gCdxx+3aRjhphS5ZMwIH4hFy/Cw==}
 
   '@types/node@20.17.6':
     resolution: {integrity: sha512-VEI7OdvK2wP7XHnsuXbAJnEpEkF6NjSN45QJlL4VGqZSXsnicpesdTWsg9RISeSdYd3yeRj/y3k5KGjUXYnFwQ==}
@@ -222,6 +231,8 @@ snapshots:
       regenerator-runtime: 0.14.1
 
   '@types/command-line-args@5.2.3': {}
+
+  '@types/emscripten@1.39.13': {}
 
   '@types/node@20.17.6':
     dependencies:

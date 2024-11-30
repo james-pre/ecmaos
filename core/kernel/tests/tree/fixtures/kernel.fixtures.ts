@@ -1,2 +1,2 @@
 export const TestDomOptions = { topbar: false }
-export const TestLogOptions = false
+export const TestLogOptions = undefined

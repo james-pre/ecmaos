@@ -12,7 +12,8 @@ import chalk from 'chalk'
 import figlet from 'figlet'
 import Module from 'node:module'
 import { Notyf } from 'notyf'
-import { Credentials, credentials, DeviceDriver, DeviceFS } from '@zenfs/core'
+import { Credentials, credentials, DeviceDriver, DeviceFS, resolveMountConfig } from '@zenfs/core'
+import { Emscripten } from '@zenfs/emscripten'
 
 import './../themes/default.scss'
 import 'notyf/notyf.min.css'
@@ -38,6 +39,7 @@ import { Wasm } from '#wasm.ts'
 import { Windows } from '#windows.ts'
 import { Workers } from '#workers.ts'
 
+import bios, { BIOSModule } from '@ecmaos/bios'
 import { TerminalCommands } from '#lib/commands/index.js'
 
 import {
@@ -118,94 +120,74 @@ export class Kernel implements IKernel {
   public readonly name: string = import.meta.env['NAME']
   public readonly version: string = import.meta.env['VERSION']
 
-  private _auth: Auth
-  private _channel: BroadcastChannel
-  private _components: Components
-  private _dom: Dom
-  private _devices: Map<string, { device: KernelDevice, drivers?: DeviceDriver[] }> = new Map()
-  private _events: Events
-  private _filesystem: Filesystem
-  private _i18n: I18n
-  private _intervals: Intervals
-  private _keyboard: Keyboard
-  private _log: Log | null
-  private _memory: Memory
-  private _options: KernelOptions
-  private _packages: Map<string, Module> = new Map()
-  private _processes: ProcessManager
-  private _protocol: Protocol
-  private _screensavers: Map<string, { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }>
-  private _service: Service
-  private _shell: Shell
+  public readonly auth: Auth
+  public bios?: BIOSModule
+  public readonly channel: BroadcastChannel
+  public readonly components: Components
+  public readonly dom: Dom
+  public readonly devices: Map<string, { device: KernelDevice, drivers?: DeviceDriver[] }> = new Map()
+  public readonly events: Events
+  public readonly filesystem: Filesystem
+  public readonly i18n: I18n
+  public readonly intervals: Intervals
+  public readonly keyboard: Keyboard
+  public readonly log: Log | null
+  public readonly memory: Memory
+  public readonly options: KernelOptions
+  public readonly packages: Map<string, Module> = new Map()
+  public readonly processes: ProcessManager
+  public readonly protocol: Protocol
+  public readonly screensavers: Map<string, { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }>
+  public readonly service: Service
+  public readonly shell: Shell
+  public readonly storage: Storage
+  public readonly terminal: ITerminal
+  public readonly toast: Notyf
+  public readonly users: Users
+  public readonly wasm: IWasm
+  public readonly windows: IWindows
+  public readonly workers: IWorkers
+
   private _state: KernelState = KernelState.BOOTING
-  private _storage: Storage
-  private _terminal: ITerminal
-  private _toast: Notyf
-  private _users: Users
-  private _wasm: IWasm
-  private _windows: IWindows
-  private _workers: IWorkers
-
-  get addEventListener() { return this.on }
-  get removeEventListener() { return this.off }
-
-  get auth() { return this._auth }
-  get channel() { return this._channel }
-  get components() { return this._components }
-  get dom() { return this._dom }
-  get devices() { return this._devices }
-  get events() { return this._events }
-  get filesystem() { return this._filesystem }
-  get i18n() { return this._i18n }
-  get intervals() { return this._intervals }
-  get keyboard() { return this._keyboard }
-  get log() { return this._log }
-  get memory() { return this._memory }
-  get options() { return this._options }
-  get packages() { return this._packages }
-  get processes() { return this._processes }
-  get protocol() { return this._protocol }
-  get screensavers() { return this._screensavers }
-  get service() { return this._service }
-  get shell() { return this._shell }
   get state() { return this._state }
-  get storage() { return this._storage }
-  get terminal() { return this._terminal }
-  get toast() { return this._toast }
-  get users() { return this._users }
-  get wasm() { return this._wasm }
-  get windows() { return this._windows }
-  get workers() { return this._workers }
+
+  get addEventListener() { return this.events.on }
+  get removeEventListener() { return this.events.off }
 
   constructor(_options: KernelOptions = DefaultKernelOptions) {
-    this._options = { ...DefaultKernelOptions, ..._options }
+    this.options = { ...DefaultKernelOptions, ..._options }
 
-    this._auth = new Auth()
-    this._channel = new BroadcastChannel(import.meta.env['NAME'] || 'ecmaos')
-    this._components = new Components()
-    this._dom = new Dom(this.options.dom)
-    this._devices = new Map<string, { device: KernelDevice, drivers?: DeviceDriver[] }>()
-    this._events = new Events()
-    this._filesystem = new Filesystem()
-    this._i18n = new I18n(this.options.i18n)
-    this._intervals = new Intervals()
-    this._keyboard = navigator.keyboard
-    this._log = this.options.log ? new Log(this.options.log) : null
-    this._memory = new Memory()
-    this._processes = new ProcessManager()
-    this._protocol = new Protocol({ kernel: this })
-    this._screensavers = new Map()
-    this._service = new Service({ kernel: this, ...this.options.service })
-    this._shell = new Shell({ kernel: this, uid: 0, gid: 0 })
-    this._storage = new Storage({ kernel: this })
-    this._terminal = new Terminal({ kernel: this, socket: this.options.socket })
-    this._toast = new Notyf(this.options.toast)
-    this._users = new Users({ kernel: this })
-    this._windows = new Windows()
-    this._wasm = new Wasm({ kernel: this })
-    this._workers = new Workers()
+    this.auth = new Auth()
+    this.channel = new BroadcastChannel(import.meta.env['NAME'] || 'ecmaos')
+    this.components = new Components()
+    this.dom = new Dom(this.options.dom)
+    this.devices = new Map<string, { device: KernelDevice, drivers?: DeviceDriver[] }>()
+    this.events = new Events()
+    this.filesystem = new Filesystem()
+    this.i18n = new I18n(this.options.i18n)
+    this.intervals = new Intervals()
+    this.keyboard = navigator.keyboard
+    this.log = this.options.log ? new Log(this.options.log) : null
+    this.memory = new Memory()
+    this.processes = new ProcessManager()
+    this.protocol = new Protocol({ kernel: this })
+    this.screensavers = new Map()
+    this.service = new Service({ kernel: this, ...this.options.service })
+    this.shell = new Shell({ kernel: this, uid: 0, gid: 0 })
+    this.storage = new Storage({ kernel: this })
+    this.terminal = new Terminal({ kernel: this, socket: this.options.socket })
+    this.toast = new Notyf(this.options.toast)
+    this.users = new Users({ kernel: this })
+    this.windows = new Windows()
+    this.wasm = new Wasm({ kernel: this })
+    this.workers = new Workers()
 
-    this._shell.attach(this._terminal)
+    this.shell.attach(this.terminal)
+    bios().then((biosModule: BIOSModule) => {
+      this.bios = biosModule
+      resolveMountConfig({ backend: Emscripten, FS: biosModule.FS })
+        .then(config => this.filesystem.fsSync.mount('/bios', config))
+    })
   }
 
   /**
@@ -351,30 +333,6 @@ export class Kernel implements IKernel {
 
       this.intervals.set('/proc', this.registerProc.bind(this), import.meta.env['KERNEL_INTERVALS_PROC'] ?? 1000)
 
-      // Setup screensavers
-      const screensavers = import.meta.glob('./lib/screensavers/*.ts', { eager: true })
-      for (const [key, saver] of Object.entries(screensavers)) {
-        this._screensavers.set(
-          key.replace('./lib/screensavers/', '').replace('.ts', ''),
-          saver as { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }
-        )
-      }
-
-      const currentSaver = this.storage.local.getItem('screensaver') || 'matrix'
-      if (currentSaver && this._screensavers.has(currentSaver)) {
-        const saver = this._screensavers.get(currentSaver)
-
-        let idleTimer: Timer
-        const resetIdleTime = () => {
-          clearTimeout(idleTimer)
-          idleTimer = setTimeout(() => saver?.default({ terminal: this.terminal }), parseInt(this.storage.local.getItem('screensaver-timeout') ?? '60000'))
-        }
-
-        resetIdleTime()
-        const events = ['mousemove', 'keydown', 'keyup', 'keypress', 'pointerdown']
-        for (const event of events) globalThis.addEventListener(event, resetIdleTime)
-      }
-
       // Setup root user or load existing users
       try {
         if (!await this.filesystem.fs.exists('/etc/passwd')) await this.users.add({ username: 'root', password: 'root', home: '/root' }, { noHome: true })
@@ -418,6 +376,30 @@ export class Kernel implements IKernel {
         // Object.freeze(credentials)
       }
 
+      // Setup screensavers
+      const screensavers = import.meta.glob('./lib/screensavers/*.ts', { eager: true })
+      for (const [key, saver] of Object.entries(screensavers)) {
+        this.screensavers.set(
+          key.replace('./lib/screensavers/', '').replace('.ts', ''),
+          saver as { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }
+        )
+      }
+
+      const currentSaver = this.storage.local.getItem('screensaver') || 'matrix'
+      if (currentSaver && this.screensavers.has(currentSaver)) {
+        const saver = this.screensavers.get(currentSaver)
+
+        let idleTimer: Timer
+        const resetIdleTime = () => {
+          clearTimeout(idleTimer)
+          idleTimer = setTimeout(() => saver?.default({ terminal: this.terminal }), parseInt(this.storage.local.getItem('screensaver-timeout') ?? '60000'))
+        }
+
+        resetIdleTime()
+        const events = ['mousemove', 'keydown', 'keyup', 'keypress', 'pointerdown']
+        for (const event of events) globalThis.addEventListener(event, resetIdleTime)
+      }
+
       // Init doesn't exit; tradition - init should become a more full-featured init system in the future
       class InitProcess extends Process { override async exit() {} }
       if (!await this.filesystem.fs.exists('/boot/init')) await this.filesystem.fs.writeFile('/boot/init', '#!ecmaos:script:init\n\n')
@@ -457,7 +439,7 @@ export class Kernel implements IKernel {
    * @param options - Configuration options for kernel subsystems
    */
   async configure(options: KernelOptions) {
-    await this._filesystem.configure(options.filesystem ?? {})
+    await this.filesystem.configure(options.filesystem ?? {})
   }
 
   /**
@@ -621,7 +603,7 @@ export class Kernel implements IKernel {
    * @returns {void}
    */
   off(event: KernelEvents, listener: EventCallback): void {
-    this._events.off(event, listener)
+    this.events.off(event, listener)
   }
 
   /**
@@ -631,7 +613,7 @@ export class Kernel implements IKernel {
    * @returns {void}
    */
   on(event: KernelEvents, listener: EventCallback): void {
-    this._events.on(event, listener)
+    this.events.on(event, listener)
   }
 
   /**
@@ -756,7 +738,7 @@ export class Kernel implements IKernel {
             this.log?.debug(`Loading package ${pkg.name} v${pkg.version}`)
             const imports = await import(/* @vite-ignore */ url)
 
-            this._packages.set(pkg.name, imports as Module)
+            this.packages.set(pkg.name, imports as Module)
           } catch (err) {
             this.log?.error(`Failed to load package ${pkg.name} v${pkg.version}: ${err}`)
           } finally {
@@ -811,15 +793,6 @@ export class Kernel implements IKernel {
         this.log?.warn(`Failed to write proc data: ${key}`, error)
       }
     }
-  }
-
-  /**
-   * Replaces the kernel's filesystem.
-   * @param {Filesystem} filesystem - The filesystem to replace the kernel's filesystem with.
-   * @returns {Promise<void>} A promise that resolves when the filesystem is replaced.
-   */
-  async replaceFilesystem(filesystem: Filesystem) {
-    this._filesystem = filesystem
   }
 
   /**

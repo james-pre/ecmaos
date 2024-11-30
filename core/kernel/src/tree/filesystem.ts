@@ -24,15 +24,7 @@ export const DefaultFilesystemOptionsTest: FilesystemOptions<FilesystemConfigMou
   onlySyncOnClose: false,
   mounts: {
     '/bin': { backend: InMemory, name: 'bin' },
-    // '/etc': ({ backend: InMemory, name: 'etc' }),
-    // '/home': ({ backend: InMemory, name: 'home' }),
-    // '/lib': ({ backend: InMemory, name: 'lib' }),
-    // '/media': ({ backend: InMemory, name: 'media' }),
-    // '/mnt': ({ backend: InMemory, name: 'mnt' }),
-    // '/opt': ({ backend: InMemory, name: 'opt' }),
-    // '/proc': ({ backend: InMemory, name: 'proc' }),
-    // '/root': ({ backend: InMemory, name: 'root' }),
-    // '/tmp': ({ backend: InMemory, name: 'tmp' })
+    '/tmp': { backend: InMemory, name: 'tmpfs' }
   }
 }
 

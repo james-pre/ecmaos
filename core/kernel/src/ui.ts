@@ -5,8 +5,8 @@ declare global {
   var kernel: Kernel | undefined // eslint-disable-line no-var
 }
 
-const username = import.meta.env.VITE_USERNAME || 'root'
-const password = import.meta.env.VITE_PASSWORD || 'root'
+const username = import.meta.env.VITE_USERNAME
+const password = import.meta.env.VITE_PASSWORD
 
 globalThis.kernel = new Kernel({
   credentials: (username && password) ? { username, password } : undefined,

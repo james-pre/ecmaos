@@ -1,5 +1,8 @@
 import { vi } from 'vitest'
 import 'fake-indexeddb/auto'
+import { Buffer } from 'node:buffer'
+
+globalThis.Buffer = Buffer
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

@@ -2,6 +2,7 @@
  * Core kernel types and interfaces
  */
 
+import type { BIOSModule } from '@ecmaos/bios'
 import type { DeviceDriver } from '@zenfs/core'
 import type { InitOptions } from 'i18next'
 import type { Notyf } from 'notyf'
@@ -10,6 +11,7 @@ import type Module from 'node:module'
 import type {
   Auth,
   Components,
+  Dom,
   DomOptions,
   KernelDevice,
   EventCallback,
@@ -34,7 +36,6 @@ import type {
   Wasm,
   Windows,
   Workers,
-  Dom
 } from './index.ts'
 
 /**
@@ -58,6 +59,7 @@ export interface Kernel {
 
   // Core services
   readonly auth: Auth
+  bios?: BIOSModule
   readonly channel: BroadcastChannel
   readonly components: Components
   readonly dom: Dom
@@ -73,7 +75,7 @@ export interface Kernel {
   readonly protocol: Protocol
   readonly screensavers: Map<string, {
     default: (options: { terminal: Terminal }) => Promise<void>
-    exit: () => Promise<void> 
+    exit: () => Promise<void>
   }>
   readonly service: Service
   readonly storage: StorageProvider

@@ -9,35 +9,16 @@
 #include <dirent.h>
 #include <cstring>
 
-void init_console_handlers() {
-    EM_ASM(
-        var oldLog = console.log;
-        var oldError = console.error;
-        
-        console.log = function(text) {
-            globalThis.log(text, 'info');
-            oldLog.apply(console, arguments);
-        };
-        
-        console.error = function(text) {
-            globalThis.log(text, 'error');
-            oldError.apply(console, arguments);
-        };
-    );
-}
-
 extern "C" {
     enum class KernelState {
         BOOTING,
         RUNNING,
-        PANIC,
-        SHUTDOWN
+        PANIC
     };
 
     // Initialize kernel and return state
     EMSCRIPTEN_KEEPALIVE
     int init() {
-        init_console_handlers();
         emscripten_console_log("Kernel initializing...");
         emscripten_console_warn("This is an experimental WASM kernel");
         return static_cast<int>(KernelState::RUNNING);

@@ -1,6 +1,6 @@
 import type { Kernel, WasmOptions, Wasm as IWasm } from '@ecmaos/types'
 
-// TODO: I don't like how heavy wabt.js is, but I want to keep experimenting with it - move WASM support to a separate package
+// TODO: I don't like how heavy wabt.js is, but I want to keep experimenting with it - move WABT support to a separate package
 // import wabt, { WasmFeatures, WasmModule, ReadWasmOptions } from 'wabt'
 
 // interface WabtModule {
