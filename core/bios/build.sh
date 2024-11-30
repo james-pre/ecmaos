@@ -1,10 +1,14 @@
 #!/bin/bash
 
+if [ -z "$SKIP_BUILD_BIOS" ]; then
+  exit 0
+fi
+
 # Ensure EMSDK is set
 if [ -z "$EMSDK" ]; then
-    echo "Error: EMSDK environment variable not set"
-    echo "Please install and activate emscripten first"
-    exit 1
+  echo "Error: EMSDK environment variable not set"
+  echo "Please install and activate emscripten first"
+  exit 1
 fi
 
 mkdir -p build

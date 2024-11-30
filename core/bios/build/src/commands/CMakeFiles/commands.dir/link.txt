@@ -1,0 +1,2 @@
+/home/archmag0s/code/ecmaos/emsdk/upstream/emscripten/emar qc libcommands.a CMakeFiles/commands.dir/ls.cpp.o CMakeFiles/commands.dir/cat.cpp.o CMakeFiles/commands.dir/echo.cpp.o CMakeFiles/commands.dir/rm.cpp.o CMakeFiles/commands.dir/execute.cpp.o
+/home/archmag0s/code/ecmaos/emsdk/upstream/emscripten/emranlib libcommands.a
