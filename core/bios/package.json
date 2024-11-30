@@ -15,6 +15,7 @@
     "email": "code@mathis.network"
   },
   "type": "module",
+  "main": "./build/dist/bios.js",
   "exports": {
     ".": {
       "types": "./src/bios.d.ts",
