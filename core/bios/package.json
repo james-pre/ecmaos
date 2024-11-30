@@ -14,8 +14,12 @@
     "url": "https://github.com/ecmaos/ecmaos/issues",
     "email": "code@mathis.network"
   },
-  "main": "./build/dist/bios.js",
-  "types": "./src/bios.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/bios.d.ts",
+      "default": "./build/dist/bios.js"
+    }
+  },
   "scripts": {
     "build": "./build.sh",
     "serve": "serve -s -l 30446",
