@@ -10,6 +10,7 @@
     "core/bios"
   ],
   "compilerOptions": {
+    "rootDir": "./core",
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

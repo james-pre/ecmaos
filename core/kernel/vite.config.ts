@@ -1,18 +1,16 @@
-/// <reference types="vitest/config" />
+
 import i18nextLoader from 'vite-plugin-i18next-loader'
 import path from 'path'
-import { defineConfig } from 'vite'
+import { defineConfig, ViteUserConfig } from 'vitest/config'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import pkg from './package.json'
 
 export default defineConfig({
   plugins: [
-    nodePolyfills({
-      include: ['module', 'os', 'path']
-    }),
+    nodePolyfills({ include: ['module', 'os', 'path'] }),
     i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] })
-  ],
+  ] as ViteUserConfig['plugins'],
   define: {
     'import.meta.env.NAME': JSON.stringify(pkg.name),
     'import.meta.env.VERSION': JSON.stringify(pkg.version),

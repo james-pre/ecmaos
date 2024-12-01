@@ -4,7 +4,7 @@
 
 [ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written in TypeScript. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
-The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be used as a platform for custom applications, games, and more.
+The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
 
 [![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
 [![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://ecmaos.sh)
@@ -57,8 +57,15 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Storage (IndexedDB, localStorage, sessionStorage, etc.)
   - Terminal (xterm.js)
   - User Manager
+  - WASM Loader
   - Window Manager (WinBox)
   - Workers (Web Workers)
+
+- `BIOS`
+  - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
+  - The BIOS has its own filesystem, located at `/bios`
+  - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
+  - Confusingly, the Kernel loads the BIOS - not the other way around
 
 - `Apps`
   - These are full applications that are developed to work with ecmaOS
@@ -181,3 +188,7 @@ turbo gen device # generate a new device template
 ```
 
 Also see [turbo.json](./turbo.json) and [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+
+## Security Vulnerabilities
+
+If you find a serious security vulnerability, please submit a new [Draft Security Advisory](https://github.com/ecmaos/ecmaos/security) or contact the project maintainer directly at [code@mathis.network](mailto:code@mathis.network).
