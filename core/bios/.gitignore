@@ -1,1 +1,4 @@
-!build/dist/
+!build
+build/*
+!build/dist
+!build/dist/**
