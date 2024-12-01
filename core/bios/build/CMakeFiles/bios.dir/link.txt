@@ -1,1 +1,0 @@
-/home/archmag0s/code/ecmaos/emsdk/upstream/emscripten/em++  -s WASM=1 -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap','FS'] -s EXPORTED_FUNCTIONS=['_malloc','_free'] -s MODULARIZE=1 -s EXPORT_ES6=1 -s EXPORT_NAME=createBIOS @CMakeFiles/bios.dir/objects1 -o dist/bios.js @CMakeFiles/bios.dir/linkLibs.rsp

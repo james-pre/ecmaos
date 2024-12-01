@@ -1,6 +1,0 @@
-/home/archmag0s/code/ecmaos/ecmaos.turbo/core/bios/build/CMakeFiles/bios.dir
-/home/archmag0s/code/ecmaos/ecmaos.turbo/core/bios/build/CMakeFiles/edit_cache.dir
-/home/archmag0s/code/ecmaos/ecmaos.turbo/core/bios/build/CMakeFiles/rebuild_cache.dir
-/home/archmag0s/code/ecmaos/ecmaos.turbo/core/bios/build/src/commands/CMakeFiles/commands.dir
-/home/archmag0s/code/ecmaos/ecmaos.turbo/core/bios/build/src/commands/CMakeFiles/edit_cache.dir
-/home/archmag0s/code/ecmaos/ecmaos.turbo/core/bios/build/src/commands/CMakeFiles/rebuild_cache.dir

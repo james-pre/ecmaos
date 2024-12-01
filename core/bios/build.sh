@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$SKIP_BUILD_BIOS" ]; then
+if [ -n "$SKIP_BUILD_BIOS" ]; then
   exit 0
 fi
 
