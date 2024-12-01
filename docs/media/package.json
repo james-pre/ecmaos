@@ -25,7 +25,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "build:docs": "typedoc",
+    "build:docs": "typedoc && echo docs.ecmaos.sh > docs/CNAME",
     "build:kernel": "turbo run build --filter=@ecmaos/kernel",
     "cp:readme": "cp README.md core/kernel/README.md",
     "dev:kernel": "turbo run dev --filter=@ecmaos/kernel",
