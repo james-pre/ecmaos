@@ -9,25 +9,6 @@ pnpmfileChecksum: g5t73guyf72fmho4hxqmeb6yt4
 importers:
 
   .:
-    dependencies:
-      '@typhonjs-typedoc/ts-lib-docs':
-        specifier: ^2024.9.18
-        version: 2024.9.18(typedoc@0.26.11(typescript@5.6.3))
-      '@typhonjs-typedoc/typedoc-theme-dmt':
-        specifier: ^0.2.1
-        version: 0.2.3(typedoc@0.26.11(typescript@5.6.3))
-      concurrently:
-        specifier: ^9.0.1
-        version: 9.1.0
-      nodemon:
-        specifier: ^3.1.7
-        version: 3.1.7
-      serve:
-        specifier: ^14.2.3
-        version: 14.2.4
-      typedoc:
-        specifier: ^0.26.8
-        version: 0.26.11(typescript@5.6.3)
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.10
@@ -41,15 +22,33 @@ importers:
       '@types/webmidi':
         specifier: ^2.1.0
         version: 2.1.0
+      '@typhonjs-typedoc/ts-lib-docs':
+        specifier: ^2024.9.18
+        version: 2024.9.18(typedoc@0.26.11(typescript@5.6.3))
+      '@typhonjs-typedoc/typedoc-theme-dmt':
+        specifier: ^0.2.1
+        version: 0.2.3(typedoc@0.26.11(typescript@5.6.3))
+      concurrently:
+        specifier: ^9.0.1
+        version: 9.1.0
+      nodemon:
+        specifier: ^3.1.7
+        version: 3.1.7
       prettier:
         specifier: ^3.2.5
         version: 3.3.3
+      serve:
+        specifier: ^14.2.3
+        version: 14.2.4
       sherif:
         specifier: ^1.0.1
         version: 1.0.2
       turbo:
         specifier: ^2.3.3
         version: 2.3.3
+      typedoc:
+        specifier: ^0.26.8
+        version: 0.26.11(typescript@5.6.3)
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
