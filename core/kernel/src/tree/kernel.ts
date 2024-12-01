@@ -116,42 +116,75 @@ const DefaultFigletFonts = [
  * ```
  */
 export class Kernel implements IKernel {
+  /** Unique identifier for this kernel instance */
   public readonly id: string = crypto.randomUUID()
-  public readonly name: string = import.meta.env['NAME']
-  public readonly version: string = import.meta.env['VERSION']
+  /** Name of the kernel */
+  public readonly name: string = import.meta.env['NAME'] || 'ecmaOS'
+  /** Version string of the kernel */
+  public readonly version: string = import.meta.env['VERSION'] || '?.?.?'
 
+  /** Authentication and authorization service */
   public readonly auth: Auth
+  /** BIOS module providing low-level functionality */
   public bios?: BIOSModule
+  /** Broadcast channel for inter-kernel communication */
   public readonly channel: BroadcastChannel
+  /** Web Components manager */
   public readonly components: Components
+  /** DOM manipulation service */
   public readonly dom: Dom
+  /** Map of registered devices and their drivers */
   public readonly devices: Map<string, { device: KernelDevice, drivers?: DeviceDriver[] }> = new Map()
+  /** Event management system */
   public readonly events: Events
+  /** Virtual filesystem */
   public readonly filesystem: Filesystem
+  /** Internationalization service */
   public readonly i18n: I18n
+  /** Interval management service */
   public readonly intervals: Intervals
+  /** Keyboard interface */
   public readonly keyboard: Keyboard
+  /** Logging system, null if disabled */
   public readonly log: Log | null
+  /** Memory management service */
   public readonly memory: Memory
+  /** Configuration options passed to the kernel */
   public readonly options: KernelOptions
+  /** Map of loaded packages */
   public readonly packages: Map<string, Module> = new Map()
+  /** Process management service */
   public readonly processes: ProcessManager
+  /** Protocol handler service */
   public readonly protocol: Protocol
+  /** Map of available screensavers */
   public readonly screensavers: Map<string, { default: (options: { terminal: ITerminal }) => Promise<void>, exit: () => Promise<void> }>
+  /** Service management system */
   public readonly service: Service
+  /** Shell for command interpretation and execution */
   public readonly shell: Shell
+  /** Storage provider interface */
   public readonly storage: Storage
+  /** Terminal interface for user interaction */
   public readonly terminal: ITerminal
+  /** Toast notification service */
   public readonly toast: Notyf
+  /** User management service */
   public readonly users: Users
+  /** WebAssembly service */
   public readonly wasm: IWasm
+  /** Window management service */
   public readonly windows: IWindows
+  /** Web Worker management service */
   public readonly workers: IWorkers
 
+  /** Current state of the kernel */
   private _state: KernelState = KernelState.BOOTING
   get state() { return this._state }
 
+  /** Add an event listener; alias for `events.on` */
   get addEventListener() { return this.events.on }
+  /** Remove an event listener; alias for `events.off` */
   get removeEventListener() { return this.events.off }
 
   constructor(_options: KernelOptions = DefaultKernelOptions) {
@@ -308,7 +341,7 @@ export class Kernel implements IKernel {
         if (!logObj._meta) return
         const formattedDate = new Date(logObj._meta.date).toLocaleString(this.memory.config.get('locale') as string || 'en-US', {
           year: 'numeric',
-          month: '2-digit', 
+          month: '2-digit',
           day: '2-digit',
           hour: '2-digit',
           minute: '2-digit',

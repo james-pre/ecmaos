@@ -5,7 +5,7 @@
   "theme": "default-modern",
   "customCss": "./typedoc.css",
   "dmtFavicon": "./core/kernel/public/favicon.ico",
-  "exclude": ["**/node_modules/**/*"],
+  "exclude": ["**/node_modules/**/*", "**/dist/**/*"],
   "plugin": [
     "@typhonjs-typedoc/typedoc-theme-dmt",
     "@typhonjs-typedoc/ts-lib-docs/typedoc/ts-links/dom/2024",

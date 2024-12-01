@@ -48,55 +48,136 @@ import type {
  *
  */
 export interface Kernel {
+  /** Unique identifier for this kernel instance */
   readonly id: string
+
+  /** Name of the kernel */
   readonly name: string
+
+  /** Version string of the kernel */
   readonly version: string
+
+  /** Current state of the kernel */
   readonly state: KernelState
+
+  /** Configuration options passed to the kernel */
   readonly options: KernelOptions
+
+  /** Terminal interface for user interaction */
   readonly terminal: Terminal
+
+  /** Shell for command interpretation and execution */
   readonly shell: Shell
+
+  /** Logging system, null if disabled */
   readonly log: Log | null
 
   // Core services
+
+  /** Authentication and authorization service */
   readonly auth: Auth
+
+  /** BIOS module providing low-level functionality */
   bios?: BIOSModule
+
+  /** Broadcast channel for inter-kernel communication */
   readonly channel: BroadcastChannel
+
+  /** Web Components manager */
   readonly components: Components
+
+  /** DOM manipulation service */
   readonly dom: Dom
+
+  /** Map of registered devices and their drivers */
   readonly devices: Map<string, { device: KernelDevice, drivers?: DeviceDriver[] }>
+
+  /** Event management system */
   readonly events: Events
+
+  /** Virtual filesystem */
   readonly filesystem: Filesystem
+
+  /** Internationalization service */
   readonly i18n: I18n
+
+  /** Interval management service */
   readonly intervals: Intervals
+
+  /** Keyboard interface */
   readonly keyboard: Keyboard
+
+  /** Memory management service */
   readonly memory: Memory
+
+  /** Map of loaded packages */
   readonly packages: Map<string, Module>
+
+  /** Process management service */
   readonly processes: ProcessManager
+
+  /** Protocol handler service */
   readonly protocol: Protocol
+
+  /** Map of available screensavers */
   readonly screensavers: Map<string, {
     default: (options: { terminal: Terminal }) => Promise<void>
     exit: () => Promise<void>
   }>
+
+  /** Service management system */
   readonly service: Service
+
+  /** Storage provider interface */
   readonly storage: StorageProvider
+
+  /** Toast notification service */
   readonly toast: Notyf
+
+  /** User management service */
   readonly users: Users
+
+  /** WebAssembly service */
   readonly wasm: Wasm
+
+  /** Window management service */
   readonly windows: Windows
+
+  /** Web Worker management service */
   readonly workers: Workers
 
   // Event handling aliases
+
+  /** Add an event listener */
   addEventListener: (event: KernelEvents, listener: EventCallback) => void
+
+  /** Remove an event listener */
   removeEventListener: (event: KernelEvents, listener: EventCallback) => void
 
   // Core methods
+
+  /** Boot the kernel with optional configuration */
   boot(options?: BootOptions): Promise<void>
+
+  /** Configure kernel options */
   configure(options: KernelOptions): Promise<void>
+
+  /** Execute a command or program */
   execute(options: KernelExecuteOptions): Promise<number>
+
+  /** Show a system notification */
   notify(title: string, options?: object): Promise<Notification | void>
+
+  /** Add an event listener */
   on(event: KernelEvents, listener: EventCallback): void
+
+  /** Remove an event listener */
   off(event: KernelEvents, listener: EventCallback): void
+
+  /** Reboot the kernel */
   reboot(): Promise<void>
+
+  /** Shutdown the kernel */
   shutdown(): Promise<void>
 }
 

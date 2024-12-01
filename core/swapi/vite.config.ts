@@ -10,5 +10,8 @@ export default defineConfig({
       formats: ['es'],
       fileName: 'swapi'
     }
+  },
+  server: {
+    port: Number(process.env['VITE_PORT']) || 30447
   }
 })
