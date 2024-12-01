@@ -47,14 +47,7 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    minify: false,
-    rollupOptions: {
-      external: [
-        'async_hooks',
-        'vite-plugin-node-polyfills/shims/buffer',
-        'vite-plugin-node-polyfills/shims/process'
-      ]
-    }
+    minify: false
   },
   test: {
     globals: true,

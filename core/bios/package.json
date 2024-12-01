@@ -43,5 +43,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "vite-plugin-node-polyfills": "^0.22.0"
   }
 }
