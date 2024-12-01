@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "Should skip build? $SKIP_BUILD_BIOS"
 if [ -n "$SKIP_BUILD_BIOS" ]; then
   exit 0
 fi
