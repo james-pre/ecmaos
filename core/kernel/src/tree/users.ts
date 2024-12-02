@@ -40,7 +40,6 @@ export class Users {
 
     if (!options.noHome) {
       await this._options.kernel.filesystem.fs.mkdir(user.home, { recursive: true, mode: 0o750 })
-      // this._options.kernel.filesystem.fsSync.chownSync(user.home, user.uid, user.gid[0] ?? user.uid) // async chown doesn't work, and sync chown claims no such dir
     }
 
     if (!user.keypair) {
@@ -87,7 +86,6 @@ export class Users {
     // Fix user home permissions
     try { this._options.kernel.filesystem.fsSync.chownSync(user.home, user.uid, user.gid[0] ?? user.uid) }
     catch {}
-    // catch (err) { this._options.kernel.log?.warn(err) }
   }
 
   /**

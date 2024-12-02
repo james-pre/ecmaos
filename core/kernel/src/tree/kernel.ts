@@ -406,6 +406,7 @@ export class Kernel implements IKernel {
             const password = await this.terminal.readline(`🔒  ${this.i18n.t('Password')}: `, true)
             const { cred } = await this.users.login(username, password)
             Object.assign(credentials, cred)
+            this.shell.credentials = cred
             break
           } catch (err) {
             console.error(err)

@@ -1227,21 +1227,14 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
   const url = `${repo}/${packageName}${version === 'latest' ? '' : '@' + version}/package.json`
   const response = await globalThis.fetch(url)
   const data = await response.json()
-  
-  terminal.writeln(chalk.yellow(`Installing ${data.name} v${data.version} from ${repo}...`))
 
-  // Get list of files to download
+  terminal.writeln(chalk.yellow(`Installing ${data.name} v${data.version} from ${repo}...`))
   let files = [data.module, data.main, data.types].filter(Boolean) as string[]
   
   // Handle browser field remapping
   const browserMappings: Record<string, string | false> = {}
   if (typeof data.browser === 'object') {
-    // Store the mappings separately
-    Object.entries(data.browser).forEach(([key, value]) => {
-      browserMappings[key] = value as string | false
-    })
-    
-    // Add original files to the download list
+    for (const [key, value] of Object.entries(data.browser)) browserMappings[key] = value as string | false
     files = [...files, ...Object.keys(data.browser)]
   } else if (typeof data.browser === 'string') {
     files.push(data.browser)
@@ -1257,11 +1250,10 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
     ? [packageName.split('/')[0], packageName.split('/')[1]]
     : [null, packageName]
 
-  // Create versioned package directory
   const packagePath = org 
     ? `/opt/${org}/${name}/${data.version}`
     : `/opt/${name}/${data.version}`
-    
+
   const packageDirs = packagePath.split('/')
   let currentPath = ''
   for (const dir of packageDirs) {
@@ -1271,13 +1263,10 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
     catch {}
   }
 
-  // Save package.json
   await kernel.filesystem.fs.writeFile(`${packagePath}/package.json`, JSON.stringify(data, null, 2), { mode: 0o755 })
   terminal.writeln(chalk.green(`Downloaded package.json to ${packagePath}/package.json`))
 
-  // Track processed files to avoid duplicates
   const processedFiles = new Set<string>()
-
   for (const file of files) {
     if (!file || processedFiles.has(file)) continue
     processedFiles.add(file)
@@ -1302,12 +1291,8 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
       catch {}
     }
 
-    // Download the file
     const fileUrl = `${repo}/${packageName}@${data.version}/${targetFile}`
-    
-    if (browserReplacement) {
-      terminal.writeln(chalk.blue(`Remapping ${file} to ${browserReplacement}`))
-    }
+    if (browserReplacement) terminal.writeln(chalk.blue(`Remapping ${file} to ${browserReplacement}`))
 
     try {
       terminal.writeln(chalk.green(`Downloading ${targetFile} to ${filePath}`))
@@ -1334,8 +1319,7 @@ export const install = async ({ kernel, terminal, args }: CommandArgs) => {
       const packagesData = await kernel.filesystem.fs.readFile('/etc/packages', 'utf-8')
       if (packagesData) packages = JSON.parse(packagesData)
     } catch {}
-    
-    // Append the new package entry
+
     packages.push(packageEntry)
     await kernel.filesystem.fs.writeFile('/etc/packages', JSON.stringify(packages, null, 2))
     terminal.writeln(chalk.green(`Added ${packageName}@${data.version} to /etc/packages`))
