@@ -384,6 +384,22 @@ export class Kernel implements IKernel {
         Object.assign(credentials, cred)
       } else {
         if (import.meta.env['VITE_APP_SHOW_DEFAULT_LOGIN'] === 'true') this.terminal.writeln('Default Login: root / root\n')
+
+        this.terminal.writeln(`${Intl.DateTimeFormat(this.memory.config.get('locale') as string || 'en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }).format(new Date())}`)
+
+        const issue = await this.filesystem.fs.exists('/etc/issue')
+          ? await this.filesystem.fs.readFile('/etc/issue', 'utf-8')
+          : null
+
+        if (issue) this.terminal.writeln(issue)
+
         while (true) {
           try {
             const username = await this.terminal.readline(`👤  ${this.i18n.t('Username')}: `)
@@ -397,6 +413,12 @@ export class Kernel implements IKernel {
           }
         }
       }
+
+      const motd = await this.filesystem.fs.exists('/etc/motd')
+        ? await this.filesystem.fs.readFile('/etc/motd', 'utf-8')
+        : null
+
+      if (motd) this.terminal.writeln('\n' + motd)
 
       const user = this.users.get(credentials.uid ?? 0)
       if (!user) throw new Error(t('kernel.userNotFound'))
