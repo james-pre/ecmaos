@@ -1,7 +1,7 @@
 {
   "name": "@ecmaos/metal",
   "description": "A backend for EcmaOS",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Jay Mathis <code@mathis.network>",
   "license": "MIT",
   "type": "module",
