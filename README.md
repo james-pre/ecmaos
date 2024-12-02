@@ -9,7 +9,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
 [![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://ecmaos.sh)
 [![Site Status](https://img.shields.io/website?url=https%3A%2F%2Fecmaos.sh)](https://ecmaos.sh)
-[![Created](https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&label=created)](https://github.com/ecmaos/ecmaos/pulse)
+[![Created](https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&label=created&color=success)](https://github.com/ecmaos/ecmaos/pulse)
 [![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/main)
 
 [![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues)
@@ -34,7 +34,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 ## Features
 
 - TypeScript, WebAssembly
-- Filesystem supporting multiple backends powered by [@zenfs/core](https://github.com/zen-fs/core)
+- Filesystem supporting multiple backends powered by [zenfs](https://github.com/zen-fs/core)
 - Terminal interface powered by [xterm.js](https://xtermjs.org)
 - Pseudo-streams, allowing redirection and piping
 - Device framework with a common interface for working with hardware: WebBluetooth, WebSerial, WebHID, WebUSB, etc.
