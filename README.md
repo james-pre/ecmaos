@@ -27,6 +27,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&logo=reddit&logoColor=white&label=r/ecmaos)](https://www.reddit.com/r/ecmaos)
 
 > Made with ❤️ by [Jay Mathis](https://jaymath.is)
+>
 > [![Stars](https://img.shields.io/github/stars/mathiscode?style=flat&logo=github&label=⭐️)](https://github.com/mathiscode) [![Followers](https://img.shields.io/github/followers/mathiscode?style=flat&logo=github&label=follow)](https://github.com/mathiscode)
 
 ## Features
