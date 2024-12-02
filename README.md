@@ -2,8 +2,6 @@
 
 [![Launch ecmaOS.sh](https://img.shields.io/badge/launch-ecmaos.sh-blue?style=for-the-badge)](https://ecmaos.sh)
 
-[![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️)](https://github.com/ecmaos/ecmaos/stargazers)
-
 [ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written in TypeScript. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
 The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
@@ -11,14 +9,17 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
 [![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://ecmaos.sh)
 [![Site Status](https://img.shields.io/website?url=https%3A%2F%2Fecmaos.sh)](https://ecmaos.sh)
+[![Created](https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&label=created)](https://github.com/ecmaos/ecmaos/pulse)
 [![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/main)
 [![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues)
 [![Closed issues](https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed)
+[![Open PRs](https://img.shields.io/github/issues-pr-raw/ecmaos/ecmaos.svg?label=PRs)](https://github.com/ecmaos/ecmaos/pulls)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?label=PRs)](https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed)
 
+[![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️)](https://github.com/ecmaos/ecmaos/stargazers)
 [![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red)](https://github.com/sponsors/mathiscode)
 [![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow)](https://github.com/ecmaos/ecmaos/graphs/contributors)
 [![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/ecmaos/ecmaos/compare)
 
 [![Discord](https://img.shields.io/discord/1311804229127508081?label=discord&logo=discord&logoColor=white)](https://discord.gg/ZJYGkbVsCh)
 [![Matrix](https://img.shields.io/matrix/ecmaos:matrix.org?label=%23ecmaos%3Amatrix.org&logo=matrix&logoColor=white)](https://matrix.to/#/#ecmaos:matrix.org)
@@ -26,6 +27,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&logo=reddit&logoColor=white&label=r/ecmaos)](https://www.reddit.com/r/ecmaos)
 
 > Made with ❤️ by [Jay Mathis](https://jaymath.is)
+> [![Stars](https://img.shields.io/github/stars/mathiscode?style=flat&logo=github&label=⭐️)](https://github.com/mathiscode) [![Followers](https://img.shields.io/github/followers/mathiscode?style=flat&logo=github&label=follow)](https://github.com/mathiscode)
 
 ## Features
 
