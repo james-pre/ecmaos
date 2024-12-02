@@ -2,6 +2,8 @@
 
 [![Launch ecmaOS.sh](https://img.shields.io/badge/launch-ecmaos.sh-blue?style=for-the-badge)](https://ecmaos.sh)
 
+[![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️)](https://github.com/ecmaos/ecmaos/stargazers)
+
 [ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written in TypeScript. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
 The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
@@ -19,6 +21,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/ecmaos/ecmaos/compare)
 
 [![Discord](https://img.shields.io/discord/1311804229127508081?label=discord&logo=discord&logoColor=white)](https://discord.gg/ZJYGkbVsCh)
+[![Matrix](https://img.shields.io/matrix/ecmaos:matrix.org?label=%23ecmaos%3Amatrix.org&logo=matrix&logoColor=white)](https://matrix.to/#/#ecmaos:matrix.org)
 [![Bluesky](https://img.shields.io/badge/follow-on%20Bluesky-blue?logo=bluesky&logoColor=white)](https://ecmaos.bsky.social)
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&logo=reddit&logoColor=white&label=r/ecmaos)](https://www.reddit.com/r/ecmaos)
 
