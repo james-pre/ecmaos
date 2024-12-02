@@ -15,8 +15,14 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 [![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red)](https://github.com/sponsors/mathiscode)
 [![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow)](https://github.com/ecmaos/ecmaos/graphs/contributors)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/ecmaos/ecmaos/compare)
+
+[![Discord](https://img.shields.io/discord/1311804229127508081?label=discord&logo=discord&logoColor=white)](https://discord.gg/ZJYGkbVsCh)
+[![Bluesky](https://img.shields.io/badge/follow-on%20Bluesky-blue?logo=bluesky&logoColor=white)](https://ecmaos.bsky.social)
+[![Reddit](https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&logo=reddit&logoColor=white&label=r/ecmaos)](https://www.reddit.com/r/ecmaos)
+
+> Made with ❤️ by [Jay Mathis](https://jaymath.is)
 
 ## Features
 
@@ -149,11 +155,11 @@ The kernel is currently in active development. It is not considered stable and t
 
 Things to keep in mind:
 
+- Things have changed a lot since the tests were written, so they need to be updated and fixed
 - The kernel is designed to be run in an environment with a DOM (i.e. a browser)
 - Many features are only available on Chromium-based browsers, and many more behind feature flags
 - Command interfaces won't match what you might be used to from a traditional Linux environment; not all commands and options are supported. Over time, Linuxish commands will be fleshed out and made to behave in a more familiar way.
 - Globbing doesn't work in the terminal yet
-- Things have changed a lot since the tests were written, so they need to be updated and fixed
 
 ## Development
 

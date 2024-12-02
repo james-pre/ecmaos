@@ -10,8 +10,14 @@
 <a href="https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed" target="_blank" class="external"><img src="https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg" alt="Closed issues"></a></p>
 <p><a href="https://github.com/sponsors/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/sponsors/mathiscode?color=red" alt="Sponsors"></a>
 <a href="https://github.com/ecmaos/ecmaos/graphs/contributors" target="_blank" class="external"><img src="https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow" alt="Contributors"></a>
-<a href="https://github.com/ecmaos/ecmaos/blob/main/LICENSE" target="_blank" class="external"><img src="https://img.shields.io/badge/license-MIT-blue" alt="GitHub license"></a>
+<a href="https://github.com/ecmaos/ecmaos/blob/main/LICENSE" target="_blank" class="external"><img src="https://img.shields.io/badge/license-MIT+Apache2.0-blue" alt="GitHub license"></a>
 <a href="https://github.com/ecmaos/ecmaos/compare" target="_blank" class="external"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg" alt="PRs Welcome"></a></p>
+<p><a href="https://discord.gg/ZJYGkbVsCh" target="_blank" class="external"><img src="https://img.shields.io/discord/1311804229127508081?label=discord&amp;logo=discord&amp;logoColor=white" alt="Discord"></a>
+<a href="https://ecmaos.bsky.social" target="_blank" class="external"><img src="https://img.shields.io/badge/follow-on%20Bluesky-blue?logo=bluesky&amp;logoColor=white" alt="Bluesky"></a>
+<a href="https://www.reddit.com/r/ecmaos" target="_blank" class="external"><img src="https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&amp;logo=reddit&amp;logoColor=white&amp;label=r/ecmaos" alt="Reddit"></a></p>
+<blockquote>
+<p>Made with ❤️ by <a href="https://jaymath.is" target="_blank" class="external">Jay Mathis</a></p>
+</blockquote>
 <a id="features" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Features<a href="#features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
 <li>TypeScript, WebAssembly</li>
 <li>Filesystem supporting multiple backends powered by <a href="https://github.com/zen-fs/core" target="_blank" class="external">@zenfs/core</a></li>
@@ -109,11 +115,11 @@
 <a id="early-days" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Early Days<a href="#early-days" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>The kernel is currently in active development. It is not considered stable and the structure and API are very likely to change in unexpected and possibly unannounced ways until version 1.0.0. Use cautiously and at your own risk.</p>
 <p>Things to keep in mind:</p>
 <ul>
+<li>Things have changed a lot since the tests were written, so they need to be updated and fixed</li>
 <li>The kernel is designed to be run in an environment with a DOM (i.e. a browser)</li>
 <li>Many features are only available on Chromium-based browsers, and many more behind feature flags</li>
 <li>Command interfaces won't match what you might be used to from a traditional Linux environment; not all commands and options are supported. Over time, Linuxish commands will be fleshed out and made to behave in a more familiar way.</li>
 <li>Globbing doesn't work in the terminal yet</li>
-<li>Things have changed a lot since the tests were written, so they need to be updated and fixed</li>
 </ul>
 <a id="development" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Development<a href="#development" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p><a href="https://turbo.build/repo" target="_blank" class="external">Turborepo</a> is used to manage the monorepo, and <a href="https://pnpm.io" target="_blank" class="external">pnpm</a> is used for package management.</p>
 <p>A good place to start is viewing the <code>scripts</code> property of <a href="media/package.json">package.json</a> in the root of the repository.</p>
