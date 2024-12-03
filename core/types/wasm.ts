@@ -26,5 +26,5 @@ export interface Wasm {
    * Load a WebAssembly module
    * @param path - Path to the WebAssembly module
    */
-  loadWasm(path: string): Promise<void>
+  loadWasm(path: string): Promise<{ module: WebAssembly.Module; instance: WebAssembly.Instance }>
 }
