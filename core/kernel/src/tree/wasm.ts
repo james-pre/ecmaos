@@ -12,7 +12,10 @@ import type { Kernel, WasmOptions, Wasm as IWasm } from '@ecmaos/types'
 
 export class Wasm implements IWasm {
   private _kernel: Kernel
+  private _modules: Map<string, { module: WebAssembly.Module; instance: WebAssembly.Instance }> = new Map()
   // private _wabt?: WabtModule
+
+  get modules() { return this._modules }
 
   constructor(options: WasmOptions) {
     this._kernel = options.kernel
@@ -27,5 +30,21 @@ export class Wasm implements IWasm {
     const script = document.createElement('script')
     script.textContent = contents
     document.head.appendChild(script)
+  }
+
+  /**
+   * Load a WebAssembly module
+   */
+  async loadWasm(path: string) {
+    const importObject = {
+      env: {
+        log: console.log
+      }
+    }
+
+    const wasm = await this._kernel.filesystem.fs.readFile(path)
+    const { module, instance } = await WebAssembly.instantiate(wasm, importObject)
+    this._modules.set(path, { module, instance })
+    return { module, instance }
   }
 }

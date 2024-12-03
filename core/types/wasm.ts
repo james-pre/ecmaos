@@ -21,4 +21,10 @@ export interface Wasm {
    * @param path - Path to the emscripten JS file
    */
   loadEmscripten(path: string): Promise<void>
-} 
+
+  /**
+   * Load a WebAssembly module
+   * @param path - Path to the WebAssembly module
+   */
+  loadWasm(path: string): Promise<void>
+}
