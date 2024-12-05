@@ -1,5 +1,11 @@
 # @ecmaos/types
 
+## 0.1.2
+
+### Patch Changes
+
+- 9348f4b: WASM module loading
+
 ## 0.1.1
 
 ### Patch Changes
