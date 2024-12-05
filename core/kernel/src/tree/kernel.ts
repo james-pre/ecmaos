@@ -301,7 +301,7 @@ export class Kernel implements IKernel {
         spinner.start()
 
         console.log(`%c${logoFiglet}`, 'color: green')
-        console.log('%chttps://github.com/ecmaos/kernel', 'color: blue; text-decoration: underline; font-size: 16px')
+        console.log(`%c${import.meta.env['REPOSITORY'] || 'https://github.com/ecmaos/ecmaos'}`, 'color: blue; text-decoration: underline; font-size: 16px')
         this.log.info(`${import.meta.env['NAME'] || 'ecmaOS'} v${import.meta.env['VERSION']}`)
 
         if (Notification?.permission === 'default') Notification.requestPermission()
