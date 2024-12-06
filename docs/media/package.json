@@ -20,7 +20,7 @@
     "node": ">=20"
   },
   "homepage": "https://github.com/ecmaos/ecmaos#readme",
-  "license": "MIT",
+  "license": "MIT+Apache-2.0",
   "packageManager": "pnpm@9.14.3",
   "private": true,
   "scripts": {

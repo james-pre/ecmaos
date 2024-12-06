@@ -3,7 +3,7 @@
   "description": "A backend for EcmaOS",
   "version": "0.1.1",
   "author": "Jay Mathis <code@mathis.network>",
-  "license": "MIT",
+  "license": "MIT+Apache-2.0",
   "type": "module",
   "scripts": {
     "build": "tsc",
