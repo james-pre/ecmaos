@@ -9,7 +9,8 @@
     ".": "./dist/index.d.ts"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "dependencies": {
     "@ecmaos/bios": "workspace:^",

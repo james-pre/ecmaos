@@ -98,13 +98,19 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Devices may also be directly read/written, and will behave accordingly
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
 
+- `Modules`
+  - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
+  - They can provide additional functionality, devices, commands, etc.
+  - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
+  - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
+
 - `Utils`
   - Utilities used during development
 
 ## Command Examples
 
 ```sh
-ai "Despite all my rage" # use env OPENAI_API_KEY --set sk-
+ai "Despite all my rage" # use `env OPENAI_API_KEY --set sk-`
 cat /var/log/kernel.log
 cd /tmp
 echo "Hello, world!" > hello.txt

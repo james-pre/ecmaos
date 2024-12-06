@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  ws: '>=8.17.1'
-
-pnpmfileChecksum: g5t73guyf72fmho4hxqmeb6yt4
-
 importers:
 
   .:
@@ -269,9 +264,6 @@ importers:
       serve:
         specifier: ^14.2.3
         version: 14.2.4
-      typedoc:
-        specifier: ^0.26.8
-        version: 0.26.11(typescript@5.6.3)
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
@@ -3716,6 +3708,18 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
+  ws@8.14.2:
+    resolution: {integrity: sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   ws@8.18.0:
     resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
     engines: {node: '>=10.0.0'}
@@ -6110,7 +6114,7 @@ snapshots:
       nanoid: 3.3.6
       secure-json-parse: 2.7.0
       type-fest: 4.9.0
-      ws: 8.18.0
+      ws: 8.14.2
       zod: 3.22.4
       zod-to-json-schema: 3.22.3(zod@3.22.4)
     transitivePeerDependencies:
@@ -7292,6 +7296,8 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
+
+  ws@8.14.2: {}
 
   ws@8.18.0: {}
 

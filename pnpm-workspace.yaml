@@ -2,4 +2,5 @@ packages:
   - 'apps/*'
   - 'core/*'
   - 'devices/*'
+  - 'modules/*'
   - 'utils/*'

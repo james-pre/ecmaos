@@ -62,7 +62,9 @@ import type {
   EventCallback,
   ProcessEntryParams,
   FileHeader,
-  KernelShutdownEvent
+  KernelShutdownEvent,
+  KernelModule,
+  KernelModules
 } from '@ecmaos/types'
 
 const DefaultKernelOptions: KernelOptions = {
@@ -149,6 +151,8 @@ export class Kernel implements IKernel {
   public readonly log: Log | null
   /** Memory management service */
   public readonly memory: Memory
+  /** Map of loaded modules */
+  public readonly modules: KernelModules = new Map()
   /** Configuration options passed to the kernel */
   public readonly options: KernelOptions
   /** Map of loaded packages */
@@ -202,6 +206,7 @@ export class Kernel implements IKernel {
     this.keyboard = navigator.keyboard
     this.log = this.options.log ? new Log(this.options.log) : null
     this.memory = new Memory()
+    this.modules = new Map()
     this.processes = new ProcessManager()
     this.protocol = new Protocol({ kernel: this })
     this.screensavers = new Map()
@@ -364,7 +369,24 @@ export class Kernel implements IKernel {
       await this.registerProc() // TODO: This will be revamped elsewhere or implemented as a procfs backend
       await this.registerPackages()
 
-      this.intervals.set('/proc', this.registerProc.bind(this), import.meta.env['KERNEL_INTERVALS_PROC'] ?? 1000)
+      this.intervals.set('/proc', this.registerProc.bind(this), import.meta.env['VITE_KERNEL_INTERVALS_PROC'] ?? 1000)
+
+      // Load kernel modules
+      const modules = import.meta.env['VITE_KERNEL_MODULES']
+      if (modules) {
+        const mods = modules.split(',')
+        for (const mod of mods) {
+          this.log?.info(`Loading module ${mod}`)
+          try {
+            const module = (await import(mod)) as KernelModule
+            const name = module.name?.value || mod
+            module.init?.(this.id)
+            this.modules.set(name, module)
+          } catch (error) {
+            this.log?.error(`Failed to load module ${mod}: ${(error as Error).message}`)
+          }
+        }
+      }
 
       // Setup root user or load existing users
       try {
@@ -433,6 +455,7 @@ export class Kernel implements IKernel {
       }
 
       // Setup screensavers
+      // TODO: This shouldn't really be a part of the kernel
       const screensavers = import.meta.glob('./lib/screensavers/*.ts', { eager: true })
       for (const [key, saver] of Object.entries(screensavers)) {
         this.screensavers.set(

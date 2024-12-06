@@ -21,6 +21,7 @@ import type {
   FilesystemOptions,
   I18n,
   Intervals,
+  KernelModules,
   Keyboard,
   Log,
   LogOptions,
@@ -109,6 +110,9 @@ export interface Kernel {
 
   /** Memory management service */
   readonly memory: Memory
+
+  /** Module management service */
+  readonly modules: KernelModules
 
   /** Map of loaded packages */
   readonly packages: Map<string, Module>
