@@ -1,5 +1,11 @@
 # @ecmaos/types
 
+## 0.1.3
+
+### Patch Changes
+
+- 36111f6: prepare publishing kernel module support
+
 ## 0.1.2
 
 ### Patch Changes

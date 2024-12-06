@@ -1,6 +1,6 @@
 {
   "name": "@ecmaos/module-sample",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sample module for EcmaOS",
   "type": "module",
   "exports": {
