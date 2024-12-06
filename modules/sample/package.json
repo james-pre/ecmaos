@@ -29,6 +29,9 @@
       "assembly/**/*"
     ]
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "assemblyscript": "^0.27.31",
     "serve": "^14.2.3"
