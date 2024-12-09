@@ -2,7 +2,11 @@
 
 [![Launch ecmaOS.sh](https://img.shields.io/badge/launch-ecmaos.sh-blue?style=for-the-badge)](https://ecmaos.sh)
 
-[ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written in TypeScript. It's the successor of [web3os](https://github.com/web3os-org/kernel).
+> Made with ❤️ by [Jay Mathis](https://jaymath.is)
+>
+> [![Stars](https://img.shields.io/github/stars/mathiscode?style=flat&logo=github&label=⭐️)](https://github.com/mathiscode) [![Followers](https://img.shields.io/github/followers/mathiscode?style=flat&logo=github&label=follow)](https://github.com/mathiscode)
+
+[ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written primarily in TypeScript, AssemblyScript, and C++. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
 The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
 
@@ -30,10 +34,6 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![Bluesky](https://img.shields.io/badge/follow-on%20Bluesky-blue?logo=bluesky&logoColor=white)](https://ecmaos.bsky.social)
 [![Reddit](https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&logo=reddit&logoColor=white&label=r/ecmaos)](https://www.reddit.com/r/ecmaos)
 
-> Made with ❤️ by [Jay Mathis](https://jaymath.is)
->
-> [![Stars](https://img.shields.io/github/stars/mathiscode?style=flat&logo=github&label=⭐️)](https://github.com/mathiscode) [![Followers](https://img.shields.io/github/followers/mathiscode?style=flat&logo=github&label=follow)](https://github.com/mathiscode)
-
 ## Features
 
 - TypeScript, WebAssembly, AssemblyScript, C++
@@ -56,6 +56,36 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ## Basic Overview
 
+- `Apps`
+  - These are full applications that are developed specifically to work with ecmaOS
+  - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
+  - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
+  - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/boilerplate`
+  - Run the installed app: `# /usr/bin/boilerplate arg1 arg2` *(absolute path not required)*
+  - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages: `# install @myscope/mypackage --registry http://localhost:4873`
+  - To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
+  - Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
+
+- `BIOS`
+  - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
+  - The BIOS has its own filesystem, located at `/bios` — this allows data to be copied in and out of the BIOS for custom code and utilities
+  - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
+  - Confusingly, the Kernel loads the BIOS — not the other way around
+
+- `Core`
+  - Core modules provide the system's essential functionality; this includes the kernel itself
+  - Other core modules include Metal, SWAPI, BIOS, as well as the main `@ecmaos/types` package
+
+- `Commands`
+  - Commands are small utilities that aren't quite full Apps, provided by the shell
+  - Some builtin commands that exist now will be moved into separate apps over time
+
+- `Devices`
+  - Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.
+  - A device can support being "run" by a user, e.g. `# /dev/battery status`
+  - Devices may also be directly read/written, and will behave accordingly (or have no effect)
+  - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
+
 - `Kernel`
   - Authentication (WebAuthn)
   - Components (Web Components/Custom Elements)
@@ -77,36 +107,6 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - WASM Loader
   - Window Manager (WinBox)
   - Workers (Web Workers)
-
-- `BIOS`
-  - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
-  - The BIOS has its own filesystem, located at `/bios` — this allows data to be copied in and out of the BIOS for custom code and utilities
-  - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
-  - Confusingly, the Kernel loads the BIOS — not the other way around
-
-- `Apps`
-  - These are full applications that are developed specifically to work with ecmaOS
-  - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
-  - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
-  - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/boilerplate`
-  - Run the installed app: `# /usr/bin/boilerplate arg1 arg2` *(absolute path not required)*
-  - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages: `# install @myscope/mypackage --registry http://localhost:4873`
-  - To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
-  - Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
-
-- `Core`
-  - Core modules provide the system's essential functionality; this includes the kernel itself
-  - Other core modules include Metal, SWAPI, BIOS, as well as the main `@ecmaos/types` package
-
-- `Commands`
-  - Commands are small utilities that aren't quite full Apps, provided by the shell
-  - Some builtin commands that exist now will be moved into separate apps over time
-
-- `Devices`
-  - Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.
-  - A device can support being "run" by a user, e.g. `# /dev/battery status`
-  - Devices may also be directly read/written, and will behave accordingly (or have no effect)
-  - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
 
 - `Metal`
   - Metal is an API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
