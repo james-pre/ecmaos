@@ -7,7 +7,7 @@
 — Hal Finney</p>
 </blockquote>
 <p><a href="https://docs.ecmaos.sh" target="_blank" class="external"><img src="https://img.shields.io/badge/API-Reference-success" alt="API Reference"></a>
-<a href="https://ecmaos.sh" target="_blank" class="external"><img src="https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success" alt="Version"></a>
+<a href="https://www.npmjs.com/package/@ecmaos/kernel" target="_blank" class="external"><img src="https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success" alt="Version"></a>
 <a href="https://ecmaos.sh" target="_blank" class="external"><img src="https://img.shields.io/website?url=https%3A%2F%2Fecmaos.sh" alt="Site Status"></a>
 <a href="https://github.com/ecmaos/ecmaos/pulse" target="_blank" class="external"><img src="https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&amp;label=created&amp;color=success" alt="Created"></a>
 <a href="https://github.com/ecmaos/ecmaos/commit/main" target="_blank" class="external"><img src="https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg" alt="Last Commit"></a></p>
@@ -28,7 +28,7 @@
 <p><a href="https://github.com/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/stars/mathiscode?style=flat&amp;logo=github&amp;label=%E2%AD%90%EF%B8%8F" alt="Stars"></a> <a href="https://github.com/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/followers/mathiscode?style=flat&amp;logo=github&amp;label=follow" alt="Followers"></a></p>
 </blockquote>
 <a id="features" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Features<a href="#features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
-<li>TypeScript, WebAssembly</li>
+<li>TypeScript, WebAssembly, AssemblyScript, C++</li>
 <li>Filesystem supporting multiple backends powered by <a href="https://github.com/zen-fs/core" target="_blank" class="external">zenfs</a></li>
 <li>Terminal interface powered by <a href="https://xtermjs.org" target="_blank" class="external">xterm.js</a></li>
 <li>Pseudo-streams, allowing redirection and piping</li>
@@ -42,8 +42,9 @@
 <li>Storage manager for managing Storage API capabilities: IndexedDB, localStorage, etc.</li>
 <li>Internationalization framework for translating text powered by <a href="https://www.i18next.com" target="_blank" class="external">i18next</a></li>
 <li>Window manager powered by <a href="https://github.com/nextapps-de/winbox" target="_blank" class="external">WinBox</a></li>
-<li><code>SWAPI</code>: An API server running completely inside a service worker using <a href="https://hono.dev" target="_blank" class="external">Hono</a></li>
+<li><code>BIOS</code>: A C++ module compiled to WebAssembly with <a href="https://emscripten.org" target="_blank" class="external">Emscripten</a> providing performance-critical functionality</li>
 <li><code>Metal</code>: An API server for allowing connections to physical systems from ecmaOS using <a href="https://hono.dev" target="_blank" class="external">Hono</a></li>
+<li><code>SWAPI</code>: An API server running completely inside a service worker using <a href="https://hono.dev" target="_blank" class="external">Hono</a></li>
 </ul>
 <a id="basic-overview" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Basic Overview<a href="#basic-overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
 <li>
@@ -75,27 +76,36 @@
 <p><code>BIOS</code></p>
 <ul>
 <li>The BIOS is a C++ module compiled to WebAssembly with <a href="https://emscripten.org" target="_blank" class="external">Emscripten</a> providing performance-critical functionality</li>
-<li>The BIOS has its own filesystem, located at <code>/bios</code></li>
+<li>The BIOS has its own filesystem, located at <code>/bios</code> — this allows data to be copied in and out of the BIOS for custom code and utilities</li>
 <li>The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities</li>
-<li>Confusingly, the Kernel loads the BIOS - not the other way around</li>
+<li>Confusingly, the Kernel loads the BIOS — not the other way around</li>
 </ul>
 </li>
 <li>
 <p><code>Apps</code></p>
 <ul>
-<li>These are full applications that are developed to work with ecmaOS</li>
+<li>These are full applications that are developed specifically to work with ecmaOS</li>
+<li>An app is an npm package, in which the bin file has a shebang line of <code>#!ecmaos:bin:app:myappname</code></li>
+<li>Its default export (or exported <code>main</code> function) will be called with the <code>ProcessEntryParams</code> object</li>
+<li>They can be installed from the terminal using the <code>install</code> command, e.g. <code># install @ecmaos-apps/boilerplate</code></li>
+<li>Run the installed app: <code># /usr/bin/boilerplate arg1 arg2</code> <em>(absolute path not required)</em></li>
+<li>During development, it can be useful to run a <a href="https://github.com/verdaccio/verdaccio" target="_blank" class="external">Verdaccio</a> server to test local packages: <code># install @myscope/mypackage --registry http://localhost:4873</code></li>
+<li>To publish to Verdaccio, run <code># npm publish --registry http://localhost:4873</code> in your app's development environment</li>
+<li>Then to install from your local registry, run <code># install @myscope/mypackage --registry http://localhost:4873</code></li>
 </ul>
 </li>
 <li>
 <p><code>Core</code></p>
 <ul>
 <li>Core modules provide the system's essential functionality; this includes the kernel itself</li>
+<li>Other core modules include Metal, SWAPI, BIOS, as well as the main <code>@ecmaos/types</code> package</li>
 </ul>
 </li>
 <li>
 <p><code>Commands</code></p>
 <ul>
 <li>Commands are small utilities that aren't quite full Apps, provided by the shell</li>
+<li>Some builtin commands that exist now will be moved into separate apps over time</li>
 </ul>
 </li>
 <li>
@@ -103,18 +113,56 @@
 <ul>
 <li>Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.</li>
 <li>A device can support being "run" by a user, e.g. <code># /dev/battery status</code></li>
-<li>Devices may also be directly read/written, and will behave accordingly</li>
+<li>Devices may also be directly read/written, and will behave accordingly (or have no effect)</li>
 <li>An individual device module can provide multiple device drivers, e.g. <code>/dev/usb</code> provides <code>/dev/usb-mydevice-0001-0002</code></li>
+</ul>
+</li>
+<li>
+<p><code>Metal</code></p>
+<ul>
+<li>Metal is an API server for allowing connections to physical systems from ecmaOS using <a href="https://hono.dev" target="_blank" class="external">Hono</a></li>
+<li>Authenticated and encrypted connections with JWK/JWE/JOSE</li>
+</ul>
+</li>
+<li>
+<p><code>Modules</code></p>
+<ul>
+<li>Modules are dynamically loaded into the kernel at boot and can be enabled or disabled</li>
+<li>They can provide additional functionality, devices, commands, etc.</li>
+<li>They offer a <a href="modules/types_modules.html">common interface</a> for interacting with the kernel</li>
+<li>Generally they should be written in <a href="https://www.assemblyscript.org" target="_blank" class="external">AssemblyScript</a>, but this isn't required</li>
+</ul>
+</li>
+<li>
+<p><code>Packages</code></p>
+<ul>
+<li>Packages are <a href="https://www.npmjs.com" target="_blank" class="external">npm packages</a> that are installed into the ecmaOS environment</li>
+<li>They can be installed from the terminal using the <code>install</code> command, e.g. <code># install jquery</code></li>
+<li>NPM version specifiers are supported, e.g.:
+<ul>
+<li><code># install jquery@3.7.1</code></li>
+<li><code># install jquery@^3.7.1</code></li>
+<li><code># install jquery@latest</code></li>
+</ul>
+</li>
+<li><a href="https://jsr.io" target="_blank" class="external">JSR</a> support is coming soon</li>
+</ul>
+</li>
+<li>
+<p><code>SWAPI</code></p>
+<ul>
+<li>The SWAPI is an API server running completely inside a service worker using <a href="https://hono.dev" target="_blank" class="external">Hono</a></li>
+<li>e.g., <code># fetch /swapi/fake/person/fullName</code></li>
 </ul>
 </li>
 <li>
 <p><code>Utils</code></p>
 <ul>
-<li>Utilities used during development</li>
+<li>Utilities and configuration used during development</li>
 </ul>
 </li>
 </ul>
-<a id="command-examples" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Command Examples<a href="#command-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="sh"><span class="hl-0">ai</span><span class="hl-1"> </span><span class="hl-2">"Despite all my rage"</span><span class="hl-1"> </span><span class="hl-3"># use env OPENAI_API_KEY --set sk-</span><br><span class="hl-0">cat</span><span class="hl-1"> </span><span class="hl-2">/var/log/kernel.log</span><br><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">/tmp</span><br><span class="hl-0">echo</span><span class="hl-1"> </span><span class="hl-2">"Hello, world!"</span><span class="hl-1"> &gt; </span><span class="hl-2">hello.txt</span><br><span class="hl-0">chmod</span><span class="hl-1"> </span><span class="hl-4">700</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">chown</span><span class="hl-1"> </span><span class="hl-2">user</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">clear</span><br><span class="hl-0">cp</span><span class="hl-1"> </span><span class="hl-2">/tmp/hello.txt</span><span class="hl-1"> </span><span class="hl-2">/tmp/hi.txt</span><br><span class="hl-0">download</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">edit</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">env</span><span class="hl-1"> </span><span class="hl-2">hello</span><span class="hl-1"> </span><span class="hl-5">--set</span><span class="hl-1"> </span><span class="hl-2">world</span><span class="hl-1"> ; </span><span class="hl-0">env</span><br><span class="hl-0">fetch</span><span class="hl-1"> </span><span class="hl-2">https://ipecho.net/plain</span><span class="hl-1"> &gt; </span><span class="hl-2">/tmp/myip.txt</span><br><span class="hl-0">install</span><span class="hl-1"> </span><span class="hl-2">jquery</span><br><span class="hl-0">ls</span><span class="hl-1"> </span><span class="hl-2">/dev</span><br><span class="hl-0">mkdir</span><span class="hl-1"> </span><span class="hl-2">/tmp/zip</span><span class="hl-1"> ; </span><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">/tmp/zip</span><br><span class="hl-0">upload</span><br><span class="hl-0">mount</span><span class="hl-1"> </span><span class="hl-2">myuploadedzip.zip</span><span class="hl-1"> </span><span class="hl-2">/mnt/zip</span><span class="hl-1"> </span><span class="hl-5">-t</span><span class="hl-1"> </span><span class="hl-2">zip</span><br><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">..</span><span class="hl-1"> ; </span><span class="hl-0">pwd</span><br><span class="hl-0">unzip</span><span class="hl-1"> </span><span class="hl-2">zip/myuploaded.zip</span><br><span class="hl-0">mv</span><span class="hl-1"> </span><span class="hl-2">zip/myuploaded.zip</span><span class="hl-1"> </span><span class="hl-2">/tmp/backup.zip</span><br><span class="hl-0">passwd</span><span class="hl-1"> </span><span class="hl-2">old</span><span class="hl-1"> </span><span class="hl-2">new</span><br><span class="hl-0">play</span><span class="hl-1"> </span><span class="hl-2">/root/test.mp3</span><br><span class="hl-0">ps</span><br><span class="hl-0">rm</span><span class="hl-1"> </span><span class="hl-2">/tmp/backup.zip</span><br><span class="hl-0">screensaver</span><br><span class="hl-0">snake</span><br><span class="hl-0">stat</span><span class="hl-1"> </span><span class="hl-2">/tmp/hello.txt</span><br><span class="hl-0">touch</span><span class="hl-1"> </span><span class="hl-2">/tmp/test.bin</span><br><span class="hl-0">umount</span><span class="hl-1"> </span><span class="hl-2">/mnt/zip</span><br><span class="hl-0">user</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-5">--username</span><span class="hl-1"> </span><span class="hl-2">user</span><br><span class="hl-0">su</span><span class="hl-1"> </span><span class="hl-2">user</span><br><span class="hl-0">video</span><span class="hl-1"> </span><span class="hl-2">/root/video.mp4</span><br><span class="hl-0">zip</span><span class="hl-1"> </span><span class="hl-2">/root/tmp.zip</span><span class="hl-1"> </span><span class="hl-2">/tmp</span>
+<a id="command-examples" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Command Examples<a href="#command-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="sh"><span class="hl-0">ai</span><span class="hl-1"> </span><span class="hl-2">"Despite all my rage"</span><span class="hl-1"> </span><span class="hl-3"># use `env OPENAI_API_KEY --set sk-`</span><br><span class="hl-0">cat</span><span class="hl-1"> </span><span class="hl-2">/var/log/kernel.log</span><br><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">/tmp</span><br><span class="hl-0">echo</span><span class="hl-1"> </span><span class="hl-2">"Hello, world!"</span><span class="hl-1"> &gt; </span><span class="hl-2">hello.txt</span><br><span class="hl-0">chmod</span><span class="hl-1"> </span><span class="hl-4">700</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">chown</span><span class="hl-1"> </span><span class="hl-2">user</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">clear</span><br><span class="hl-0">cp</span><span class="hl-1"> </span><span class="hl-2">/tmp/hello.txt</span><span class="hl-1"> </span><span class="hl-2">/tmp/hi.txt</span><br><span class="hl-0">download</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">edit</span><span class="hl-1"> </span><span class="hl-2">hello.txt</span><br><span class="hl-0">env</span><span class="hl-1"> </span><span class="hl-2">hello</span><span class="hl-1"> </span><span class="hl-5">--set</span><span class="hl-1"> </span><span class="hl-2">world</span><span class="hl-1"> ; </span><span class="hl-0">env</span><br><span class="hl-0">fetch</span><span class="hl-1"> </span><span class="hl-2">https://ipecho.net/plain</span><span class="hl-1"> &gt; </span><span class="hl-2">/tmp/myip.txt</span><br><span class="hl-0">fetch</span><span class="hl-1"> </span><span class="hl-2">/xkcd-os.sixel</span><span class="hl-1"> </span><span class="hl-3"># xterm.js includes sixel support</span><br><span class="hl-0">fetch</span><span class="hl-1"> </span><span class="hl-2">/swapi/fake/person/fullName</span><span class="hl-1"> </span><span class="hl-3"># fetch a random person from the SWAPI</span><br><span class="hl-0">install</span><span class="hl-1"> </span><span class="hl-2">jquery</span><br><span class="hl-0">ls</span><span class="hl-1"> </span><span class="hl-2">/dev</span><br><span class="hl-0">mkdir</span><span class="hl-1"> </span><span class="hl-2">/tmp/zip</span><span class="hl-1"> ; </span><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">/tmp/zip</span><br><span class="hl-0">upload</span><br><span class="hl-0">mount</span><span class="hl-1"> </span><span class="hl-2">myuploadedzip.zip</span><span class="hl-1"> </span><span class="hl-2">/mnt/zip</span><span class="hl-1"> </span><span class="hl-5">-t</span><span class="hl-1"> </span><span class="hl-2">zip</span><br><span class="hl-0">cd</span><span class="hl-1"> </span><span class="hl-2">..</span><span class="hl-1"> ; </span><span class="hl-0">pwd</span><br><span class="hl-0">unzip</span><span class="hl-1"> </span><span class="hl-2">zip/myuploaded.zip</span><br><span class="hl-0">mv</span><span class="hl-1"> </span><span class="hl-2">zip/myuploaded.zip</span><span class="hl-1"> </span><span class="hl-2">/tmp/backup.zip</span><br><span class="hl-0">passwd</span><span class="hl-1"> </span><span class="hl-2">old</span><span class="hl-1"> </span><span class="hl-2">new</span><br><span class="hl-0">play</span><span class="hl-1"> </span><span class="hl-2">/root/test.mp3</span><br><span class="hl-0">ps</span><br><span class="hl-0">rm</span><span class="hl-1"> </span><span class="hl-2">/tmp/backup.zip</span><br><span class="hl-0">screensaver</span><br><span class="hl-0">snake</span><br><span class="hl-0">stat</span><span class="hl-1"> </span><span class="hl-2">/tmp/hello.txt</span><br><span class="hl-0">touch</span><span class="hl-1"> </span><span class="hl-2">/tmp/test.bin</span><br><span class="hl-0">umount</span><span class="hl-1"> </span><span class="hl-2">/mnt/zip</span><br><span class="hl-0">user</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-5">--username</span><span class="hl-1"> </span><span class="hl-2">user</span><br><span class="hl-0">su</span><span class="hl-1"> </span><span class="hl-2">user</span><br><span class="hl-0">video</span><span class="hl-1"> </span><span class="hl-2">/root/video.mp4</span><br><span class="hl-0">zip</span><span class="hl-1"> </span><span class="hl-2">/root/tmp.zip</span><span class="hl-1"> </span><span class="hl-2">/tmp</span>
 </code><button type="button">Copy</button></pre>
 
 <a id="device-examples" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Device Examples<a href="#device-examples" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="sh"><span class="hl-0">/dev/audio</span><span class="hl-1"> </span><span class="hl-2">test</span><br><span class="hl-0">/dev/battery</span><span class="hl-1"> </span><span class="hl-2">status</span><br><span class="hl-0">/dev/bluetooth</span><span class="hl-1"> </span><span class="hl-2">scan</span><br><span class="hl-0">echo</span><span class="hl-1"> </span><span class="hl-2">"This will error"</span><span class="hl-1"> &gt; </span><span class="hl-2">/dev/full</span><br><span class="hl-0">/dev/gamepad</span><span class="hl-1"> </span><span class="hl-2">list</span><br><span class="hl-0">/dev/geo</span><span class="hl-1"> </span><span class="hl-2">position</span><br><span class="hl-0">/dev/gpu</span><span class="hl-1"> </span><span class="hl-2">test</span><br><span class="hl-0">/dev/hid</span><span class="hl-1"> </span><span class="hl-2">list</span><br><span class="hl-0">/dev/midi</span><span class="hl-1"> </span><span class="hl-2">list</span><br><span class="hl-0">echo</span><span class="hl-1"> </span><span class="hl-2">"Goodbye"</span><span class="hl-1"> &gt; </span><span class="hl-2">/dev/null</span><br><span class="hl-0">/dev/presentation</span><span class="hl-1"> </span><span class="hl-2">start</span><span class="hl-1"> </span><span class="hl-2">https://wikipedia.org</span><br><span class="hl-0">cat</span><span class="hl-1"> </span><span class="hl-2">/dev/random</span><span class="hl-1"> </span><span class="hl-5">--bytes</span><span class="hl-1"> </span><span class="hl-4">10</span><br><span class="hl-0">/dev/sensors</span><span class="hl-1"> </span><span class="hl-2">list</span><br><span class="hl-0">/dev/serial</span><span class="hl-1"> </span><span class="hl-2">devices</span><br><span class="hl-0">/dev/usb</span><span class="hl-1"> </span><span class="hl-2">list</span><br><span class="hl-0">/dev/webgpu</span><span class="hl-1"> </span><span class="hl-2">test</span><br><span class="hl-0">cat</span><span class="hl-1"> </span><span class="hl-2">/dev/zero</span><span class="hl-1"> </span><span class="hl-5">--bytes</span><span class="hl-1"> </span><span class="hl-4">10</span><span class="hl-1"> &gt; </span><span class="hl-2">/dev/null</span>

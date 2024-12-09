@@ -10,7 +10,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 > — Hal Finney
 
 [![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
-[![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://ecmaos.sh)
+[![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://www.npmjs.com/package/@ecmaos/kernel)
 [![Site Status](https://img.shields.io/website?url=https%3A%2F%2Fecmaos.sh)](https://ecmaos.sh)
 [![Created](https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&label=created&color=success)](https://github.com/ecmaos/ecmaos/pulse)
 [![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/main)
@@ -36,7 +36,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ## Features
 
-- TypeScript, WebAssembly
+- TypeScript, WebAssembly, AssemblyScript, C++
 - Filesystem supporting multiple backends powered by [zenfs](https://github.com/zen-fs/core)
 - Terminal interface powered by [xterm.js](https://xtermjs.org)
 - Pseudo-streams, allowing redirection and piping
@@ -50,8 +50,9 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 - Storage manager for managing Storage API capabilities: IndexedDB, localStorage, etc.
 - Internationalization framework for translating text powered by [i18next](https://www.i18next.com)
 - Window manager powered by [WinBox](https://github.com/nextapps-de/winbox)
-- `SWAPI`: An API server running completely inside a service worker using [Hono](https://hono.dev)
+- `BIOS`: A C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
 - `Metal`: An API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
+- `SWAPI`: An API server running completely inside a service worker using [Hono](https://hono.dev)
 
 ## Basic Overview
 
@@ -79,24 +80,37 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `BIOS`
   - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
-  - The BIOS has its own filesystem, located at `/bios`
+  - The BIOS has its own filesystem, located at `/bios` — this allows data to be copied in and out of the BIOS for custom code and utilities
   - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
-  - Confusingly, the Kernel loads the BIOS - not the other way around
+  - Confusingly, the Kernel loads the BIOS — not the other way around
 
 - `Apps`
-  - These are full applications that are developed to work with ecmaOS
+  - These are full applications that are developed specifically to work with ecmaOS
+  - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
+  - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
+  - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/boilerplate`
+  - Run the installed app: `# /usr/bin/boilerplate arg1 arg2` *(absolute path not required)*
+  - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages: `# install @myscope/mypackage --registry http://localhost:4873`
+  - To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
+  - Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
 
 - `Core`
   - Core modules provide the system's essential functionality; this includes the kernel itself
+  - Other core modules include Metal, SWAPI, BIOS, as well as the main `@ecmaos/types` package
 
 - `Commands`
   - Commands are small utilities that aren't quite full Apps, provided by the shell
+  - Some builtin commands that exist now will be moved into separate apps over time
 
 - `Devices`
   - Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
-  - Devices may also be directly read/written, and will behave accordingly
+  - Devices may also be directly read/written, and will behave accordingly (or have no effect)
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
+
+- `Metal`
+  - Metal is an API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
+  - Authenticated and encrypted connections with JWK/JWE/JOSE
 
 - `Modules`
   - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
@@ -104,8 +118,21 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
   - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
 
+- `Packages`
+  - Packages are [npm packages](https://www.npmjs.com) that are installed into the ecmaOS environment
+  - They can be installed from the terminal using the `install` command, e.g. `# install jquery`
+  - NPM version specifiers are supported, e.g.:
+    - `# install jquery@3.7.1`
+    - `# install jquery@^3.7.1`
+    - `# install jquery@latest`
+  - [JSR](https://jsr.io) support is coming soon
+
+- `SWAPI`
+  - The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)
+  - e.g., `# fetch /swapi/fake/person/fullName`
+
 - `Utils`
-  - Utilities used during development
+  - Utilities and configuration used during development
 
 ## Command Examples
 
@@ -122,6 +149,8 @@ download hello.txt
 edit hello.txt
 env hello --set world ; env
 fetch https://ipecho.net/plain > /tmp/myip.txt
+fetch /xkcd-os.sixel # xterm.js includes sixel support
+fetch /swapi/fake/person/fullName # fetch a random person from the SWAPI
 install jquery
 ls /dev
 mkdir /tmp/zip ; cd /tmp/zip

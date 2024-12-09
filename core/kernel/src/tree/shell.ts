@@ -17,9 +17,10 @@ const DefaultShellOptions = {
 }
 
 export class Shell {
-  private _cred: Credentials = { uid: 0, gid: 0, suid: 0, sgid: 0, euid: 0, egid: 0 }
+  private _cred: Credentials = { uid: 0, gid: 0, suid: 0, sgid: 0, euid: 0, egid: 0, groups: [] }
   private _cwd: string
   private _env: Map<string, string>
+  private _id: string = crypto.randomUUID()
   private _kernel: Kernel
   private _terminal: Terminal
   private _terminalWriter?: WritableStreamDefaultWriter<Uint8Array>
@@ -29,6 +30,7 @@ export class Shell {
   get env() { return this._env }
   set env(env: Map<string, string>) { this._env = env; globalThis.process.env = { ...globalThis.process.env, ...Object.fromEntries(env) } }
   get envObject() { return Object.fromEntries(this._env) }
+  get id() { return this._id }
   get kernel() { return this._kernel }
   get terminal() { return this._terminal }
   get username() { return this._kernel.users.get(this._cred.uid)?.username || 'root' }
@@ -39,6 +41,7 @@ export class Shell {
   constructor(_options: ShellOptions) {
     const options = { ...DefaultShellOptions, ..._options }
     if (!options.kernel) throw new Error('Kernel is required')
+    globalThis.shells?.set(this.id, this)
 
     this._cwd = options.cwd
     this._env = new Map([...Object.entries(DefaultShellOptions.env), ...Object.entries(options.env)])
@@ -180,7 +183,9 @@ export class Shell {
             const result = await this._kernel.execute({
               command: finalCommand,
               args,
+              kernel: this._kernel,
               shell: this,
+              terminal: this._terminal,
               stdin: inputStream,
               stdout: outputStream,
               stderr: this._terminal.stderr
@@ -214,18 +219,26 @@ export class Shell {
   }
 
   private async resolveCommand(command: string): Promise<string | undefined> {
+    if (command.startsWith('./')) {
+      const cwdCommand = path.join(this.cwd, command.slice(2))
+      if (await this._kernel.filesystem.fs.exists(cwdCommand)) {
+        return cwdCommand
+      }
+      return undefined
+    }
+
     const paths = this.env.get('PATH')?.split(':') || DefaultShellPath.split(':')
     const resolvedCommand = path.resolve(command)
 
     if (await this._kernel.filesystem.fs.exists(resolvedCommand)) {
-        return resolvedCommand
+      return resolvedCommand
     }
 
     for (const path of paths) {
-        const fullPath = `${path}/${command}`
-        if (await this._kernel.filesystem.fs.exists(fullPath)) {
-            return fullPath
-        }
+      const fullPath = `${path}/${command}`
+      if (await this._kernel.filesystem.fs.exists(fullPath)) {
+        return fullPath
+      }
     }
 
     return undefined

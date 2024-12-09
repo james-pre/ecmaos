@@ -90,7 +90,7 @@
     </div>
 
     <div class="controls">
-        <button onclick="initializeBIOS()">Initialize BIOS</button>
+        <button id="initialize-bios">Initialize BIOS</button>
         <button onclick="clearConsole()">Clear Console</button>
     </div>
 
@@ -114,7 +114,7 @@
 
     <script type="module">
         import { initializeBIOS } from '/src/index.js'
-        initializeBIOS()
+        document.getElementById('initialize-bios').onclick = initializeBIOS
     </script>
 </body>
 </html> 

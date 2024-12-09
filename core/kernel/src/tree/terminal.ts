@@ -13,7 +13,6 @@ import { ImageAddon } from '@xterm/addon-image'
 import { SearchAddon } from '@xterm/addon-search'
 import { SerializeAddon } from '@xterm/addon-serialize'
 import { WebLinksAddon } from '@xterm/addon-web-links'
-import { credentials } from '@zenfs/core'
 
 import '@xterm/xterm/css/xterm.css'
 import { TerminalCommand, TerminalCommands } from '#lib/commands/index.js' // TODO: new approach
@@ -109,6 +108,7 @@ export class Terminal extends XTerm implements ITerminal {
   private _events: Events
   private _history: string[]
   private _historyPosition: number = 0
+  private _id: string = crypto.randomUUID()
   private _kernel: Kernel
   private _keyListener: IDisposable
   private _promptTemplate: string = '{user}:{cwd}# '
@@ -134,6 +134,7 @@ export class Terminal extends XTerm implements ITerminal {
   get cwd() { return this._shell.cwd }
   get emojis() { return emoji }
   get events() { return this._events }
+  get id() { return this._id }
   get socket() { return this._socket }
   get socketKey() { return this._socketKey }
   get stdin() { return this._stdin }
@@ -146,6 +147,7 @@ export class Terminal extends XTerm implements ITerminal {
   constructor(options: TerminalOptions = DefaultTerminalOptions) {
     if (!options.kernel) throw new Error('Terminal requires a kernel')
     super({ ...DefaultTerminalOptions, ...options })
+    globalThis.terminals?.set(this.id, this)
 
     // Create the stdin stream that can receive keyboard input
     this._stdinStream = new TransformStream({
@@ -383,13 +385,13 @@ export class Terminal extends XTerm implements ITerminal {
 
   // TODO: make more configurable and robust
   prompt(text: string = this._promptTemplate) {
-    const user = this._kernel.users.get(credentials.uid ?? 0)
+    const user = this._kernel.users.get(this._shell.credentials.uid ?? 0)
 
     // @ts-expect-error
     return this.ansi.style[this.options.theme?.promptColor || 'green'] + text
       .replace('{cwd}', this.cwd)
       .replace('{uid}', user?.uid.toString() || '')
-      .replace('{gid}', user?.gid?.[0]?.toString() || '')
+      .replace('{gid}', user?.gid.toString() || '')
       .replace('{user}', user?.username || '')
       + this.ansi.style.white
   }
@@ -468,11 +470,12 @@ export class Terminal extends XTerm implements ITerminal {
           } catch (error) {
             this.writeln(chalk.red(`${error}`))
           }
+        } else {
+          this.write(this.prompt())
         }
 
         this._cmd = ''
         this._cursorPosition = 0
-        this.write(this.prompt())
         break
       case 'Backspace':
         if (this._cursorPosition > 0) {
@@ -561,11 +564,11 @@ export class Terminal extends XTerm implements ITerminal {
         break
       case 'Home':
         this._cursorPosition = 0
-        this.write(ansi.cursor.horizontalAbsolute(this.prompt().length + 1))
+        this.write(ansi.cursor.horizontalAbsolute(this.prompt().replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').length + 1))
         break
       case 'End':
         this._cursorPosition = this._cmd.length + 1
-        this.write(ansi.cursor.horizontalAbsolute(this.prompt().length + this._cmd.length + 1))
+        this.write(ansi.cursor.horizontalAbsolute(this.prompt().replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '').length + this._cmd.length + 1))
         break
       case 'Tab': {
         domEvent.preventDefault()
@@ -577,8 +580,14 @@ export class Terminal extends XTerm implements ITerminal {
           this._isTabCycling = true
         }
 
-        const matches = this.getCompletionMatches(this._lastTabCommand) // Use original command for matches
-        if (matches.length > 0) {
+        const matches = await this.getCompletionMatches(this._lastTabCommand) // Use original command for matches
+        if (this._cmd.endsWith('/')) { // show possible entries in directory
+          const path = this._cmd.split(' ').slice(-1)[0]
+          if (!(await this._kernel.filesystem.fs.exists(path))) break
+          await this.write('\n')
+          await this._shell.execute(`ls ${path}`)
+          this.write(this.prompt() + this._cmd)
+        } else if (matches.length > 0) {
           this.write('\r' + ansi.erase.inLine())
           this._tabCompletionIndex = (this._tabCompletionIndex + 1) % matches.length
           const newCmd = matches[this._tabCompletionIndex] || ''
@@ -668,11 +677,39 @@ export class Terminal extends XTerm implements ITerminal {
     }
   }
 
-  private getCompletionMatches(partial: string): string[] {
+  private async getCompletionMatches(partial: string): Promise<string[]> {
     const parts = partial.split(' ')
     const lastWord = parts[parts.length - 1]
     if (!lastWord) return []
     
+    // If this is the first word (command), search in PATH
+    if (parts.length === 1) {
+      const pathDirs = (this._shell.env.get('PATH') || '').split(':')
+      const matches: string[] = []
+      
+      // First check built-in commands
+      const builtinMatches = Object.keys(this._commands).filter(cmd => 
+        cmd.toLowerCase().startsWith(lastWord.toLowerCase())
+      )
+      matches.push(...builtinMatches)
+
+      // Then check executables in PATH
+      for (const dir of pathDirs) {
+        try {
+          const entries = await this._kernel.filesystem.fs.readdir(dir)
+          const dirMatches = entries.filter((entry: string) => 
+            entry.toLowerCase().startsWith(lastWord.toLowerCase())
+          )
+          matches.push(...dirMatches)
+        } catch {
+          continue // Skip invalid directories
+        }
+      }
+
+      return [...new Set(matches)].map(match => match) // Remove duplicates
+    }
+
+    // Existing file/directory completion logic
     const lastSlashIndex = lastWord.lastIndexOf('/')
     const searchDir = lastSlashIndex !== -1 ? 
       path.resolve(this._shell.cwd, lastWord.substring(0, lastSlashIndex + 1)) : 
@@ -682,23 +719,24 @@ export class Terminal extends XTerm implements ITerminal {
       lastWord
 
     try {
-      const entries = this._kernel.filesystem.fsSync.readdirSync(searchDir)
+      const entries = await this._kernel.filesystem.fs.readdir(searchDir)
       const matches = entries.filter((entry: string) => {
         if (!searchTerm) return true
         return entry.toLowerCase().startsWith(searchTerm.toLowerCase())
       })
 
       const prefix = lastSlashIndex !== -1 ? (lastWord || '').substring(0, lastSlashIndex + 1) : ''
-      return matches.map((match: string) => {
+      const matchesMap = await Promise.all(matches.map(async (match: string) => {
         const fullPath = path.join(searchDir, match)
-        const isDirectory = this._kernel.filesystem.fsSync.statSync(fullPath).isDirectory()
+        const isDirectory = (await this._kernel.filesystem.fs.stat(fullPath)).isDirectory()
         const escapedMatch = match.includes(' ') ? match.replace(/ /g, '\\ ') : match
         const matchWithSlash = isDirectory ? escapedMatch + '/' : escapedMatch
-        
         const newParts = [...parts]
         newParts[newParts.length - 1] = prefix + matchWithSlash
         return newParts.join(' ')
-      })
+      }))
+
+      return matchesMap
     } catch {
       return []
     }

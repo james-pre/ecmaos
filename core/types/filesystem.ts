@@ -79,6 +79,13 @@ export interface Filesystem {
   exists(path: string): Promise<boolean>
 
   /**
+   * Extracts a tarball to the given path.
+   * @param tarballPath - The path to the tarball.
+   * @param extractPath - The path to extract the tarball to.
+   */
+  extractTarball(tarballPath: string, extractPath: string): Promise<void>
+
+  /**
    * Get filesystem descriptions
    * @param t - Optional translation function
    */

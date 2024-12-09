@@ -24,8 +24,10 @@ export interface UsersOptions {
 export interface User {
   /** Home directory path */
   home: string
-  /** Group IDs */
-  gid: number[]
+  /** Group ID */
+  gid: number
+  /** Additional Groups */
+  groups: number[]
   /** Username */
   username: string
   /** Shell path */

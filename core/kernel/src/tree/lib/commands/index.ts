@@ -3,7 +3,7 @@
  * 
  * @remarks
  * TODO: Eventually this will be refactored to have a more consistent (and familiar) CLI interface.
- * This file is getting large and many larger commands should be moved to their own files or packages.
+ * This file is getting large and many larger commands are being moved to their own files or packages.
  * I think simple commands should still be bundled together though, to reduce the need for file jumping.
  * Although it looks unweildy, if your editor supports code folding, a simple Fold All makes it much easier to navigate.
  * Looking for a command definition in two places might be annoying, but just use this trick:
@@ -23,7 +23,7 @@ import path from 'path'
 // import * as jose from 'jose'
 import * as zipjs from '@zip.js/zip.js'
 
-import { credentials, Fetch, InMemory, resolveMountConfig, Stats } from '@zenfs/core'
+import { createCredentials, Fetch, InMemory, resolveMountConfig, useCredentials, Stats } from '@zenfs/core'
 import { IndexedDB } from '@zenfs/dom'
 import { Zip } from '@zenfs/zip'
 
@@ -92,7 +92,7 @@ export class TerminalCommand implements ITerminalCommand {
     this.stdout = stdout
     this.stderr = stderr
 
-    this.run = async (pid: number, argv: string[]) => {
+    this.run =  async (pid: number, argv: string[]) => {
       if (argv === null) return 1
       try {
         const parsed = parseArgs(this.options, { argv })
@@ -234,6 +234,17 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
         return await cp({ kernel, shell, terminal, args: argv.args })
       }
     }),
+    df: new TerminalCommand({
+      command: 'df',
+      description: 'Display disk space usage',
+      kernel,
+      shell,
+      terminal,
+      options: [],
+      run: async () => {
+        return await df({ kernel, shell, terminal, args: [] })
+      }
+    }),
     download: new TerminalCommand({
       command: 'download',
       description: 'Download a file from the filesystem',
@@ -316,11 +327,26 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
       terminal,
       options: [
         HelpOption,
-        { name: 'url', type: String, typeLabel: '{underline url}', defaultOption: true, description: 'The URL to the package to install' },
-        { name: 'repo', type: String, description: 'The repository to use', defaultValue: 'https://unpkg.com' }
+        { name: 'package', type: String, typeLabel: '{underline package}', defaultOption: true, description: 'The package name and optional version (e.g. package@1.0.0)' },
+        { name: 'registry', type: String, description: 'The registry to use', defaultValue: 'https://registry.npmjs.org' }
       ],
       run: async (argv: CommandLineOptions) => {
-        return await install({ kernel, shell, terminal, args: [argv.url] })
+        const { default: install } = await import('./install')
+        return await install({ kernel, shell, terminal, args: [argv.package, argv.registry] })
+      }
+    }),
+    load: new TerminalCommand({
+      command: 'load',
+      description: 'Load a JavaScript file',
+      kernel,
+      shell,
+      terminal,
+      options: [
+        HelpOption,
+        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to the file to load' }
+      ],
+      run: async (argv: CommandLineOptions) => {
+        return await load({ kernel, shell, terminal, args: [argv.path] })
       }
     }),
     ls: new TerminalCommand({
@@ -481,6 +507,20 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
         return await rm({ kernel, shell, terminal, args: [argv.path] })
       }
     }),
+    rmdir: new TerminalCommand({
+      command: 'rmdir',
+      description: 'Remove a directory',
+      kernel,
+      shell,
+      terminal,
+      options: [
+        HelpOption,
+        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to the directory to remove' }
+      ],
+      run: async (argv: CommandLineOptions) => {
+        return await rmdir({ kernel, shell, terminal, args: [argv.path] })
+      }
+    }),
     screensaver: new TerminalCommand({
       command: 'screensaver',
       description: 'Start the screensaver',
@@ -579,6 +619,34 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
         return await umount({ kernel, shell, terminal, args: [argv.path] })
       }
     }),
+    unzip: new TerminalCommand({
+      command: 'unzip',
+      description: 'Unzip a file',
+      kernel,
+      shell,
+      terminal,
+      options: [
+        HelpOption,
+        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to the file to unzip' }
+      ],
+      run: async (argv: CommandLineOptions) => {
+        return await unzip({ kernel, shell, terminal, args: [argv.path] })
+      }
+    }),
+    upload: new TerminalCommand({
+      command: 'upload',
+      description: 'Upload a file to the filesystem',
+      kernel,
+      shell,
+      terminal,
+      options: [
+        HelpOption,
+        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to store the file' }
+      ],
+      run: async (argv: CommandLineOptions) => {
+        return await upload({ kernel, shell, terminal, args: [argv.path] })
+      }
+    }),
     user: new TerminalCommand({
       command: 'user',
       description: 'Manage users',
@@ -610,34 +678,6 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
       ],
       run: async (argv: CommandLineOptions) => {
         return await user({ kernel, shell, terminal, args: [argv.command, argv.username, argv.password] })
-      }
-    }),
-    unzip: new TerminalCommand({
-      command: 'unzip',
-      description: 'Unzip a file',
-      kernel,
-      shell,
-      terminal,
-      options: [
-        HelpOption,
-        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to the file to unzip' }
-      ],
-      run: async (argv: CommandLineOptions) => {
-        return await unzip({ kernel, shell, terminal, args: [argv.path] })
-      }
-    }),
-    upload: new TerminalCommand({
-      command: 'upload',
-      description: 'Upload a file to the filesystem',
-      kernel,
-      shell,
-      terminal,
-      options: [
-        HelpOption,
-        { name: 'path', type: String, typeLabel: '{underline path}', defaultOption: true, description: 'The path to store the file' }
-      ],
-      run: async (argv: CommandLineOptions) => {
-        return await upload({ kernel, shell, terminal, args: [argv.path] })
       }
     }),
     video: new TerminalCommand({
@@ -801,7 +841,6 @@ export const chown = async ({ kernel, shell, args }: CommandArgs) => {
   const [user, target, group] = (args as string[])
   if (!user || !target) return 1
   const fullPath = path.resolve(shell.cwd, target)
-  // await kernel.filesystem.fs.chown(fullPath, parseInt(user), parseInt(group))
   kernel.filesystem.fsSync.chownSync(fullPath, parseInt(user), parseInt(group ?? user))
 }
 
@@ -813,9 +852,32 @@ export const cp = async ({ kernel, shell, args }: CommandArgs) => {
   const [source, destination] = (args as string[]).map(arg => path.resolve(shell.cwd, arg))
   if (!source || !destination) return 1
   const destinationStats = await kernel.filesystem.fs.stat(destination).catch(() => null)
-  // 🪵
+  // 🪵⛟
   const finalDestination = destinationStats?.isDirectory() ? path.join(destination, path.basename(source)) : destination
   await kernel.filesystem.fs.copyFile(source, finalDestination)
+}
+
+export const df = async ({ kernel, terminal }: CommandArgs) => {
+const usage = await kernel.storage.usage()
+  if (!usage) return 1
+
+  const getData = (usage: StorageEstimate) => {
+    const data: Record<string, string | Record<string, string>> = {}
+    for (const [key, value] of Object.entries(usage)) {
+      if (typeof value === 'object' && value !== null) {
+        data[key] = getData(value as StorageEstimate) as Record<string, string>
+      } else if (typeof value === 'number') {
+        data[key] = humanFormat(value)
+      } else {
+        data[key] = String(value)
+      }
+    }
+    return data
+  }
+
+  const data = getData(usage)
+  terminal.writeln(JSON.stringify(data, null, 2))
+  return 0
 }
 
 export const download = async ({ kernel, shell, terminal, args }: CommandArgs) => {
@@ -1201,131 +1263,17 @@ export const fetch = async ({ kernel, shell, terminal, process, args }: CommandA
   }
 }
 
-export const install = async ({ kernel, terminal, args }: CommandArgs) => {
-  const [packageArg, repoArg] = (args as string[])
-  if (!packageArg) {
-    terminal.writeln(chalk.red('Usage: install <package-name>[@version]'))
+export const load = async ({ kernel, shell, args }: CommandArgs) => {
+  const [target] = (args as string[])
+  if (!target) {
+    await shell.execute('load --help')
     return 1
   }
 
-  // Parse package name and version
-  const versionMatch = packageArg.match(/(@[^/]+\/[^@]+|[^@]+)(?:@([^/]+))?/)
-  if (!versionMatch) {
-    terminal.writeln(chalk.red('Invalid package name format'))
-    return 1
-  }
-
-  const packageName = versionMatch[1]
-  const version = versionMatch[2] || 'latest'
-  const repo = repoArg || 'https://unpkg.com'
-
-  if (!packageName) {
-    terminal.writeln(chalk.red('Invalid package name format'))
-    return 1
-  }
-
-  const url = `${repo}/${packageName}${version === 'latest' ? '' : '@' + version}/package.json`
-  const response = await globalThis.fetch(url)
-  const data = await response.json()
-
-  terminal.writeln(chalk.yellow(`Installing ${data.name} v${data.version} from ${repo}...`))
-  let files = [data.module, data.main, data.types].filter(Boolean) as string[]
-  
-  // Handle browser field remapping
-  const browserMappings: Record<string, string | false> = {}
-  if (typeof data.browser === 'object') {
-    for (const [key, value] of Object.entries(data.browser)) browserMappings[key] = value as string | false
-    files = [...files, ...Object.keys(data.browser)]
-  } else if (typeof data.browser === 'string') {
-    files.push(data.browser)
-  }
-
-  if (files.length === 0) {
-    terminal.writeln(chalk.red('No files found in package'))
-    return 1
-  }
-
-  // Parse package name into org and name parts
-  const [org, name] = packageName.startsWith('@') 
-    ? [packageName.split('/')[0], packageName.split('/')[1]]
-    : [null, packageName]
-
-  const packagePath = org 
-    ? `/opt/${org}/${name}/${data.version}`
-    : `/opt/${name}/${data.version}`
-
-  const packageDirs = packagePath.split('/')
-  let currentPath = ''
-  for (const dir of packageDirs) {
-    if (!dir) continue
-    currentPath += '/' + dir
-    try { await kernel.filesystem.fs.mkdir(currentPath, 0o755) }
-    catch {}
-  }
-
-  await kernel.filesystem.fs.writeFile(`${packagePath}/package.json`, JSON.stringify(data, null, 2), { mode: 0o755 })
-  terminal.writeln(chalk.green(`Downloaded package.json to ${packagePath}/package.json`))
-
-  const processedFiles = new Set<string>()
-  for (const file of files) {
-    if (!file || processedFiles.has(file)) continue
-    processedFiles.add(file)
-
-    // Check if this file should be remapped or skipped
-    const browserReplacement = browserMappings[file]
-    if (browserReplacement === false || (typeof browserReplacement === 'string' && browserReplacement.includes('null'))) {
-      terminal.writeln(chalk.yellow(`Skipping ${file} (browser field nullified)`))
-      continue
-    }
-
-    // Create any nested directories needed for this file
-    const targetFile = browserReplacement || file
-    const filePath = `${packagePath}/${targetFile}`
-    const filePathParts = filePath.split('/')
-    filePathParts.pop() // Remove filename
-    let dirPath = ''
-    for (const part of filePathParts) {
-      if (!part) continue
-      dirPath += '/' + part
-      try { await kernel.filesystem.fs.mkdir(dirPath, 0o755) }
-      catch {}
-    }
-
-    const fileUrl = `${repo}/${packageName}@${data.version}/${targetFile}`
-    if (browserReplacement) terminal.writeln(chalk.blue(`Remapping ${file} to ${browserReplacement}`))
-
-    try {
-      terminal.writeln(chalk.green(`Downloading ${targetFile} to ${filePath}`))
-      const fileResponse = await globalThis.fetch(fileUrl)
-      if (!fileResponse.ok) {
-        terminal.writeln(chalk.red(`Failed to download ${targetFile}: ${fileResponse.status} ${fileResponse.statusText}`))
-        continue
-      }
-      const fileData = await fileResponse.text()
-      await kernel.filesystem.fs.writeFile(filePath, fileData, { mode: 0o755 })
-    } catch (error) {
-      terminal.writeln(chalk.red(`Failed to download ${targetFile}: ${error instanceof Error ? error.message : 'Unknown error'}`))
-    }
-  }
-
-  // Add package to /etc/packages
-  const packageEntry = {
-    name: packageName,
-    version: data.version
-  }
-  try {
-    let packages = []
-    try {
-      const packagesData = await kernel.filesystem.fs.readFile('/etc/packages', 'utf-8')
-      if (packagesData) packages = JSON.parse(packagesData)
-    } catch {}
-
-    packages.push(packageEntry)
-    await kernel.filesystem.fs.writeFile('/etc/packages', JSON.stringify(packages, null, 2))
-    terminal.writeln(chalk.green(`Added ${packageName}@${data.version} to /etc/packages`))
-  } catch (error) {
-    terminal.writeln(chalk.red(`Failed to update /etc/packages: ${error}`))
-  }
+  const fullPath = path.resolve(shell.cwd, target)
+  const code = await kernel.filesystem.fs.readFile(fullPath, 'utf-8')
+  const script = new Function(code)
+  script()
 }
 
 export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
@@ -1379,22 +1327,50 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   const mounts = Array.from(kernel.filesystem.fsSync.mounts.entries() as [string, FileSystem][])
     .filter(([target]) => path.dirname(target) === fullPath && target !== '/')
 
-  const files = entries
-    .map(entry => {
-      const target = path.resolve(fullPath, entry)
-      try { return { target, name: entry, stats: kernel.filesystem.fsSync.statSync(target) } }
-      catch (err) { kernel.log?.warn(err); return null }
-    })
-    .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
-    .filter(entry => !entry.stats.isDirectory())
+  // const files = entries
+  //   .map(entry => {
+  //     const target = path.resolve(fullPath, entry)
+  //     try { return { target, name: entry, stats: kernel.filesystem.fsSync.statSync(target) } }
+  //     catch (err) { kernel.log?.warn(err); return null }
+  //   })
+  //   .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
+  //   .filter(entry => !entry.stats.isDirectory())
 
-  const directories = entries
-    .map(entry => {
+  const filesMap = await Promise.all(entries
+    // .filter(entry => !entry.startsWith('/'))
+    .map(async entry => {
       const target = path.resolve(fullPath, entry)
-      try { return { target, name: entry, stats: kernel.filesystem.fsSync.statSync(target) } }
-      catch (err) { kernel.log?.warn(err); return null }
-    })
-    .filter(entry => entry && entry.stats.isDirectory())
+      return { target, name: entry, stats: await kernel.filesystem.fs.stat(target) }
+    }))
+
+  const files = filesMap
+    .filter(entry => !entry.stats.isDirectory())
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
+
+  // const directories = entries
+  //   .map(entry => {
+  //     const target = path.resolve(fullPath, entry)
+  //     try { return { target, name: entry, stats: kernel.filesystem.fsSync.statSync(target) } }
+  //     catch (err) { kernel.log?.warn(err); return null }
+  //   })
+  //   .filter(entry => entry && entry.stats.isDirectory())
+  //   .concat(mounts.map(([target]) => ({
+  //     target,
+  //     name: path.basename(target),
+  //     stats: { isDirectory: () => true, mtime: new Date(), mode: 0o755 } as Stats
+  //   })))
+  //   .filter((entry, index, self) => self.findIndex(e => e?.name === entry?.name) === index)
+  //   .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
+
+  const directoryMap = await Promise.all(entries
+    // .filter(entry => entry.startsWith('/'))
+    .map(async entry => {
+      const target = path.resolve(fullPath, entry)
+      return { target, name: entry, stats: await kernel.filesystem.fs.stat(target) }
+    }))
+
+  const directories = directoryMap
+    .filter(entry => entry.stats.isDirectory())
     .concat(mounts.map(([target]) => ({
       target,
       name: path.basename(target),
@@ -1452,7 +1428,6 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     // Remove ANSI escape sequences before calculating length
     const cleanedCell = row[colIndex]?.replace(/\u001b\[.*?m/g, '')
     // count all emojis as two characters
-    
     return cleanedCell?.length || 0
   })))
 
@@ -1468,6 +1443,8 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
 
     if (data.length > 1) terminal.writeln(line)
   }
+
+  return 0
 }
 
 export const mount = async ({ kernel, shell, terminal, args }: CommandArgs) => {
@@ -1671,6 +1648,12 @@ export const rm = async ({ kernel, shell, args }: CommandArgs) => {
   if ((await kernel.filesystem.fs.stat(fullPath)).isDirectory()) await kernel.filesystem.fs.rmdir(fullPath)
   else await kernel.filesystem.fs.unlink(fullPath)
   return 0
+}
+
+export const rmdir = async ({ kernel, shell, args }: CommandArgs) => {
+  const target = (args as string[])[0]
+  const fullPath = target ? path.resolve(shell.cwd, target) : shell.cwd
+  await kernel.filesystem.fs.rm(fullPath, { recursive: true, force: true })
 }
 
 export const screensaver = async ({ kernel, terminal, args }: CommandArgs) => {
@@ -1898,10 +1881,10 @@ export const stat = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   }
 }
 
-export const su = async ({ kernel, terminal, args }: CommandArgs) => {
+export const su = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   const username = (args as string[])[0]
-  const currentUser = kernel.users.get(credentials.suid) as User
-  if (!currentUser || credentials.suid !== 0) {
+  const currentUser = kernel.users.get(shell.credentials.suid) as User
+  if (!currentUser || shell.credentials.suid !== 0) {
     terminal.writeln(chalk.red(kernel.i18n.t('Unauthorized')))
     return 1
   }
@@ -1912,15 +1895,8 @@ export const su = async ({ kernel, terminal, args }: CommandArgs) => {
     return 1
   }
 
-  // await kernel.filesystem.configure({ uid: user.uid, gid: user.gid[0] ?? user.uid })
-  Object.assign(credentials, {
-    uid: user.uid,
-    gid: user.gid[0] ?? user.uid,
-    euid: user.uid,
-    egid: user.gid[0] ?? user.uid,
-    suid: currentUser.uid,
-    sgid: currentUser.gid[0] ?? currentUser.uid
-  })
+  const cred = createCredentials(user)
+  useCredentials(cred)
 
   terminal.promptTemplate = `{user}:{cwd}${user.uid === 0 ? '#' : '$'} `
 }
@@ -2014,7 +1990,7 @@ export const user = async ({ kernel, shell, terminal, args }: CommandArgs) => {
       // Calculate column widths
       const uidWidth = Math.max(3, ...users.map(u => u.uid.toString().length))
       const usernameWidth = Math.max(8, ...users.map(u => u.username.length))
-      const gidWidth = Math.max(3, ...users.map(u => u.gid[0]?.toString().length || 0))
+      const gidWidth = Math.max(3, ...users.map(u => u.gid.toString().length))
 
       terminal.writeln(chalk.bold(
         'UID'.padEnd(uidWidth) + '\t' +
@@ -2027,8 +2003,8 @@ export const user = async ({ kernel, shell, terminal, args }: CommandArgs) => {
         terminal.writeln(
           chalk.yellow(user.uid.toString().padEnd(uidWidth)) + '\t' +
           chalk.green(user.username.padEnd(usernameWidth)) + '\t' +
-          chalk.cyan(user.gid[0]?.toString().padEnd(gidWidth)) + '\t' +
-          chalk.blue(user.gid.join(', '))
+          chalk.cyan(user.gid.toString().padEnd(gidWidth)) + '\t' +
+          chalk.blue(user.groups.join(', '))
         )
       }
 

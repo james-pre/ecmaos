@@ -34,6 +34,8 @@ export interface Shell {
   readonly env: Map<string, string>
   /** Environment variables as object */
   readonly envObject: Record<string, string>
+  /** Shell ID */
+  readonly id: string
   /** Current user's credentials */
   credentials: Credentials
   /** Current username */

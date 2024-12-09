@@ -1,7 +1,9 @@
 {
   "name": "ecmaos",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "ecmaOS: Micro-kernel and framework for web technologies",
+  "homepage": "https://github.com/ecmaos/ecmaos#readme",
+  "license": "MIT+Apache-2.0",
   "author": {
     "name": "Jay Mathis",
     "email": "code@mathis.network",
@@ -16,13 +18,11 @@
   ],
   "repository": "https://github.com/ecmaos/ecmaos",
   "bugs": "https://github.com/ecmaos/ecmaos/issues",
+  "private": true,
   "engines": {
     "node": ">=20"
   },
-  "homepage": "https://github.com/ecmaos/ecmaos#readme",
-  "license": "MIT+Apache-2.0",
   "packageManager": "pnpm@9.14.3",
-  "private": true,
   "scripts": {
     "build": "turbo run build",
     "build:docs": "typedoc && echo docs.ecmaos.sh > docs/CNAME",
@@ -42,7 +42,8 @@
     "test:coverage": "turbo run test:coverage",
     "test:bench": "turbo run test:bench",
     "test:ui": "turbo run test:ui",
-    "test:watch": "turbo run test:watch"
+    "test:watch": "turbo run test:watch",
+    "sync:version": "pnpm version $(node -e \"console.log(require('./core/kernel/package.json').version)\")"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",

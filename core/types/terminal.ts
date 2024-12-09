@@ -143,6 +143,8 @@ export interface Terminal extends XTerm {
   readonly emojis: any
   /** Get event emitter */
   readonly events: any
+  /** Get terminal ID */
+  readonly id: string
   /** Get WebSocket connection */
   readonly socket?: WebSocket
   /** Get socket public key */

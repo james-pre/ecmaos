@@ -1,32 +1,26 @@
 /**
- * The filesystem module provides filesystem capabilities to the ecmaOS kernel with ZenFS.
-*/
+ * @experimental
+ * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
+ *
+ * The Filesystem class provides a virtual filesystem for the ecmaOS kernel.
+ * 
+ * @see {@link https://github.com/zen-fs/core ZenFS}
+ *
+ */
 
 import { TFunction } from 'i18next'
 import { configure, fs, InMemory, DeviceFS, credentials } from '@zenfs/core'
-import { WebStorage } from '@zenfs/dom'
+import { IndexedDB } from '@zenfs/dom'
+import { TarReader } from '@gera2ld/tarjs'
+import pako from 'pako'
+import path from 'path'
 
-import type { ConfigMounts } from '@zenfs/core'
+import type { ConfigMounts, MountConfiguration } from '@zenfs/core'
 
 import type {
   FilesystemConfigMounts,
   FilesystemOptions
 } from '@ecmaos/types'
-
-export const DefaultFilesystemOptionsTest: FilesystemOptions<FilesystemConfigMounts> = {
-  uid: 0,
-  gid: 0,
-  addDevices: false,
-  cacheStats: false,
-  cachePaths: false,
-  disableAccessChecks: false,
-  disableUpdateOnRead: false,
-  onlySyncOnClose: false,
-  mounts: {
-    '/bin': { backend: InMemory, name: 'bin' },
-    '/tmp': { backend: InMemory, name: 'tmpfs' }
-  }
-}
 
 export const DefaultFilesystemOptions: FilesystemOptions<FilesystemConfigMounts> = {
   uid: 0,
@@ -35,11 +29,11 @@ export const DefaultFilesystemOptions: FilesystemOptions<FilesystemConfigMounts>
   cachePaths: false,
   cacheStats: false,
   disableAccessChecks: false,
+  disableAsyncCache: true,
   disableUpdateOnRead: false,
   onlySyncOnClose: false,
   mounts: {
-    // '/': { backend: IndexedDB, storeName: 'root' },
-    '/': WebStorage, // I would prefer to use IndexedDB, but there are issues with accessing files after write
+    '/': { backend: IndexedDB, storeName: 'root' } as MountConfiguration<IndexedDB>,
     '/media': { backend: InMemory, name: 'media' },
     '/mnt': { backend: InMemory, name: 'mnt' },
     '/proc': { backend: InMemory, name: 'procfs' },
@@ -48,9 +42,13 @@ export const DefaultFilesystemOptions: FilesystemOptions<FilesystemConfigMounts>
 }
 
 /**
+ * @experimental
+ * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
+ *
  * The Filesystem class provides a virtual filesystem for the ecmaOS kernel.
  * 
  * @see {@link https://github.com/zen-fs/core ZenFS}
+ *
  */
 export class Filesystem {
   private _config: FilesystemOptions<ConfigMounts> = DefaultFilesystemOptions
@@ -111,6 +109,33 @@ export class Filesystem {
    */
   async exists(path: string) {
     return await this.fs.exists(path)
+  }
+
+  /**
+   * Extracts a tarball to the given path.
+   * @param {string} tarballPath - The path to the tarball.
+   * @param {string} extractPath - The path to extract the tarball to.
+   * @returns {Promise<void>} A promise that resolves when the tarball is extracted.
+   */
+  async extractTarball(tarballPath: string, extractPath: string) {
+    const tarball = await this.fs.readFile(tarballPath)
+    const decompressed = pako.ungzip(tarball)
+    const tar = await TarReader.load(decompressed)
+    for (const file of tar.fileInfos) {
+      try { await this.fs.mkdir(path.join(extractPath, file.name.endsWith('/') ? file.name : path.dirname(file.name)), { mode: 0o755, recursive: true }) }
+      catch {}
+
+      if (file.name.endsWith('/')) continue
+
+      try {
+        const blob = tar.getFileBlob(file.name)
+        const binaryData = await blob.arrayBuffer().then(buffer => new Uint8Array(buffer))
+        const filePath = path.join(extractPath, file.name)
+        await this.fs.writeFile(filePath, binaryData, { encoding: 'binary', mode: 0o644 })
+      } catch (error) {
+        console.error(`Failed to extract file ${file.name}: ${error}`)
+      }
+    }
   }
 
   /**

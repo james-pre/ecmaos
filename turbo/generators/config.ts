@@ -1,6 +1,34 @@
 import { PlopTypes } from '@turbo/gen'
 
 export default function generator(plop: PlopTypes.NodePlopAPI): void {
+  plop.setGenerator('app', {
+    description: 'Creates a new app',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'What is the name of the new app?',
+      },
+    ],
+    actions: [
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/apps/{{ dashCase name }}/package.json',
+        templateFile: 'templates/app/package.json.hbs',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/apps/{{ dashCase name }}/tsconfig.json',
+        templateFile: 'templates/app/tsconfig.json.hbs',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/apps/{{ dashCase name }}/src/index.ts',
+        templateFile: 'templates/app/src/index.ts.hbs',
+      },
+    ],
+  })
+
   plop.setGenerator('device', {
     description: 'Creates a new device',
     prompts: [

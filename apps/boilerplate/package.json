@@ -1,0 +1,27 @@
+{
+  "name": "@ecmaos-apps/boilerplate",
+  "description": "Boilerplate App for EcmaOS",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "boilerplate": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "publish:dev": "npm run build && npm publish --registry=http://localhost:4873",
+    "republish:dev": "npm run build && npm run unpublish:dev && npm run publish:dev",
+    "unpublish:dev": "npm unpublish @ecmaos-apps/boilerplate --registry=http://localhost:4873 --force"
+  },
+  "devDependencies": {
+    "@ecmaos/config-typescript": "workspace:^",
+    "@ecmaos/types": "workspace:^",
+    "typescript": "^5.6.3"
+  }
+}

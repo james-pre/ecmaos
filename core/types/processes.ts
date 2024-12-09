@@ -185,6 +185,12 @@ export interface ProcessManager {
   add(process: Process): number
 
   /**
+   * Create a process
+   * @param options - Process options
+   */
+  create(options: ProcessOptions): Process
+
+  /**
    * Get a process by ID
    * @param pid - Process ID
    */

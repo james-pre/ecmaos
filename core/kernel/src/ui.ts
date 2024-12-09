@@ -1,9 +1,12 @@
 import { Kernel } from '#kernel.ts'
+import type { Shell, Terminal } from '@ecmaos/types'
 import './ui.css'
 
 declare global {
   var kernel: Kernel | undefined // eslint-disable-line no-var
   var kernels: Map<string, Kernel> | undefined // eslint-disable-line no-var
+  var shells: Map<string, Shell> | undefined // eslint-disable-line no-var
+  var terminals: Map<string, Terminal> | undefined // eslint-disable-line no-var
 }
 
 const username = import.meta.env.VITE_AUTOLOGIN_USERNAME
@@ -19,6 +22,12 @@ const kernel = new Kernel({
 
 globalThis.kernels = globalThis.kernels || new Map()
 globalThis.kernels.set(kernel.id, kernel)
+
+globalThis.shells = globalThis.shells || new Map()
+globalThis.shells.set(kernel.shell.id, kernel.shell)
+
+globalThis.terminals = globalThis.terminals || new Map()
+globalThis.terminals.set(kernel.terminal.id, kernel.terminal)
 
 const primaryKernel = globalThis.kernels.values().next().value
 globalThis.kernel = primaryKernel

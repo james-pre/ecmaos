@@ -40,7 +40,7 @@ import type {
 } from './index.ts'
 
 /**
- * @alpha
+ * @experimental
  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
  *
  * @remarks
@@ -242,6 +242,7 @@ export interface BootOptions {
  */
 export interface KernelExecuteOptions {
   command: string
+  file?: string
   args?: string[]
   kernel?: Kernel
   shell: Shell

@@ -43,7 +43,7 @@
     "test:bench": "turbo run test:bench",
     "test:ui": "turbo run test:ui",
     "test:watch": "turbo run test:watch",
-    "sync:version": "pnpm version --no-git-checks $(node -e \"console.log(require('./core/kernel/package.json').version)\")"
+    "sync:version": "pnpm version $(node -e \"console.log(require('./core/kernel/package.json').version)\")"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.10",

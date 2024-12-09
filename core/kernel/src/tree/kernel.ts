@@ -1,5 +1,5 @@
 /**
- * @alpha
+ * @experimental
  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
  *
  * @remarks
@@ -8,11 +8,12 @@
  *
  */
 
+import ansi from 'ansi-escape-sequences'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import Module from 'node:module'
 import { Notyf } from 'notyf'
-import { Credentials, credentials, DeviceDriver, DeviceFS, resolveMountConfig } from '@zenfs/core'
+import { addDevice, CredentialInit, credentials, DeviceDriver, resolveMountConfig, useCredentials } from '@zenfs/core'
 import { Emscripten } from '@zenfs/emscripten'
 
 import './../themes/default.scss'
@@ -103,7 +104,7 @@ const DefaultFigletFonts = [
 ]
 
 /**
- * @alpha
+ * @experimental
  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
  *
  * The Kernel class is the core of the ecmaOS system.
@@ -355,8 +356,8 @@ export class Kernel implements IKernel {
           hour12: false
         }).replace(',', '')
 
-        this.sudo(() =>
-          this.filesystem.fs.appendFile('/var/log/kernel.log',
+        this.sudo(async () =>
+          await this.filesystem.fs.appendFile('/var/log/kernel.log',
             `${formattedDate} [${logObj._meta?.logLevelName}] ${logObj[0] || logObj.message}\n\n`
           )
         )
@@ -403,7 +404,8 @@ export class Kernel implements IKernel {
       // Show login prompt or auto-login
       if (this.options.credentials) {
         const { cred } = await this.users.login(this.options.credentials.username, this.options.credentials.password)
-        Object.assign(credentials, cred)
+        this.shell.credentials = cred
+        useCredentials(cred)
       } else {
         if (import.meta.env['VITE_APP_SHOW_DEFAULT_LOGIN'] === 'true') this.terminal.writeln('Default Login: root / root\n')
 
@@ -427,8 +429,8 @@ export class Kernel implements IKernel {
             const username = await this.terminal.readline(`👤  ${this.i18n.t('Username')}: `)
             const password = await this.terminal.readline(`🔒  ${this.i18n.t('Password')}: `, true)
             const { cred } = await this.users.login(username, password)
-            Object.assign(credentials, cred)
             this.shell.credentials = cred
+            useCredentials(cred)
             break
           } catch (err) {
             console.error(err)
@@ -443,16 +445,12 @@ export class Kernel implements IKernel {
 
       if (motd) this.terminal.writeln('\n' + motd)
 
-      const user = this.users.get(credentials.uid ?? 0)
+      const user = this.users.get(this.shell.credentials.uid ?? 0)
       if (!user) throw new Error(t('kernel.userNotFound'))
       this.shell.cwd = user.uid === 0 ? '/' : (user.home || '/')
 
-      if (user.uid !== 0) {
-        this.terminal.promptTemplate = `{user}:{cwd}$ `
-
-        // TODO: find a way to freeze credentials without breaking sudo for the kernel's own use
-        // Object.freeze(credentials)
-      }
+      // TODO: Customizable prompt templates loaded from fs
+      if (user.uid !== 0) this.terminal.promptTemplate = `{user}:{cwd}$ `
 
       // Setup screensavers
       // TODO: This shouldn't really be a part of the kernel
@@ -487,7 +485,7 @@ export class Kernel implements IKernel {
         args: [],
         command: 'init',
         uid: user.uid,
-        gid: user.gid?.[0] ?? 0,
+        gid: user.gid,
         kernel: this,
         shell: this.shell,
         terminal: this.terminal,
@@ -496,7 +494,6 @@ export class Kernel implements IKernel {
 
       initProcess.start()
       this._state = KernelState.RUNNING
-      this.terminal.write('\n' + this.terminal.prompt())
       this.terminal.focus()
       this.terminal.listen()
     } catch (error) {
@@ -552,14 +549,25 @@ export class Kernel implements IKernel {
               exitCode = await this.executeCommand({ ...options, command: header.name })
               break
             }
+            case 'app': {
+              if (!header.name) return -1
+              exitCode = await this.executeApp({ ...options, command: header.name, file: options.command })
+              break
+            }
           }; break
+        case 'node': // we'll do what we can to try to make it run, but it may fail
+          exitCode = await this.executeNode(options)
+          break
         case 'script':
           exitCode = await this.executeScript(options)
+          break
       }
 
       exitCode = exitCode ?? 0
       options.shell.env.set('?', exitCode.toString())
       this.events.dispatch<KernelExecuteEvent>(KernelEvents.EXECUTE, { command: options.command, args: options.args, exitCode })
+      const terminal = options.terminal || this.terminal
+      if (header.type !== 'bin' || header.namespace !== 'app') terminal.write(ansi.erase.inLine(2) + terminal.prompt())
       return exitCode
     } catch (error) {
       console.error(error)
@@ -567,6 +575,48 @@ export class Kernel implements IKernel {
       options.shell.env.set('?', '-1')
       return -1
     }
+  }
+
+  /**
+   * Executes an app
+   * @param options - Execution options containing app path and shell
+   * @returns Exit code of the app
+   */
+  async executeApp(options: KernelExecuteOptions): Promise<number> {
+    const blob = new Blob([await this.filesystem.fs.readFile(options.file!, 'utf-8')], { type: 'text/javascript' })
+    const url = URL.createObjectURL(blob)
+    const script = document.createElement('script')
+
+    script.type = 'module'
+    script.textContent = `
+      import('${url}').then(async module => {
+        const main = module?.main || module?.default
+        const kernel = globalThis.kernels.get('${options.kernel?.id || this.id}') || this
+        const shell = globalThis.shells.get('${options.shell?.id || this.shell.id}') || this.shell
+        const terminal = globalThis.terminals.get('${options.terminal?.id || this.terminal.id}') || this.terminal
+
+        // TODO: Streams
+        const process = kernel.processes.create({
+          args: ${JSON.stringify(options.args)},
+          command: '${options.command}',
+          file: '${options.file}',
+          kernel,
+          shell,
+          terminal,
+          uid: ${options.shell.credentials.uid},
+          gid: ${options.shell.credentials.gid},
+          entry: async (params) => {
+            if (main) await main(params)
+            terminal.write(terminal.prompt())
+          }
+        })
+
+        process.start()
+      })
+    `
+
+    document.head.appendChild(script)
+    return 0
   }
 
   /**
@@ -592,7 +642,10 @@ export class Kernel implements IKernel {
       stderr: options.stderr
     })
 
-    return await process.start()
+    console.log(process)
+    await process.start()
+    console.log('process done')
+    return 0
   }
 
   /**
@@ -634,6 +687,33 @@ export class Kernel implements IKernel {
       return -2
     } finally {
       deviceProcess = null
+    }
+  }
+
+  /**
+   * Executes a node script (or tries to)
+   * @param options - Execution options containing script path and shell
+   * @returns Exit code of the script
+   */
+  async executeNode(options: KernelExecuteOptions): Promise<number> {
+    if (!options.command) return -1
+
+    try {
+      const code = await this.filesystem.fs.readFile(options.command, 'utf-8')
+      if (!code) return -1
+
+      const blob = new Blob([code], { type: 'text/javascript' })
+      const url = URL.createObjectURL(blob)
+      const script = document.createElement('script')
+      script.type = 'module'
+      script.src = url
+      document.head.appendChild(script)
+
+      return 0
+    } catch (error) {
+      this.log?.error(`Failed to execute node script: ${error}`)
+      this.terminal.writeln(chalk.red((error as Error).message))
+      return -1
     }
   }
 
@@ -702,24 +782,33 @@ export class Kernel implements IKernel {
    */
   async readFileHeader(filePath: string): Promise<FileHeader | null> {
     const parseHeader = (header: string): FileHeader | null => {
-      if (!header.startsWith('#!ecmaos')) return null
+      if (!header.startsWith('#!')) return null
+      if (header.startsWith('#!ecmaos:')) {
+        const [type, namespace, name] = header.replace('#!ecmaos:', '').split(':')
+        if (!type) return null
+        return { type, namespace, name }
+      }
 
-      const [type, namespace, name] = header.replace('#!ecmaos:', '').split(':')
-      if (!type) return null
-      return { type, namespace, name }
+      if (header.startsWith('#!/usr/bin/env node')) {
+        return { type: 'node' }
+      }
+
+      return null
     }
 
     return new Promise((resolve, reject) => {
-      try {
-        if (!this.filesystem.fsSync.existsSync(filePath)) return resolve(null)
-        const readable = this.filesystem.fsSync.createReadStream(filePath)
-        readable.on('data', (chunk: Buffer) => resolve(parseHeader(chunk.toString().split('\n')[0] || '')))
-        readable.on('error', (error: Error) => reject(error))
-        readable.on('close', () => resolve(null))
-      } catch (error) {
-        this.log?.error(error)
-        reject(error)
-      }
+      (async () => {
+        try {
+          if (!await this.filesystem.fs.exists(filePath)) return resolve(null)
+          const readable = this.filesystem.fsSync.createReadStream(filePath)
+          readable.on('data', (chunk: Buffer) => resolve(parseHeader(chunk.toString().split('\n')[0] || '')))
+          readable.on('error', (error: Error) => reject(error))
+          readable.on('close', () => resolve(null))
+        } catch (error) {
+          this.log?.error(error)
+          reject(error)
+        }
+      })()
     })
   }
 
@@ -750,12 +839,12 @@ export class Kernel implements IKernel {
    * @returns {Promise<void>} A promise that resolves when the devices are registered.
    */
   async registerDevices() {
-    const devfs = this.filesystem.mounts.get('/dev') as DeviceFS
-    for (const dev of Object.values(DefaultDevices)) {
-      const drivers = await dev.getDrivers(this)
-      this.devices.set(dev.pkg.name, { device: dev, drivers })
+    for (const device of Object.values(DefaultDevices)) {
+      const drivers = await device.getDrivers(this)
+      this.devices.set(device.pkg.name, { device, drivers })
       for (const driver of drivers) {
-        devfs.createDevice(`/${driver.name}`, driver)
+        driver.singleton = driver.singleton ?? true
+        addDevice(driver)
       }
     }
   }
@@ -787,15 +876,49 @@ export class Kernel implements IKernel {
       const packagesData = await this.filesystem.fs.readFile('/etc/packages', 'utf-8')
       const packages = JSON.parse(packagesData)
       for (const pkg of packages) {
-        const pkgJson = await this.filesystem.fs.readFile(`/opt/${pkg.name}/${pkg.version}/package.json`, 'utf-8')
+        let mainFile = null
+        const pkgJson = await this.filesystem.fs.readFile(`/usr/lib/${pkg.name}/${pkg.version}/package/package.json`, 'utf-8')
         const pkgData = JSON.parse(pkgJson)
 
-        let mainFile = pkgData.browser || pkgData.module || pkgData.main
-        if (typeof mainFile === 'object') {
-          for (const key of Object.keys(mainFile)) {
-            if (typeof mainFile[key] === 'string') {
-              mainFile = mainFile[key]
+        if (pkgData.exports) {
+          const exportPaths = [
+            './browser',
+            '.',
+            './index',
+            './module',
+            './main'
+          ]
+          
+          for (const path of exportPaths) {
+            const entry = pkgData.exports[path]
+            if (typeof entry === 'string') {
+              mainFile = entry
               break
+            } else if (typeof entry === 'object' && entry !== null) {
+              const subPaths = ['browser', 'module', 'default', 'import']
+              for (const subPath of subPaths) {
+                if (typeof entry[subPath] === 'string') {
+                  mainFile = entry[subPath]
+                  break
+                }
+              }
+
+              if (mainFile) break
+            }
+          }
+        }
+
+        // Fallback to legacy fields if exports didn't yield a result
+        if (!mainFile) {
+          mainFile = pkgData.browser || pkgData.module || pkgData.main
+
+          // Handle browser field if it's an object (remapping)
+          if (typeof mainFile === 'object' && mainFile !== null) {
+            for (const key of Object.keys(mainFile)) {
+              if (typeof mainFile[key] === 'string') {
+                mainFile = mainFile[key]
+                break
+              }
             }
           }
         }
@@ -806,13 +929,13 @@ export class Kernel implements IKernel {
         }
 
         try {
-          const filePath = `/opt/${pkg.name}/${pkg.version}/${mainFile}`
+          const filePath = `/usr/lib/${pkg.name}/${pkg.version}/package/${mainFile}`
           const fileContents = await this.filesystem.fs.readFile(filePath, 'utf-8')
 
           const type = pkgData.type === 'module' || mainFile === pkgData.module ? 'module' : 'text/javascript'
           const blob = new Blob([fileContents], { type })
           const url = URL.createObjectURL(blob)
-          
+
           try {
             this.log?.debug(`Loading package ${pkg.name} v${pkg.version}`)
             const imports = await import(/* @vite-ignore */ url)
@@ -892,14 +1015,20 @@ export class Kernel implements IKernel {
    */
   private async sudo<T>(
     operation: () => Promise<T>,
-    cred: Partial<Credentials> = { uid: 0, gid: 0 }
-  ): Promise<T> {
+    cred: CredentialInit = { uid: 0, gid: 0 }
+  ): Promise<T | undefined> {
     const currentCredentials = { ...credentials }
+    let result: T | undefined
+
     try {
-      Object.assign(credentials, { euid: 0, egid: 0, ...cred })
-      return await operation()
+      useCredentials(cred)
+      result = await operation()
+    } catch (error) {
+      this.log?.error(error)
     } finally {
-      Object.assign(credentials, currentCredentials)
+      useCredentials(currentCredentials)
     }
+
+    return result
   }
 }

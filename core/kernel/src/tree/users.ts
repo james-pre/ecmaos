@@ -3,6 +3,7 @@ import type {
   User,
   UsersOptions
 } from '@ecmaos/types'
+import { createCredentials } from '@zenfs/core'
 
 export class Users {
   private _options: UsersOptions
@@ -19,7 +20,8 @@ export class Users {
    */
   async add(user: Partial<User>, options: AddUserOptions = {}) {
     if (!user.uid) user.uid = this._users.size
-    if (!user.gid) user.gid = [user.uid]
+    if (!user.gid) user.gid = user.uid
+    if (!user.groups) user.groups = []
     if (!user.shell) user.shell = 'ecmaos'
     if (!user.home) user.home = `/home/${user.username}`
 
@@ -77,14 +79,14 @@ export class Users {
       const encryptedPrivateKey = btoa(String.fromCharCode(...encryptedData))
 
       user.keypair = { publicKey }
-      if (!options.noWrite) await this._options.kernel.filesystem.fs.appendFile('/etc/shadow', `${user.username}:${user.uid}:${user.gid.join(',')}:${user.password}:${btoa(JSON.stringify(publicKey))}:${encryptedPrivateKey}\n\n`, { encoding: 'utf-8', mode: 0o700 })
+      if (!options.noWrite) await this._options.kernel.filesystem.fs.appendFile('/etc/shadow', `${user.username}:${user.uid}:${user.gid}:${user.password}:${btoa(JSON.stringify(publicKey))}:${encryptedPrivateKey}\n\n`, { encoding: 'utf-8', mode: 0o700 })
     }
 
-    if (!options.noWrite) await this._options.kernel.filesystem.fs.appendFile('/etc/passwd', `${user.username}:${user.uid}:${user.gid.join(',')}:${user.home}:${user.shell}\n\n`, { encoding: 'utf-8', mode: 0o700 })
+    if (!options.noWrite) await this._options.kernel.filesystem.fs.appendFile('/etc/passwd', `${user.username}:${user.uid}:${user.gid}:${user.groups.join(',')}:${user.home}:${user.shell}\n\n`, { encoding: 'utf-8', mode: 0o700 })
     this._users.set(user.uid, user as User)
 
     // Fix user home permissions
-    try { this._options.kernel.filesystem.fsSync.chownSync(user.home, user.uid, user.gid[0] ?? user.uid) }
+    try { this._options.kernel.filesystem.fsSync.chownSync(user.home, user.uid, user.gid) }
     catch {}
   }
 
@@ -104,7 +106,7 @@ export class Users {
     const shadow = await kernel.filesystem.fs.readFile('/etc/shadow', 'utf-8')
     for (const line of passwd.split('\n')) {
       if (line.trim() === '' || line.trim() === '\n' || line.startsWith('#')) continue
-      const [username, uid, gid, home, shell] = line.split(':')
+      const [username, uid, gid, groups, home, shell] = line.split(':')
       if (!username || !uid || !gid || !home || !shell) continue
       const shadowEntry = shadow.split('\n').find((l: string) => l.startsWith(username + ':'))
 
@@ -116,7 +118,16 @@ export class Users {
         }
 
         const keypair = { publicKey: JSON.parse(atob(publicKey!)), privateKey: encryptedPrivateKey }
-        await this.add({ username, password, uid: parseInt(uid), gid: gid.split(',').map(Number), home, shell, keypair }, { noWrite: true, noHome: true, noHash: true })
+        await this.add({
+          username,
+          password,
+          uid: parseInt(uid),
+          gid: parseInt(gid),
+          groups: groups?.split(',').filter((g: string) => g !== '').map(Number) ?? [],
+          home,
+          shell,
+          keypair
+        }, { noWrite: true, noHome: true, noHash: true })
       } else {
         kernel.log?.warn(`User ${username} not found in /etc/shadow`)
       }
@@ -131,11 +142,11 @@ export class Users {
     const hashedPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password.trim()))
     if (!user || user.password !== Array.from(new Uint8Array(hashedPassword)).map(b => b.toString(16).padStart(2, '0')).join('')) throw new Error('Invalid username or password')
 
-    const cred = {
-      uid: user.uid, gid: user.gid[0] ?? user.uid,
-      euid: user.uid, egid: user.gid[0] ?? user.uid,
-      suid: user.uid, sgid: user.gid[0] ?? user.uid
-    }
+    const cred = createCredentials({
+      uid: user.uid,
+      gid: user.gid,
+      groups: user.groups
+    })
 
     return { user, cred }
   }
@@ -151,7 +162,7 @@ export class Users {
       const hashedNewPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(newPassword.trim()))
       user.password = Array.from(new Uint8Array(hashedNewPassword)).map(b => b.toString(16).padStart(2, '0')).join('')
       await this.update(user.uid, user)
-      await this._options.kernel.filesystem.fs.writeFile('/etc/passwd', Array.from(this._users.values()).map(u => `${u.username}:${u.uid}:${u.gid.join(',')}:${u.home}:${u.shell}`).join('\n'), { encoding: 'utf-8', mode: 0o750 })
+      await this._options.kernel.filesystem.fs.writeFile('/etc/passwd', Array.from(this._users.values()).map(u => `${u.username}:${u.uid}:${u.gid}:${u.groups.join(',')}:${u.home}:${u.shell}`).join('\n'), { encoding: 'utf-8', mode: 0o750 })
     } catch (err) {
       console.error(err)
       throw err
@@ -163,7 +174,7 @@ export class Users {
   */
   async remove(uid: number) {
     this._users.delete(uid)
-    await this._options.kernel.filesystem.fs.writeFile('/etc/passwd', Array.from(this._users.values()).map(u => `${u.username}:${u.uid}:${u.gid.join(',')}:${u.home}:${u.shell}:${u.password}`).join('\n'), { encoding: 'utf-8', mode: 0o750 })
+    await this._options.kernel.filesystem.fs.writeFile('/etc/passwd', Array.from(this._users.values()).map(u => `${u.username}:${u.uid}:${u.gid}:${u.groups.join(',')}:${u.home}:${u.shell}`).join('\n'), { encoding: 'utf-8', mode: 0o750 })
     // we leave the home directory behind for the admin to delete manually
   }
 
@@ -174,7 +185,7 @@ export class Users {
     const existingUser = this._users.get(uid);
     if (existingUser) {
       this._users.set(uid, { ...existingUser, ...user });
-      await this._options.kernel.filesystem.fs.writeFile('/etc/passwd', Array.from(this._users.values()).map(u => `${u.username}:${u.uid}:${u.gid.join(',')}:${u.home}:${u.shell}:${u.password}`).join('\n'), { encoding: 'utf-8', mode: 0o750 })
+      await this._options.kernel.filesystem.fs.writeFile('/etc/passwd', Array.from(this._users.values()).map(u => `${u.username}:${u.uid}:${u.gid}:${u.groups.join(',')}:${u.home}:${u.shell}`).join('\n'), { encoding: 'utf-8', mode: 0o750 })
     } else {
       throw new Error(`User with UID ${uid} not found`);
     }

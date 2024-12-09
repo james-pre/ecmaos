@@ -1,6 +1,6 @@
-import type { Kernel, StorageOptions } from '@ecmaos/types'
+import type { Kernel, StorageOptions, StorageProvider } from '@ecmaos/types'
 
-export class Storage {
+export class Storage implements StorageProvider {
   private _db: IDBDatabase | null = null
   private _kernel: Kernel
 
@@ -42,6 +42,17 @@ export class Storage {
 
         this._kernel.log?.silly(`IndexedDB schema ${event.newVersion === 1 ? 'created' : 'updated to version ${event.newVersion}'}`)
       }
+    }
+  }
+
+  async usage() {
+    try {
+      const usage = await navigator.storage?.estimate?.()
+      if (!usage) throw new Error('Storage usage not available')
+      return usage
+    } catch (error) {
+      this._kernel.log?.error('Storage usage failed', error)
+      return null
     }
   }
 }

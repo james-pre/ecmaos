@@ -27,6 +27,10 @@ export class ProcessManager {
     return process.pid
   }
 
+  create(options: ProcessOptions) {
+    return new Process(options)
+  }
+
   get(pid: number) {
     return this._processes.get(pid)
   }

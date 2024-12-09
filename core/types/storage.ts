@@ -34,4 +34,7 @@ export interface StorageProvider {
   readonly local: Storage
   /** SessionStorage interface */
   readonly session: Storage
+
+  /** Get storage usage */
+  usage(): Promise<StorageEstimate | null>
 } 
