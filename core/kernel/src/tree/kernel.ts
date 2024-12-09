@@ -642,9 +642,7 @@ export class Kernel implements IKernel {
       stderr: options.stderr
     })
 
-    console.log(process)
     await process.start()
-    console.log('process done')
     return 0
   }
 
