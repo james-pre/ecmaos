@@ -1,5 +1,27 @@
 # @ecmaos/kernel
 
+## 0.2.0
+
+### Minor Changes
+
+- f4395ec: many updates to various systems including app/package installation; tab completion improvements; switch to IndexedDB as root
+
+### Patch Changes
+
+- @ecmaos/device-audio@0.0.2
+- @ecmaos/device-battery@0.0.2
+- @ecmaos/device-bluetooth@0.0.2
+- @ecmaos/device-gamepad@0.0.2
+- @ecmaos/device-geo@0.0.2
+- @ecmaos/device-gpu@0.0.2
+- @ecmaos/device-hid@0.0.2
+- @ecmaos/device-midi@0.0.2
+- @ecmaos/device-presentation@0.0.2
+- @ecmaos/device-sensors@0.0.2
+- @ecmaos/device-serial@0.0.2
+- @ecmaos/device-usb@0.0.2
+- @ecmaos/device-webgl@0.0.2
+
 ## 0.1.3
 
 ### Patch Changes

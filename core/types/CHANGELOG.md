@@ -1,5 +1,11 @@
 # @ecmaos/types
 
+## 0.2.0
+
+### Minor Changes
+
+- f4395ec: many updates to various systems including app/package installation; tab completion improvements; switch to IndexedDB as root
+
 ## 0.1.3
 
 ### Patch Changes
