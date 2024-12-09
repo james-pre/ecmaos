@@ -102,10 +102,12 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
       if (typeof packageJson.bin === 'string') {
         const binPath = path.join('/usr/lib', packageName, version, 'package', packageJson.bin)
         await kernel.filesystem.fs.symlink(binPath, path.join('/usr/bin', packageJson.name))
+        terminal.writeln(chalk.green(`Linked ${packageJson.name} to ${path.join('/usr/bin', packageJson.name)}`))
       } else if (typeof packageJson.bin === 'object') {
         for (const bin in packageJson.bin) {
           const binPath = path.join('/usr/lib', packageName, version, 'package', packageJson.bin[bin])
           await kernel.filesystem.fs.symlink(binPath, path.join('/usr/bin', bin))
+          terminal.writeln(chalk.green(`Linked ${bin} to ${path.join('/usr/bin', bin)}`))
         }
       }
     }
