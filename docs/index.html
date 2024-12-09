@@ -1,6 +1,10 @@
 <!DOCTYPE html><html class="default" lang="en" data-base="."><head><style>body { visibility: hidden; }</style><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="IE=edge"><title>ecmaOS</title><meta name="description" content="Documentation for ecmaOS"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="assets/style.css"><link rel="stylesheet" href="assets/highlight.css"><link rel="stylesheet" href="assets/custom.css"><script defer="" src="assets/main.js"></script><script async="" src="assets/icons.js" id="tsd-icons-script"></script><link rel="stylesheet" href="assets/dmt/dmt-components.css"><link rel="stylesheet" href="assets/dmt/dmt-theme.css"><script src="assets/dmt/dmt-components.js" type="module"></script><link rel="icon" href="favicon.ico"><noscript><style>body { visibility: visible; }</style></noscript></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";</script><div class="overlay"></div>
 <main><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search"><div class="field" id="dmt-search-main"></div><div class="field" id="dmt-toolbar"><a href="index.html" class="title">ecmaOS</a></div></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main" tabindex="-1"><div class="col-content"><div class="tsd-page-title"><div class="dmt-title-header-flex"><h1>ecmaOS</h1></div></div><div class="tsd-panel tsd-typography"><a id="the-web-kernel" class="tsd-anchor"></a><h1 class="tsd-anchor-link">The Web Kernel<a href="#the-web-kernel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p><a href="https://ecmaos.sh" target="_blank" class="external"><img src="https://img.shields.io/badge/launch-ecmaos.sh-blue?style=for-the-badge" alt="Launch ecmaOS.sh"></a></p>
-<p><a href="https://ecmaos.sh" target="_blank" class="external">ecmaOS</a> is a <a href="https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif" target="_blank" class="external">browser-based operating system kernel</a> and suite of applications written in TypeScript. It's the successor of <a href="https://github.com/web3os-org/kernel" target="_blank" class="external">web3os</a>.</p>
+<blockquote>
+<p>Made with ❤️ by <a href="https://jaymath.is" target="_blank" class="external">Jay Mathis</a></p>
+<p><a href="https://github.com/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/stars/mathiscode?style=flat&amp;logo=github&amp;label=%E2%AD%90%EF%B8%8F" alt="Stars"></a> <a href="https://github.com/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/followers/mathiscode?style=flat&amp;logo=github&amp;label=follow" alt="Followers"></a></p>
+</blockquote>
+<p><a href="https://ecmaos.sh" target="_blank" class="external">ecmaOS</a> is a <a href="https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif" target="_blank" class="external">browser-based operating system kernel</a> and suite of applications written primarily in TypeScript, AssemblyScript, and C++. It's the successor of <a href="https://github.com/web3os-org/kernel" target="_blank" class="external">web3os</a>.</p>
 <p>The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.</p>
 <blockquote>
 <p><em>"The computer can be used as a tool to liberate and protect people, rather than to control them."</em>
@@ -23,10 +27,6 @@
 <a href="https://matrix.to/#/#ecmaos:matrix.org" target="_blank" class="external"><img src="https://img.shields.io/matrix/ecmaos:matrix.org.svg?label=%23ecmaos%3Amatrix.org&amp;logo=matrix&amp;logoColor=white" alt="Matrix"></a>
 <a href="https://ecmaos.bsky.social" target="_blank" class="external"><img src="https://img.shields.io/badge/follow-on%20Bluesky-blue?logo=bluesky&amp;logoColor=white" alt="Bluesky"></a>
 <a href="https://www.reddit.com/r/ecmaos" target="_blank" class="external"><img src="https://img.shields.io/reddit/subreddit-subscribers/ecmaos?style=flat&amp;logo=reddit&amp;logoColor=white&amp;label=r/ecmaos" alt="Reddit"></a></p>
-<blockquote>
-<p>Made with ❤️ by <a href="https://jaymath.is" target="_blank" class="external">Jay Mathis</a></p>
-<p><a href="https://github.com/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/stars/mathiscode?style=flat&amp;logo=github&amp;label=%E2%AD%90%EF%B8%8F" alt="Stars"></a> <a href="https://github.com/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/followers/mathiscode?style=flat&amp;logo=github&amp;label=follow" alt="Followers"></a></p>
-</blockquote>
 <a id="features" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Features<a href="#features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
 <li>TypeScript, WebAssembly, AssemblyScript, C++</li>
 <li>Filesystem supporting multiple backends powered by <a href="https://github.com/zen-fs/core" target="_blank" class="external">zenfs</a></li>
@@ -48,40 +48,6 @@
 </ul>
 <a id="basic-overview" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Basic Overview<a href="#basic-overview" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
 <li>
-<p><code>Kernel</code></p>
-<ul>
-<li>Authentication (WebAuthn)</li>
-<li>Components (Web Components/Custom Elements)</li>
-<li>Devices</li>
-<li>DOM</li>
-<li>Events (CustomEvents)</li>
-<li>Filesystem (ZenFS)</li>
-<li>Internationalization (i18next)</li>
-<li>Interval Manager (setInterval)</li>
-<li>Log Manager (tslog)</li>
-<li>Memory Manager (Abstractions)</li>
-<li>Process Manager</li>
-<li>Protocol Handlers (web+ecmaos://...)</li>
-<li>Service Worker Manager</li>
-<li>Shell</li>
-<li>Storage (IndexedDB, localStorage, sessionStorage, etc.)</li>
-<li>Terminal (xterm.js)</li>
-<li>User Manager</li>
-<li>WASM Loader</li>
-<li>Window Manager (WinBox)</li>
-<li>Workers (Web Workers)</li>
-</ul>
-</li>
-<li>
-<p><code>BIOS</code></p>
-<ul>
-<li>The BIOS is a C++ module compiled to WebAssembly with <a href="https://emscripten.org" target="_blank" class="external">Emscripten</a> providing performance-critical functionality</li>
-<li>The BIOS has its own filesystem, located at <code>/bios</code> — this allows data to be copied in and out of the BIOS for custom code and utilities</li>
-<li>The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities</li>
-<li>Confusingly, the Kernel loads the BIOS — not the other way around</li>
-</ul>
-</li>
-<li>
 <p><code>Apps</code></p>
 <ul>
 <li>These are full applications that are developed specifically to work with ecmaOS</li>
@@ -92,6 +58,15 @@
 <li>During development, it can be useful to run a <a href="https://github.com/verdaccio/verdaccio" target="_blank" class="external">Verdaccio</a> server to test local packages: <code># install @myscope/mypackage --registry http://localhost:4873</code></li>
 <li>To publish to Verdaccio, run <code># npm publish --registry http://localhost:4873</code> in your app's development environment</li>
 <li>Then to install from your local registry, run <code># install @myscope/mypackage --registry http://localhost:4873</code></li>
+</ul>
+</li>
+<li>
+<p><code>BIOS</code></p>
+<ul>
+<li>The BIOS is a C++ module compiled to WebAssembly with <a href="https://emscripten.org" target="_blank" class="external">Emscripten</a> providing performance-critical functionality</li>
+<li>The BIOS has its own filesystem, located at <code>/bios</code> — this allows data to be copied in and out of the BIOS for custom code and utilities</li>
+<li>The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities</li>
+<li>Confusingly, the Kernel loads the BIOS — not the other way around</li>
 </ul>
 </li>
 <li>
@@ -115,6 +90,31 @@
 <li>A device can support being "run" by a user, e.g. <code># /dev/battery status</code></li>
 <li>Devices may also be directly read/written, and will behave accordingly (or have no effect)</li>
 <li>An individual device module can provide multiple device drivers, e.g. <code>/dev/usb</code> provides <code>/dev/usb-mydevice-0001-0002</code></li>
+</ul>
+</li>
+<li>
+<p><code>Kernel</code></p>
+<ul>
+<li>Authentication (WebAuthn)</li>
+<li>Components (Web Components/Custom Elements)</li>
+<li>Devices</li>
+<li>DOM</li>
+<li>Events (CustomEvents)</li>
+<li>Filesystem (ZenFS)</li>
+<li>Internationalization (i18next)</li>
+<li>Interval Manager (setInterval)</li>
+<li>Log Manager (tslog)</li>
+<li>Memory Manager (Abstractions)</li>
+<li>Process Manager</li>
+<li>Protocol Handlers (web+ecmaos://...)</li>
+<li>Service Worker Manager</li>
+<li>Shell</li>
+<li>Storage (IndexedDB, localStorage, sessionStorage, etc.)</li>
+<li>Terminal (xterm.js)</li>
+<li>User Manager</li>
+<li>WASM Loader</li>
+<li>Window Manager (WinBox)</li>
+<li>Workers (Web Workers)</li>
 </ul>
 </li>
 <li>
