@@ -22,7 +22,7 @@
 <a href="https://github.com/ecmaos/ecmaos/pulls" target="_blank" class="external"><img src="https://img.shields.io/github/issues-pr-raw/ecmaos/ecmaos.svg?logo=github&amp;label=PRs" alt="Open PRs"></a>
 <a href="https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed" target="_blank" class="external"><img src="https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?logo=github&amp;label=PRs" alt="Closed PRs"></a></p>
 <p><a href="https://github.com/ecmaos/ecmaos/stargazers" target="_blank" class="external"><img src="https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&amp;logo=github&amp;label=%E2%AD%90%EF%B8%8F%20stars" alt="Star on GitHub"></a>
-<a href="https://github.com/ecmaos/ecmaos/network" target="_blank" class="external"><img src="https://img.shields.io/github/forks/ecmaos/ecmaos?style=flat&amp;logo=github&amp;label=%F0%9F%94%80%20forks" alt="GitHub forks"></a>
+<a href="https://github.com/ecmaos/ecmaos/forks" target="_blank" class="external"><img src="https://img.shields.io/github/forks/ecmaos/ecmaos?style=flat&amp;logo=github&amp;label=%F0%9F%94%80%20forks" alt="GitHub forks"></a>
 <a href="https://github.com/ecmaos/ecmaos/watchers" target="_blank" class="external"><img src="https://img.shields.io/github/watchers/ecmaos/ecmaos?style=flat&amp;logo=github&amp;label=%F0%9F%91%80%20watchers" alt="GitHub watchers"></a>
 <a href="https://github.com/sponsors/mathiscode" target="_blank" class="external"><img src="https://img.shields.io/github/sponsors/mathiscode?color=red&amp;logo=github&amp;label=%F0%9F%92%96%20sponsors" alt="Sponsors"></a>
 <a href="https://github.com/ecmaos/ecmaos/graphs/contributors" target="_blank" class="external"><img src="https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow&amp;logo=github&amp;label=%F0%9F%91%A5%20contributors" alt="Contributors"></a></p>
@@ -59,7 +59,7 @@
 <li>Its default export (or exported <code>main</code> function) will be called with the <code>ProcessEntryParams</code> object</li>
 <li>They can be installed from the terminal using the <code>install</code> command, e.g. <code># install @ecmaos-apps/boilerplate</code></li>
 <li>Run the installed app: <code># /usr/bin/boilerplate arg1 arg2</code> <em>(absolute path not required)</em></li>
-<li>During development, it can be useful to run a <a href="https://github.com/verdaccio/verdaccio" target="_blank" class="external">Verdaccio</a> server to test local packages: <code># install @myscope/mypackage --registry http://localhost:4873</code></li>
+<li>During development, it can be useful to run a <a href="https://github.com/verdaccio/verdaccio" target="_blank" class="external">Verdaccio</a> server to test local packages</li>
 <li>To publish to Verdaccio, run <code># npm publish --registry http://localhost:4873</code> in your app's development environment</li>
 <li>Then to install from your local registry, run <code># install @myscope/mypackage --registry http://localhost:4873</code></li>
 </ul>
@@ -90,9 +90,9 @@
 <li>
 <p><code>Devices</code></p>
 <ul>
-<li>Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.</li>
+<li>Devices get loaded on boot, e.g. <code>/dev/bluetooth</code>, <code>/dev/random</code>, <code>/dev/battery</code>, etc.</li>
 <li>A device can support being "run" by a user, e.g. <code># /dev/battery status</code></li>
-<li>Devices may also be directly read/written, and will behave accordingly (or have no effect)</li>
+<li>Devices may also be directly read/written using <code>fs</code> methods, and will behave accordingly (or have no effect if not supported)</li>
 <li>An individual device module can provide multiple device drivers, e.g. <code>/dev/usb</code> provides <code>/dev/usb-mydevice-0001-0002</code></li>
 </ul>
 </li>
