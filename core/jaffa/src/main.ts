@@ -14,7 +14,7 @@ declare global {
 }
 
 import { Kernel } from '@ecmaos/kernel'
-import '@ecmaos/kernel/kernel.css'
+import '@ecmaos/kernel/ui.css'
 
 const username = import.meta.env.VITE_AUTOLOGIN_USERNAME
 const password = import.meta.env.VITE_AUTOLOGIN_PASSWORD
