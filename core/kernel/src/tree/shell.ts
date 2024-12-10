@@ -1,8 +1,16 @@
+/**
+  * @experimental
+  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
+  * 
+  * The Shell class handles the Terminal environment and interaction with the Kernel.
+  * 
+ */
+
 import path from 'path'
 import shellQuote from 'shell-quote'
-import { credentials, Credentials } from '@zenfs/core'
 
-import type { Kernel, ShellOptions, Terminal } from '@ecmaos/types'
+import type { Credentials } from '@zenfs/core'
+import type { Kernel, Shell as IShell, ShellOptions, Terminal } from '@ecmaos/types'
 
 const DefaultShellPath = '/bin:/usr/bin:/usr/local/bin'
 const DefaultShellOptions = {
@@ -16,7 +24,14 @@ const DefaultShellOptions = {
   }
 }
 
-export class Shell {
+/**
+  * @experimental
+  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
+  * 
+  * The Shell class handles the Terminal environment and interaction with the Kernel.
+  * 
+ */
+export class Shell implements IShell {
   private _cred: Credentials = { uid: 0, gid: 0, suid: 0, sgid: 0, euid: 0, egid: 0, groups: [] }
   private _cwd: string
   private _env: Map<string, string>
@@ -165,7 +180,6 @@ export class Shell {
                   const targetPath = path.resolve(this.cwd, redirection.target)
                   outputStream = new WritableStream({
                     write: async (chunk) => {
-                      console.log(credentials)
                       await this._kernel.filesystem.fs.appendFile(targetPath, chunk)
                     }
                   })

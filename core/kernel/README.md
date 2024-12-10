@@ -8,7 +8,7 @@
 
 [ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written primarily in TypeScript, AssemblyScript, and C++. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
-The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". It offers the ability to run a wide variety of apps on top of a (mostly) sandboxed foundation, offering some measure of security by default. Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
+The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". It offers the ability to run a wide variety of apps on top of an already (mostly) sandboxed foundation, offering some measure of security by default as well as rich developer tooling. Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios, such as a platform for custom applications, games, and more.
 
 ---
 

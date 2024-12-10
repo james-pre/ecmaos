@@ -1,3 +1,11 @@
+/**
+  * @experimental
+  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
+  * 
+  * The Terminal class extends xterm.js to support ecmaOS-specific functionality.
+  * 
+ */
+
 import ansi from 'ansi-escape-sequences'
 import chalk from 'chalk'
 import path from 'path'
@@ -99,6 +107,13 @@ export const DefaultTerminalOptions: TerminalOptions = {
   }
 }
 
+/**
+  * @experimental
+  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
+  * 
+  * The Terminal class extends xterm.js to support ecmaOS-specific functionality.
+  * 
+ */
 export class Terminal extends XTerm implements ITerminal {
   private _addons: TerminalOptions['addons'] = new Map()
   private _ansi: typeof ansi = ansi
@@ -466,9 +481,10 @@ export class Terminal extends XTerm implements ITerminal {
           try {
             this.events.dispatch<TerminalExecuteEvent>(TerminalEvents.EXECUTE, { terminal: this, command: this._cmd })
             const result = await this._shell.execute(this._cmd)
-            if (result === -1) throw new Error(`Command not found: ${this._cmd}`)
+            if (result === -1) throw new Error(`${this._kernel.i18n.t('kernel.commandNotFound', 'Command not found')}: ${this._cmd}`)
           } catch (error) {
             this.writeln(chalk.red(`${error}`))
+            this.write(this.prompt())
           }
         } else {
           this.write(this.prompt())
@@ -572,7 +588,7 @@ export class Terminal extends XTerm implements ITerminal {
         break
       case 'Tab': {
         domEvent.preventDefault()
-        
+
         // If this is a new tab completion attempt (not cycling)
         if (!this._isTabCycling) {
           this._tabCompletionIndex = -1 // Start at -1 so first increment gets us to 0

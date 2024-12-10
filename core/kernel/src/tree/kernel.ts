@@ -2,7 +2,6 @@
  * @experimental
  * @author Jay Mathis <code@mathis.network> (https://github.com/mathiscode)
  *
- * @remarks
  * The Kernel class is the core of the ecmaOS system.
  * It manages the system's resources and provides a framework for system services.
  *
@@ -294,7 +293,7 @@ export class Kernel implements IKernel {
         }
 
         this.terminal.writeln(`${this.terminal.createSpecialLink(import.meta.env['HOMEPAGE'], import.meta.env['NAME'] || 'ecmaOS')} v${import.meta.env['VERSION']}`)
-        this.terminal.writeln(`${t('kernel.madeBy')} ${this.terminal.createSpecialLink(
+        this.terminal.writeln(`${t('kernel.madeBy', 'Made with ❤️  by Jay Mathis')} ${this.terminal.createSpecialLink(
           import.meta.env['AUTHOR']?.url || 'https://github.com/mathiscode',
           `${import.meta.env['AUTHOR']?.name} <${import.meta.env['AUTHOR']?.email}>`
         )}`)
@@ -320,7 +319,7 @@ export class Kernel implements IKernel {
         this.log.info(`${import.meta.env['NAME'] || 'ecmaOS'} v${import.meta.env['VERSION']}`)
 
         if (Notification?.permission === 'default') Notification.requestPermission()
-        if (Notification?.permission === 'denied') this.log?.warn(t('kernel.permissionNotificationDenied'))
+        if (Notification?.permission === 'denied') this.log?.warn(t('kernel.permissionNotificationDenied', 'Notification permission denied'))
 
         this.intervals.set('title-blink', () => {
           globalThis.document.title = globalThis.document.title.includes('_') ? 'ecmaos# ' : 'ecmaos# _'
@@ -455,7 +454,7 @@ export class Kernel implements IKernel {
       if (motd) this.terminal.writeln('\n' + motd)
 
       const user = this.users.get(this.shell.credentials.uid ?? 0)
-      if (!user) throw new Error(t('kernel.userNotFound'))
+      if (!user) throw new Error(t('kernel.userNotFound', 'User not found'))
       this.shell.cwd = user.uid === 0 ? '/' : (user.home || '/')
 
       // TODO: Customizable prompt templates loaded from fs
@@ -510,7 +509,7 @@ export class Kernel implements IKernel {
       this._state = KernelState.PANIC
       this.events.dispatch<KernelPanicEvent>(KernelEvents.PANIC, { error: error as Error })
       this.toast.error({
-        message: t('kernel.panic'),
+        message: t('kernel.panic', 'Uh oh, kernel panic! Check the logs for more details.'),
         duration: 0,
         dismissible: false
       })
