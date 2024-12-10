@@ -533,6 +533,8 @@ export class Kernel implements IKernel {
    */
   async execute(options: KernelExecuteOptions) {
     try {
+      const terminal = options.terminal || this.terminal
+
       if (!await this.filesystem.exists(options.command)) {
         this.log?.error(`File not found for execution: ${options.command}`)
         return -1
@@ -574,7 +576,6 @@ export class Kernel implements IKernel {
       exitCode = exitCode ?? 0
       options.shell.env.set('?', exitCode.toString())
       this.events.dispatch<KernelExecuteEvent>(KernelEvents.EXECUTE, { command: options.command, args: options.args, exitCode })
-      const terminal = options.terminal || this.terminal
       if (header.type !== 'bin' || header.namespace !== 'app') terminal.write(ansi.erase.inLine(2) + terminal.prompt())
       return exitCode
     } catch (error) {
@@ -686,14 +687,17 @@ export class Kernel implements IKernel {
 
     try {
       shell.setPositionalParameters([`/dev/${device.pkg.name}`, ...args])
-      return await deviceProcess.start()
+      await deviceProcess.start()
     } catch (error) {
       this.log?.error(error)
       this.terminal.writeln(chalk.red((error as Error).message))
       return -2
     } finally {
       deviceProcess = null
+      this.terminal.write(ansi.erase.inLine(2) + this.terminal.prompt())
     }
+
+    return 0
   }
 
   /**
