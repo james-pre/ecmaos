@@ -8,7 +8,7 @@
 
 [ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written primarily in TypeScript, AssemblyScript, and C++. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
-The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
+The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". It offers the ability to run a wide variety of apps on top of a (mostly) sandboxed foundation, offering some measure of security by default. Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
 
 > *"The computer can be used as a tool to liberate and protect people, rather than to control them."*
 > — Hal Finney
@@ -27,6 +27,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️)](https://github.com/ecmaos/ecmaos/stargazers)
 [![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red)](https://github.com/sponsors/mathiscode)
 [![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow)](https://github.com/ecmaos/ecmaos/graphs/contributors)
+[![Visitors](https://visitor-badge.glitch.me/badge?page_id=ecmaos.ecmaos)](https://github.com/ecmaos/ecmaos)
 [![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
 
 [![Discord](https://img.shields.io/discord/1311804229127508081?label=discord&logo=discord&logoColor=white)](https://discord.gg/ZJYGkbVsCh)
@@ -51,6 +52,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 - Internationalization framework for translating text powered by [i18next](https://www.i18next.com)
 - Window manager powered by [WinBox](https://github.com/nextapps-de/winbox)
 - `BIOS`: A C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
+- `Jaffa`: A [Tauri](https://tauri.app) app for running ecmaOS in a desktop or mobile environment
 - `Metal`: An API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
 - `SWAPI`: An API server running completely inside a service worker using [Hono](https://hono.dev)
 
@@ -74,7 +76,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `Core`
   - Core modules provide the system's essential functionality; this includes the kernel itself
-  - Other core modules include Metal, SWAPI, BIOS, as well as the main `@ecmaos/types` package
+  - Other core modules include BIOS, Jaffa, Metal, SWAPI, as well as the main `@ecmaos/types` package
 
 - `Commands`
   - Commands are small utilities that aren't quite full Apps, provided by the shell
@@ -85,6 +87,10 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
   - Devices may also be directly read/written, and will behave accordingly (or have no effect)
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
+
+- `Jaffa`
+  - Jaffa is a [Tauri](https://tauri.app) wrapper for the ecmaOS kernel
+  - It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality
 
 - `Kernel`
   - Authentication (WebAuthn)
