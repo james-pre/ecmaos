@@ -10,6 +10,8 @@
 
 The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". It offers the ability to run a wide variety of apps on top of a (mostly) sandboxed foundation, offering some measure of security by default. Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
 
+---
+
 > *"The computer can be used as a tool to liberate and protect people, rather than to control them."*
 > — Hal Finney
 
