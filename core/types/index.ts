@@ -25,3 +25,5 @@ export * from './users.js'
 export * from './wasm.js'
 export * from './windows.js'
 export * from './workers.js'
+
+export type Timer = ReturnType<typeof setInterval>

@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [
     nodePolyfills({ include: ['module', 'os', 'path'] }),
     i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] }),
-    dts({ rollupTypes: true })
+    dts({ rollupTypes: true, exclude: ['src/ui.ts'] })
   ] as ViteUserConfig['plugins'],
   define: {
     'import.meta.env.NAME': JSON.stringify(pkg.name),

@@ -1,20 +1,21 @@
 /// <reference types="vite/client" />
 /// <reference types="user-agent-data-types" />
-/// <reference types="@ecmaos/kernel" />
 
-declare type Timer = ReturnType<typeof setInterval>
+import { Kernel } from '@ecmaos/kernel'
+import type { Kernel as IKernel, Shell, Terminal } from '@ecmaos/types'
+import '@ecmaos/kernel/ui.css'
+
 
 declare global {
-  // eslint-disable-next-line no-var
-  var kernel: Kernel | undefined
+  var kernel: IKernel | undefined // eslint-disable-line no-var
+  var kernels: Map<string, IKernel> | undefined // eslint-disable-line no-var
+  var shells: Map<string, Shell> | undefined // eslint-disable-line no-var
+  var terminals: Map<string, Terminal> | undefined // eslint-disable-line no-var
 
   interface Navigator {
     userAgentData: NavigatorUAData | null
   }
 }
-
-import { Kernel } from '@ecmaos/kernel'
-import '@ecmaos/kernel/ui.css'
 
 const username = import.meta.env.VITE_AUTOLOGIN_USERNAME
 const password = import.meta.env.VITE_AUTOLOGIN_PASSWORD

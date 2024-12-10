@@ -7,7 +7,8 @@
     "**/tests/**/*",
     "core/metal",
     "core/swapi",
-    "core/bios"
+    "core/bios",
+    "core/kernel/src/ui.ts"
   ],
   "compilerOptions": {
     "rootDir": "./core",

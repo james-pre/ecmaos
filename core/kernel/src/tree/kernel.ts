@@ -65,7 +65,8 @@ import type {
   FileHeader,
   KernelShutdownEvent,
   KernelModule,
-  KernelModules
+  KernelModules,
+  Timer
 } from '@ecmaos/types'
 
 const DefaultKernelOptions: KernelOptions = {

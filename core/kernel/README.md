@@ -8,26 +8,30 @@
 
 [ecmaOS](https://ecmaos.sh) is a [browser-based operating system kernel](https://global.discourse-cdn.com/spiceworks/original/4X/8/7/b/87b7be8e7e2cd932affe5449dba69dc16e30d721.gif) and suite of applications written primarily in TypeScript, AssemblyScript, and C++. It's the successor of [web3os](https://github.com/web3os-org/kernel).
 
-The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
+The goal is to create a kernel and supporting apps that tie together modern web technologies and utilities to form an "operating system" that can run on modern browsers, not just to create a "desktop experience". It offers the ability to run a wide variety of apps on top of a (mostly) sandboxed foundation, offering some measure of security by default. Its main use case is to provide a consistent environment for running web apps, but it has features that allow for more powerful custom scenarios. The kernel could also be repurposed as a platform for custom applications, games, and more.
+
+---
 
 > *"The computer can be used as a tool to liberate and protect people, rather than to control them."*
 > — Hal Finney
 
-[![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
 [![Version](https://img.shields.io/github/package-json/v/ecmaos/ecmaos?color=success)](https://www.npmjs.com/package/@ecmaos/kernel)
 [![Site Status](https://img.shields.io/website?url=https%3A%2F%2Fecmaos.sh)](https://ecmaos.sh)
 [![Created](https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&label=created&color=success)](https://github.com/ecmaos/ecmaos/pulse)
 [![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/main)
+[![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
+[![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-success)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
 
-[![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues)
-[![Closed issues](https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed)
-[![Open PRs](https://img.shields.io/github/issues-pr-raw/ecmaos/ecmaos.svg?label=PRs)](https://github.com/ecmaos/ecmaos/pulls)
-[![Closed PRs](https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?label=PRs)](https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed)
+[![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg?logo=github)](https://github.com/ecmaos/ecmaos/issues)
+[![Closed issues](https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg?logo=github)](https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed)
+[![Open PRs](https://img.shields.io/github/issues-pr-raw/ecmaos/ecmaos.svg?logo=github&label=PRs)](https://github.com/ecmaos/ecmaos/pulls)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?logo=github&label=PRs)](https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed)
 
-[![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️)](https://github.com/ecmaos/ecmaos/stargazers)
-[![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red)](https://github.com/sponsors/mathiscode)
-[![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow)](https://github.com/ecmaos/ecmaos/graphs/contributors)
-[![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
+[![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️%20stars)](https://github.com/ecmaos/ecmaos/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ecmaos/ecmaos?style=flat&logo=github&label=🔀%20forks)](https://github.com/ecmaos/ecmaos/network)
+[![GitHub watchers](https://img.shields.io/github/watchers/ecmaos/ecmaos?style=flat&logo=github&label=👀%20watchers)](https://github.com/ecmaos/ecmaos/watchers)
+[![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red&logo=github&label=💖%20sponsors)](https://github.com/sponsors/mathiscode)
+[![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow&logo=github&label=👥%20contributors)](https://github.com/ecmaos/ecmaos/graphs/contributors)
 
 [![Discord](https://img.shields.io/discord/1311804229127508081?label=discord&logo=discord&logoColor=white)](https://discord.gg/ZJYGkbVsCh)
 [![Matrix](https://img.shields.io/matrix/ecmaos:matrix.org.svg?label=%23ecmaos%3Amatrix.org&logo=matrix&logoColor=white)](https://matrix.to/#/#ecmaos:matrix.org)
@@ -36,7 +40,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ## Features
 
-- TypeScript, WebAssembly, AssemblyScript, C++
+- TypeScript, WebAssembly, AssemblyScript, Rust, C++
 - Filesystem supporting multiple backends powered by [zenfs](https://github.com/zen-fs/core)
 - Terminal interface powered by [xterm.js](https://xtermjs.org)
 - Pseudo-streams, allowing redirection and piping
@@ -51,6 +55,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 - Internationalization framework for translating text powered by [i18next](https://www.i18next.com)
 - Window manager powered by [WinBox](https://github.com/nextapps-de/winbox)
 - `BIOS`: A C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
+- `Jaffa`: A [Tauri](https://tauri.app) app for running ecmaOS in a desktop or mobile environment
 - `Metal`: An API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
 - `SWAPI`: An API server running completely inside a service worker using [Hono](https://hono.dev)
 
@@ -74,7 +79,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `Core`
   - Core modules provide the system's essential functionality; this includes the kernel itself
-  - Other core modules include Metal, SWAPI, BIOS, as well as the main `@ecmaos/types` package
+  - Other core modules include BIOS, Jaffa, Metal, SWAPI, as well as the main `@ecmaos/types` package
 
 - `Commands`
   - Commands are small utilities that aren't quite full Apps, provided by the shell
@@ -85,6 +90,10 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
   - Devices may also be directly read/written, and will behave accordingly (or have no effect)
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
+
+- `Jaffa`
+  - Jaffa is a [Tauri](https://tauri.app) wrapper for the ecmaOS kernel
+  - It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality
 
 - `Kernel`
   - Authentication (WebAuthn)

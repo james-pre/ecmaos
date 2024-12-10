@@ -1,6 +1,6 @@
 /* Inspired by https://codepen.io/yaclive/pen/EayLYO */
 
-import type { Terminal } from '@ecmaos/types'
+import type { Terminal, Timer } from '@ecmaos/types'
 
 export default async function ({ terminal }: { terminal: Terminal }) {
   if (document.getElementById('screensaver')) return false

@@ -3,7 +3,7 @@ import type {
   User,
   UsersOptions
 } from '@ecmaos/types'
-import { createCredentials } from '@zenfs/core'
+import { createCredentials, Credentials } from '@zenfs/core'
 
 export class Users {
   private _options: UsersOptions
@@ -137,7 +137,7 @@ export class Users {
   /**
    * Login a user
    */
-  async login(username: string, password: string) {
+  async login(username: string, password: string): Promise<{ user: User, cred: Credentials }> {
     const user = Array.from(this._users.values()).find(u => u.username === username)
     const hashedPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password.trim()))
     if (!user || user.password !== Array.from(new Uint8Array(hashedPassword)).map(b => b.toString(16).padStart(2, '0')).join('')) throw new Error('Invalid username or password')

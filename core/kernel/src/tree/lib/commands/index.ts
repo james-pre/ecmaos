@@ -1409,6 +1409,7 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
           const ext = file.name.split('.').pop()
           if (ext && descriptions.has('.' + ext)) return descriptions.get('.' + ext)
           if (file.stats.isBlockDevice() || file.stats.isCharacterDevice()) {
+            // TODO: zenfs `fs.mounts` is deprecated - use a better way of getting device info
             const device = kernel.filesystem.devfs.devices.get(`/${file.name}`)
             const kdevice = kernel.devices.get(file.name)
             const description = kdevice?.device.pkg?.description || ''

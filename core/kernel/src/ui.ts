@@ -1,13 +1,5 @@
 import { Kernel } from '#kernel.ts'
-import type { Shell, Terminal } from '@ecmaos/types'
 import './ui.css'
-
-declare global {
-  var kernel: Kernel | undefined // eslint-disable-line no-var
-  var kernels: Map<string, Kernel> | undefined // eslint-disable-line no-var
-  var shells: Map<string, Shell> | undefined // eslint-disable-line no-var
-  var terminals: Map<string, Terminal> | undefined // eslint-disable-line no-var
-}
 
 const username = import.meta.env.VITE_AUTOLOGIN_USERNAME
 const password = import.meta.env.VITE_AUTOLOGIN_PASSWORD

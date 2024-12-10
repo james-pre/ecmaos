@@ -15,7 +15,7 @@ import { TarReader } from '@gera2ld/tarjs'
 import pako from 'pako'
 import path from 'path'
 
-import type { ConfigMounts, MountConfiguration } from '@zenfs/core'
+import type { ConfigMounts, Credentials, MountConfiguration } from '@zenfs/core'
 
 import type {
   FilesystemConfigMounts,
@@ -65,14 +65,14 @@ export class Filesystem {
   get constants() { return this._fs.constants }
 
   /**
-   * @returns {ZenFS.credentials} The filesystem credentials.
+   * @returns The filesystem credentials.
    */
-  get credentials() { return credentials }
+  get credentials(): Credentials { return credentials }
 
   /**
    * @returns {DeviceFS} The device filesystem.
    */
-  get devfs() { return this._fs.mounts.get('/dev') as DeviceFS }
+  get devfs(): DeviceFS { return this._fs.mounts.get('/dev') as DeviceFS }
 
   /**
    * @returns {ZenFS.fs.promises} The asynchronous ZenFS filesystem instance.
@@ -87,7 +87,7 @@ export class Filesystem {
   /**
    * @returns {ZenFS.mounts} The mounted filesystems.
    */
-  get mounts() { return this._fs.mounts }
+  get mounts(): typeof fs.mounts { return this._fs.mounts }
 
   /**
    * Configures the filesystem with the given options.
@@ -144,11 +144,11 @@ export class Filesystem {
    * @returns {FilesystemOptions} The filesystem options with the given extensions.
    *
    */
-  static options<T extends ConfigMounts>(extensions?: Partial<FilesystemOptions<T>>) {
+  static options<T extends ConfigMounts>(extensions?: Partial<FilesystemOptions<T>>): FilesystemOptions<T> {
     return {
       ...DefaultFilesystemOptions,
       ...(extensions || {})
-    }
+    } as FilesystemOptions<T>
   }
 
   // Descriptions for common filesystem entries

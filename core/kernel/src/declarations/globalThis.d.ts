@@ -1,10 +1,14 @@
+import type { Kernel, Shell, Terminal } from '@ecmaos/types'
+
 declare global {
-  // eslint-disable-next-line no-var
-  var kernel: Kernel | undefined
+  var kernel: Kernel | undefined // eslint-disable-line no-var
+  var kernels: Map<string, Kernel> | undefined // eslint-disable-line no-var
+  var shells: Map<string, Shell> | undefined // eslint-disable-line no-var
+  var terminals: Map<string, Terminal> | undefined // eslint-disable-line no-var
 
   interface Navigator {
     userAgentData: NavigatorUAData | null
   }
 }
 
-type Timer = ReturnType<typeof setInterval>
+export type Timer = ReturnType<typeof setInterval>
