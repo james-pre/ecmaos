@@ -3,10 +3,10 @@
   "version": "0.1.2",
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
+    "buildx": "tsc && vite build",
     "build:tauri": "tauri build",
     "bundle": "pnpm build:tauri && pnpm bundle",
-    "dev": "vite",
+    "devx": "vite",
     "dev:tauri": "tauri dev",
     "preview": "vite preview",
     "tauri": "tauri"
