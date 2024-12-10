@@ -71,6 +71,7 @@ export class Filesystem {
 
   /**
    * @returns {DeviceFS} The device filesystem.
+   * @todo Remove or replace this; zenfs.mounts is deprecated.
    */
   get devfs(): DeviceFS { return this._fs.mounts.get('/dev') as DeviceFS }
 
@@ -86,6 +87,7 @@ export class Filesystem {
 
   /**
    * @returns {ZenFS.mounts} The mounted filesystems.
+   * @todo Remove or replace this; zenfs.mounts is deprecated.
    */
   get mounts(): typeof fs.mounts { return this._fs.mounts }
 

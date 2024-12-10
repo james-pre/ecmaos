@@ -28,7 +28,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![Closed PRs](https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?logo=github&label=PRs)](https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed)
 
 [![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️%20stars)](https://github.com/ecmaos/ecmaos/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ecmaos/ecmaos?style=flat&logo=github&label=🔀%20forks)](https://github.com/ecmaos/ecmaos/network)
+[![GitHub forks](https://img.shields.io/github/forks/ecmaos/ecmaos?style=flat&logo=github&label=🔀%20forks)](https://github.com/ecmaos/ecmaos/forks)
 [![GitHub watchers](https://img.shields.io/github/watchers/ecmaos/ecmaos?style=flat&logo=github&label=👀%20watchers)](https://github.com/ecmaos/ecmaos/watchers)
 [![Sponsors](https://img.shields.io/github/sponsors/mathiscode?color=red&logo=github&label=💖%20sponsors)](https://github.com/sponsors/mathiscode)
 [![Contributors](https://img.shields.io/github/contributors/ecmaos/ecmaos?color=yellow&logo=github&label=👥%20contributors)](https://github.com/ecmaos/ecmaos/graphs/contributors)
@@ -67,7 +67,7 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
   - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/boilerplate`
   - Run the installed app: `# /usr/bin/boilerplate arg1 arg2` *(absolute path not required)*
-  - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages: `# install @myscope/mypackage --registry http://localhost:4873`
+  - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages
   - To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
   - Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
 
@@ -86,9 +86,9 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Some builtin commands that exist now will be moved into separate apps over time
 
 - `Devices`
-  - Devices get loaded on boot, e.g. /dev/bluetooth, /dev/random, /dev/battery, etc.
+  - Devices get loaded on boot, e.g. `/dev/bluetooth`, `/dev/random`, `/dev/battery`, etc.
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
-  - Devices may also be directly read/written, and will behave accordingly (or have no effect)
+  - Devices may also be directly read/written using `fs` methods, and will behave accordingly (or have no effect if not supported)
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
 
 - `Jaffa`
