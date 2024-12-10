@@ -1,5 +1,11 @@
 # @ecmaos/kernel
 
+## 0.2.1
+
+### Patch Changes
+
+- ac98305: override figlet fonts for now
+
 ## 0.2.0
 
 ### Minor Changes
