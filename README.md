@@ -20,12 +20,12 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 [![Created](https://img.shields.io/github/created-at/ecmaos/ecmaos?style=flat&label=created&color=success)](https://github.com/ecmaos/ecmaos/pulse)
 [![Last Commit](https://img.shields.io/github/last-commit/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/commit/main)
 [![API Reference](https://img.shields.io/badge/API-Reference-success)](https://docs.ecmaos.sh)
+[![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-success)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
 
-[![GitHub license](https://img.shields.io/badge/license-MIT+Apache2.0-blue)](https://github.com/ecmaos/ecmaos/blob/main/LICENSE)
-[![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues)
-[![Closed issues](https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg)](https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed)
-[![Open PRs](https://img.shields.io/github/issues-pr-raw/ecmaos/ecmaos.svg?label=PRs)](https://github.com/ecmaos/ecmaos/pulls)
-[![Closed PRs](https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?label=PRs)](https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed)
+[![Open issues](https://img.shields.io/github/issues/ecmaos/ecmaos.svg?logo=github)](https://github.com/ecmaos/ecmaos/issues)
+[![Closed issues](https://img.shields.io/github/issues-closed/ecmaos/ecmaos.svg?logo=github)](https://github.com/ecmaos/ecmaos/issues?q=is%3Aissue+is%3Aclosed)
+[![Open PRs](https://img.shields.io/github/issues-pr-raw/ecmaos/ecmaos.svg?logo=github&label=PRs)](https://github.com/ecmaos/ecmaos/pulls)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/ecmaos/ecmaos.svg?logo=github&label=PRs)](https://github.com/ecmaos/ecmaos/pulls?q=is%3Apr+is%3Aclosed)
 
 [![Star on GitHub](https://img.shields.io/github/stars/ecmaos/ecmaos?style=flat&logo=github&label=⭐️%20stars)](https://github.com/ecmaos/ecmaos/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ecmaos/ecmaos?style=flat&logo=github&label=🔀%20forks)](https://github.com/ecmaos/ecmaos/network)
