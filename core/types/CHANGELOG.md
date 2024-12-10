@@ -1,5 +1,11 @@
 # @ecmaos/types
 
+## 0.2.1
+
+### Patch Changes
+
+- 0cf6dda: fix typings; rebuild docs
+
 ## 0.2.0
 
 ### Minor Changes
