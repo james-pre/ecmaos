@@ -30,7 +30,7 @@
     "cp:readme": "cp README.md core/kernel/README.md",
     "dev": "turbo run dev",
     "dev:kernel": "turbo run dev --filter=@ecmaos/kernel",
-    "dev:docs": "pnpm cp:readme && concurrently nodemon \"serve -l 30444 docs\"",
+    "dev:docs": "pnpm cp:readme && concurrently nodemon \"pnpx serve -l 30444 ./docs\"",
     "fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "fix:repo": "sherif --fix",
     "lint": "turbo run lint",

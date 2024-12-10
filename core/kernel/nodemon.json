@@ -1,9 +1,0 @@
-{
-  "watch": [
-    "src",
-    "typedoc.json",
-    "README.md"
-  ],
-  "ext": "ts,json,md",
-  "exec": "bunx typedoc"
-}
