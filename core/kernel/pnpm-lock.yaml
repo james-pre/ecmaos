@@ -92,8 +92,8 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(@zenfs/core@1.6.6)
       '@zenfs/emscripten':
-        specifier: ^0.1.2
-        version: 0.1.2(@zenfs/core@1.6.6)
+        specifier: ^1.0.0
+        version: 1.0.0(@zenfs/core@1.6.6)
       '@zenfs/zip':
         specifier: ^0.5.2
         version: 0.5.2(@zenfs/core@1.6.6)
@@ -241,7 +241,7 @@ importers:
         version: 2.1.5(@types/node@22.9.1)(playwright@1.49.0)(typescript@5.6.3)(vite@6.0.1(@types/node@22.9.1)(sass-embedded@1.81.0)(yaml@2.6.1))(vitest@2.1.5)
       '@vitest/coverage-v8':
         specifier: ^2.1.2
-        version: 2.1.5(@vitest/browser@2.1.5(@types/node@22.9.1)(playwright@1.49.0)(typescript@5.6.3)(vite@6.0.1(@types/node@22.9.1)(sass-embedded@1.81.0)(yaml@2.6.1))(vitest@2.1.5))(vitest@2.1.5(@types/node@22.9.1)(@vitest/browser@2.1.5)(@vitest/ui@2.1.5)(jsdom@25.0.1(canvas@2.11.2))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass-embedded@1.81.0))
+        version: 2.1.5(@vitest/browser@2.1.5)(vitest@2.1.5)
       '@vitest/ui':
         specifier: ^2.1.2
         version: 2.1.5(vitest@2.1.5)
@@ -1362,11 +1362,11 @@ packages:
     peerDependencies:
       '@zenfs/core': ^1.6.4
 
-  '@zenfs/emscripten@0.1.2':
-    resolution: {integrity: sha512-lcCSIc/8JaQ8tPhUmGUBe/aUiw4ajD6bKkd3ktS9AQ6TNzW1S5zsO8ocGlX61lnD3KoV1MFJAKbWEaLq4EA9dA==}
+  '@zenfs/emscripten@1.0.0':
+    resolution: {integrity: sha512-QvxoqmXNRnVRnKlliDNu/hBaIMeDYGkP4PHoxOzeVyY0J3Mah/I0wzG1S+atWynld6g7Y+H64HwsOjrlMPY5wA==}
     engines: {node: '>= 18'}
     peerDependencies:
-      '@zenfs/core': ^1.0.4
+      '@zenfs/core': ^1.3.0
 
   '@zenfs/zip@0.5.2':
     resolution: {integrity: sha512-1rrYJ7SWiIqa2+TCoaOY5QjTScMhPim0odpbuwrzukIW+NAR3ZGqkuMVc7/hlkdj2nxpGuvini53vWyWNwdhWQ==}
@@ -4870,7 +4870,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/coverage-v8@2.1.5(@vitest/browser@2.1.5(@types/node@22.9.1)(playwright@1.49.0)(typescript@5.6.3)(vite@6.0.1(@types/node@22.9.1)(sass-embedded@1.81.0)(yaml@2.6.1))(vitest@2.1.5))(vitest@2.1.5(@types/node@22.9.1)(@vitest/browser@2.1.5)(@vitest/ui@2.1.5)(jsdom@25.0.1(canvas@2.11.2))(msw@2.6.5(@types/node@22.9.1)(typescript@5.6.3))(sass-embedded@1.81.0))':
+  '@vitest/coverage-v8@2.1.5(@vitest/browser@2.1.5)(vitest@2.1.5)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -5046,10 +5046,10 @@ snapshots:
       fake-indexeddb: 6.0.0
       file-system-access: 1.0.4
 
-  '@zenfs/emscripten@0.1.2(@zenfs/core@1.6.6)':
+  '@zenfs/emscripten@1.0.0(@zenfs/core@1.6.6)':
     dependencies:
       '@zenfs/core': 1.6.6
-      utilium: 1.1.0
+      utilium: 1.1.1
 
   '@zenfs/zip@0.5.2(@zenfs/core@1.6.6)':
     dependencies:
