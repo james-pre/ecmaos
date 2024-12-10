@@ -279,11 +279,16 @@ export class Kernel implements IKernel {
           return (chalk as unknown as { [key: string]: (text: string) => string })[color]?.(text) || text
         }
 
-        const loadedFont = await import(/* @vite-ignore */`/importable-fonts/${figletFont}.js`)
-        figlet.parseFont(figletFont || 'Poison', loadedFont.default)
+        let logoFiglet: string | undefined
+        try {
+          const loadedFont = await import(/* @vite-ignore */`importable-fonts/${figletFont}.js`)
+          figlet.parseFont(figletFont || 'Poison', loadedFont.default)
+          logoFiglet = figlet.textSync(import.meta.env['FIGLET_TEXT'] || 'ECMAOS', { font: figletFont as keyof typeof figlet.fonts })
+          this.terminal.writeln(colorFiglet(figletColor, logoFiglet))
+        } catch (error) {
+          this.log?.error(`Failed to load figlet font ${figletFont}: ${(error as Error).message}`)
+        }
 
-        const logoFiglet = figlet.textSync(import.meta.env['FIGLET_TEXT'] || 'ECMAOS', { font: figletFont as keyof typeof figlet.fonts })
-        this.terminal.writeln(colorFiglet(figletColor, logoFiglet))
         this.terminal.writeln(`${this.terminal.createSpecialLink(import.meta.env['HOMEPAGE'], import.meta.env['NAME'] || 'ecmaOS')} v${import.meta.env['VERSION']}`)
         this.terminal.writeln(`${t('kernel.madeBy')} ${this.terminal.createSpecialLink(
           import.meta.env['AUTHOR']?.url || 'https://github.com/mathiscode',
@@ -306,7 +311,7 @@ export class Kernel implements IKernel {
         spinner = this.terminal.spinner('arrow3', chalk.yellow(this.i18n.t('Booting')))
         spinner.start()
 
-        console.log(`%c${logoFiglet}`, 'color: green')
+        if (logoFiglet) console.log(`%c${logoFiglet}`, 'color: green')
         console.log(`%c${import.meta.env['REPOSITORY'] || 'https://github.com/ecmaos/ecmaos'}`, 'color: blue; text-decoration: underline; font-size: 16px')
         this.log.info(`${import.meta.env['NAME'] || 'ecmaOS'} v${import.meta.env['VERSION']}`)
 
@@ -379,7 +384,7 @@ export class Kernel implements IKernel {
         for (const mod of mods) {
           this.log?.info(`Loading module ${mod}`)
           try {
-            const module = (await import(mod)) as KernelModule
+            const module = (await import(/* @vite-ignore */ mod)) as KernelModule
             const name = module.name?.value || mod
             module.init?.(this.id)
             this.modules.set(name, module)

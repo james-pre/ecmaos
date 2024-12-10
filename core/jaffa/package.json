@@ -1,0 +1,32 @@
+{
+  "name": "@ecmaos/jaffa",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "build:tauri": "tauri build",
+    "bundle": "pnpm build:tauri && pnpm bundle",
+    "dev": "vite",
+    "dev:tauri": "tauri dev",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@ecmaos/kernel": "workspace:^",
+    "@ecmaos/types": "workspace:^",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-shell": "^2"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "sass-embedded": "^1.79.4",
+    "typescript": "^5.2.2",
+    "user-agent-data-types": "^0.4.2",
+    "vite": "^5.3.1",
+    "vite-plugin-i18next-loader": "^2.0.13",
+    "vite-plugin-node-polyfills": "^0.22.0"
+  }
+}

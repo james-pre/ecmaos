@@ -8,7 +8,7 @@ export class Protocol {
   constructor(options: ProtocolOptions) {
     this._kernel = options.kernel
 
-    globalThis.navigator.registerProtocolHandler(
+    globalThis.navigator?.registerProtocolHandler?.(
       import.meta.env.VITE_APP_PROTOCOL || options.schema || 'web+ecmaos',
       `${import.meta.env.VITE_APP_URL || window.location.origin}?protocol=%s`
     )

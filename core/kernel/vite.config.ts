@@ -3,13 +3,15 @@ import i18nextLoader from 'vite-plugin-i18next-loader'
 import path from 'path'
 import { defineConfig, ViteUserConfig } from 'vitest/config'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import dts from 'vite-plugin-dts'
 
 import pkg from './package.json'
 
 export default defineConfig({
   plugins: [
     nodePolyfills({ include: ['module', 'os', 'path'] }),
-    i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] })
+    i18nextLoader({ namespaceResolution: 'basename', paths: ['locales'] }),
+    dts({ rollupTypes: true })
   ] as ViteUserConfig['plugins'],
   define: {
     'import.meta.env.NAME': JSON.stringify(pkg.name),
@@ -45,7 +47,14 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    minify: false
+    minify: false,
+    manifest: true,
+    target: ['es2020'],
+    lib: {
+      entry: ['src/ui.ts', 'src/tree/kernel.ts'],
+      formats: ['es'],
+      name: 'ecmaos',
+    },
   },
   test: {
     globals: true,

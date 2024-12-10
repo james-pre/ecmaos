@@ -1,7 +1,10 @@
 import i18next from 'i18next'
-import resources from 'virtual:i18next-loader'
+// import resources from 'virtual:i18next-loader'
 
 import type { InitOptions } from 'i18next'
+
+// TODO: find a different approach than virtual loader
+const resources = {}
 
 export const DefaultI18nOptions: InitOptions = {
   resources,

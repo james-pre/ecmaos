@@ -5,6 +5,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "rootDir": "./src",
+    "outDir": "./dist",
     "types": [
       "./src/declarations/globalThis.d.ts",
       "./src/declarations/figlet-fonts.d.ts",
