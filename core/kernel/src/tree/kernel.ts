@@ -452,7 +452,7 @@ export class Kernel implements IKernel {
         this.shell.credentials = cred
         useCredentials(cred)
       } else {
-        if (import.meta.env['VITE_APP_SHOW_DEFAULT_LOGIN'] === 'true') this.terminal.writeln('Default Login: root / root\n')
+        if (import.meta.env['VITE_APP_SHOW_DEFAULT_LOGIN'] === 'true') this.terminal.writeln(chalk.yellow.bold('Default Login: root / root\n'))
 
         this.terminal.writeln(`${Intl.DateTimeFormat(this.memory.config.get('locale') as string || 'en-US', {
           year: 'numeric',
