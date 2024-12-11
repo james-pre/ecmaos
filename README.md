@@ -138,6 +138,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `SWAPI`
   - The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)
+  - It allows for various operations including the `fs` route to fetch files via URL
+  - e.g., `# fetch /swapi/fs/home/user/hello.txt`
   - e.g., `# fetch /swapi/fake/person/fullName`
 
 - `Utils`
@@ -159,6 +161,7 @@ edit hello.txt
 env hello --set world ; env
 fetch https://ipecho.net/plain > /tmp/myip.txt
 fetch /xkcd-os.sixel # xterm.js includes sixel support
+fetch /swapi/fs/home/user/hello.txt # fetch a file from the filesystem
 fetch /swapi/fake/person/fullName # fetch a random person from the SWAPI
 install jquery
 ls /dev

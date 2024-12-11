@@ -12,7 +12,7 @@ import shellQuote from 'shell-quote'
 import type { Credentials } from '@zenfs/core'
 import type { Kernel, Shell as IShell, ShellOptions, Terminal } from '@ecmaos/types'
 
-const DefaultShellPath = '/bin:/usr/bin:/usr/local/bin'
+const DefaultShellPath = '$HOME/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin'
 const DefaultShellOptions = {
   cwd: '/',
   env: {
@@ -249,7 +249,8 @@ export class Shell implements IShell {
     }
 
     for (const path of paths) {
-      const fullPath = `${path}/${command}`
+      const expandedPath = path.replace(/\$([A-Z_]+)/g, (_, name) => this.env.get(name) || '')
+      const fullPath = `${expandedPath}/${command}`
       if (await this._kernel.filesystem.fs.exists(fullPath)) {
         return fullPath
       }
