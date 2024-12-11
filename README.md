@@ -131,13 +131,14 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
 
 - `Packages`
-  - Packages are [npm packages](https://www.npmjs.com) that are installed into the ecmaOS environment
+  - Packages are [NPM packages](https://www.npmjs.com) that are installed into the ecmaOS environment
   - They can be installed from the terminal using the `install` command, e.g. `# install jquery`
   - NPM version specifiers are supported, e.g.:
     - `# install jquery@3.7.1`
     - `# install jquery@^3.7.1`
     - `# install jquery@latest`
-  - [JSR](https://jsr.io) support is coming soon
+  - [JSR](https://jsr.io) may be used with the [NPM compatibility layer](https://jsr.io/docs/npm-compatibility):
+    - `# install @jsr/defaude__hello-jsr --registry https://npm.jsr.io`
 
 - `SWAPI`
   - The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)

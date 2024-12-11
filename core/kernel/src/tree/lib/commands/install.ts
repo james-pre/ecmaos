@@ -47,7 +47,7 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   terminal.writeln(`Installing ${data.name} v${version} from ${registry}...`)
 
   const tarballUrl = data.versions[version]?.dist?.tarball
-  const tarballChecksum = data.versions[version]?.dist?.shasum
+  const tarballChecksum = data.versions[version]?.dist?.shasum?.toLowerCase()
   if (!tarballUrl || !tarballChecksum) {
     terminal.writeln(chalk.red(`No tarball URL or checksum found for ${packageName} v${version}`))
     return 1
