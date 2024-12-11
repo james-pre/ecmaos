@@ -101,26 +101,27 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality
 
 - `Kernel`
-  - Authentication (WebAuthn)
-  - Components (Web Components/Custom Elements)
-  - Devices
-  - DOM
-  - Events (CustomEvents)
-  - Filesystem (ZenFS)
-  - Internationalization (i18next)
-  - Interval Manager (setInterval)
-  - Log Manager (tslog)
-  - Memory Manager (Abstractions)
-  - Process Manager
-  - Protocol Handlers (web+ecmaos://...)
-  - Service Worker Manager
-  - Shell
-  - Storage (IndexedDB, localStorage, sessionStorage, etc.)
-  - Terminal (xterm.js)
-  - User Manager
-  - WASM Loader
-  - Window Manager (WinBox)
-  - Workers (Web Workers)
+  - The kernel ties together the various components of the system into a cohesive whole
+    - Authentication (WebAuthn)
+    - Components (Web Components/Custom Elements)
+    - Devices
+    - DOM
+    - Events (CustomEvents)
+    - Filesystem (ZenFS)
+    - Internationalization (i18next)
+    - Interval Manager (setInterval)
+    - Log Manager (tslog)
+    - Memory Manager (Abstractions)
+    - Process Manager
+    - Protocol Handlers (web+ecmaos://...)
+    - Service Worker Manager
+    - Shell
+    - Storage (IndexedDB, localStorage, sessionStorage, etc.)
+    - Terminal (xterm.js)
+    - User Manager
+    - WASM Loader
+    - Window Manager (WinBox)
+    - Workers (Web Workers)
 
 - `Metal`
   - Metal is an API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
@@ -173,6 +174,7 @@ fetch /xkcd-os.sixel # xterm.js includes sixel support
 fetch /swapi/fs/home/user/hello.txt # fetch a file from the filesystem
 fetch /swapi/fake/person/fullName # fetch a random person from the SWAPI
 install jquery
+install @ecmaos-apps/boilerplate
 ls /dev
 mkdir /tmp/zip ; cd /tmp/zip
 upload

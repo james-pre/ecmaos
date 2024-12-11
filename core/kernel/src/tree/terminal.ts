@@ -121,7 +121,7 @@ export class Terminal extends XTerm implements ITerminal {
   private _commands: { [key: string]: TerminalCommand }
   private _cursorPosition: number = 0
   private _events: Events
-  private _history: string[]
+  private _history: Record<string, string[]> = {}
   private _historyPosition: number = 0
   private _id: string = crypto.randomUUID()
   private _kernel: Kernel
@@ -293,7 +293,7 @@ export class Terminal extends XTerm implements ITerminal {
     this._kernel = options.kernel
     this._commands = TerminalCommands(this._kernel, this._shell, this)
     this._history = this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) ? JSON.parse(this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) || '[]') : []
-    this._historyPosition = this._history.length
+    this._historyPosition = this._history[this._shell.credentials.uid]?.length || 0
 
     this.events.dispatch<TerminalCreatedEvent>(TerminalEvents.CREATED, { terminal: this })
     this.element?.setAttribute('enterkeyhint', 'send')
@@ -470,15 +470,16 @@ export class Terminal extends XTerm implements ITerminal {
         this.write('\n')
 
         if (this._cmd.trim().length > 0) {
+          const uid = this._shell.credentials.uid
           // Don't save history if the command begins with a space or is the same as the last command
-          if (this._cmd[0] !== ' ' && this._cmd !== this._history[this._history.length - 1]) {
+          if (this._cmd[0] !== ' ' && this._cmd !== this._history[uid]?.[this._history[uid]?.length - 1]) {
             // TODO: Save to $HOME/.history instead and don't load entire history into kernel - index history file by line
-            this._history.push(this._cmd)
-            try { this._kernel.storage.local.setItem(`history:${this._shell.credentials.uid}`, JSON.stringify(this._history)) }
+            this._history[uid]?.push(this._cmd)
+            try { this._kernel.storage.local.setItem(`history:${uid}`, JSON.stringify(this._history[uid] || [])) }
             catch (error) { this._kernel.log?.error('Failed to save history', error) }
           }
 
-          this._historyPosition = this._history.length
+          this._historyPosition = this._history[uid]?.length || 0
 
           try {
             this.events.dispatch<TerminalExecuteEvent>(TerminalEvents.EXECUTE, { terminal: this, command: this._cmd })
@@ -531,7 +532,7 @@ export class Terminal extends XTerm implements ITerminal {
       case 'ArrowUp':
         if (this._historyPosition > 0) {
           this._historyPosition--
-          this._cmd = this._history[this._historyPosition] || ''
+          this._cmd = this._history[this._shell.credentials.uid]?.[this._historyPosition] || ''
           this._cursorPosition = this._cmd.length
           this.write('\x1b[2K\r')
           if (this._multiLineMode) {
@@ -552,9 +553,9 @@ export class Terminal extends XTerm implements ITerminal {
         }
         break
       case 'ArrowDown':
-        if (this._historyPosition < this._history.length) {
+        if (this._historyPosition < (this._history[this._shell.credentials.uid]?.length || 0)) {
           this._historyPosition++
-          this._cmd = this._history[this._historyPosition] || ''
+          this._cmd = this._history[this._shell.credentials.uid]?.[this._historyPosition] || ''
           this._cursorPosition = this._cmd.length
           this.write('\x1b[2K\r')
           if (this._multiLineMode) {
