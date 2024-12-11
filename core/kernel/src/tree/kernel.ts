@@ -11,6 +11,10 @@ import ansi from 'ansi-escape-sequences'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import Module from 'node:module'
+import path from 'node:path'
+
+import { JSONSchemaForNPMPackageJsonFiles } from '@schemastore/package'
+
 import { Notyf } from 'notyf'
 import { addDevice, CredentialInit, credentials, DeviceDriver, resolveMountConfig, useCredentials } from '@zenfs/core'
 import { Emscripten } from '@zenfs/emscripten'
@@ -385,12 +389,45 @@ export class Kernel implements IKernel {
       if (modules) {
         const mods = modules.split(',')
         for (const mod of mods) {
-          this.log?.info(`Loading module ${mod}`)
           try {
-            const module = (await import(/* @vite-ignore */ mod)) as KernelModule
-            const name = module.name?.value || mod
+            const spec = mod.match(/(@[^/]+\/[^@]+|[^@]+)(?:@([^/]+))?/)
+            const name = spec?.[1]
+            const version = spec?.[2]
+
+            if (!name) {
+              this.log?.error(`Failed to load module ${mod}: Invalid package name format`)
+              continue
+            }
+
+            if (!version) {
+              this.log?.error(`Failed to load module ${mod}: No version specified`)
+              continue
+            }
+
+            this.log?.info(`Loading module ${name}@${version}`)
+            const [scope, pkg] = name.split('/')
+            const pkgPath = `/usr/lib/${scope ? `${scope}/` : ''}${pkg}/${version}`
+            const exists = await this.filesystem.fs.exists(pkgPath)
+
+            let result
+            if (!exists) {
+              result = await this.shell.execute(`/bin/install ${name}@${version}`)
+              if (result !== 0) throw new Error(`Failed to install module ${name}@${version}: ${result}`)
+              if (!await this.filesystem.fs.exists(pkgPath)) throw new Error(`Failed to install module ${name}@${version}: ${result}`)
+            }
+
+            // load its main export from package.json
+            const pkgJson = await this.filesystem.fs.readFile(`${pkgPath}/package/package.json`, 'utf-8')
+            const pkgData = JSON.parse(pkgJson) as JSONSchemaForNPMPackageJsonFiles
+            const mainFile = this.getPackageMainExport(pkgData)
+            if (!mainFile) throw new Error(`Failed to load module ${name}@${version}: No main export found`)
+            const mainPath = path.join(pkgPath, 'package', mainFile)
+
+            // Importing from a blob objectURL doesn't work for some reason, so use SWAPI
+            const module = await import(/* @vite-ignore */ `/swapi/fs/${mainPath}`) as KernelModule
+            const modname = module.name?.value || mod
             module.init?.(this.id)
-            this.modules.set(name, module)
+            this.modules.set(modname, module)
           } catch (error) {
             this.log?.error(`Failed to load module ${mod}: ${(error as Error).message}`)
           }
@@ -524,6 +561,60 @@ export class Kernel implements IKernel {
    */
   async configure(options: KernelOptions) {
     await this.filesystem.configure(options.filesystem ?? {})
+  }
+
+  /**
+   * Gets the main entry file path from a package.json
+   * @param pkgData - The parsed package.json data
+   * @returns The main entry file path or null if not found
+   */
+  getPackageMainExport(pkgData: JSONSchemaForNPMPackageJsonFiles): string | null {
+    let mainFile = null
+
+    if (pkgData.exports) {
+      const exportPaths = [
+        './browser',
+        '.',
+        './index',
+        './module',
+        './main'
+      ]
+      
+      for (const path of exportPaths) {
+        const entry = (pkgData.exports as Record<string, unknown>)[path]
+        if (typeof entry === 'string') {
+          mainFile = entry
+          break
+        } else if (typeof entry === 'object' && entry !== null) {
+          const subPaths = ['browser', 'module', 'default', 'import']
+          for (const subPath of subPaths) {
+            if (typeof (entry as Record<string, unknown>)[subPath] === 'string') {
+              mainFile = (entry as Record<string, unknown>)[subPath]
+              break
+            }
+          }
+
+          if (mainFile) break
+        }
+      }
+    }
+
+    // Fallback to legacy fields if exports didn't yield a result
+    if (!mainFile) {
+      mainFile = pkgData.browser || pkgData.module || pkgData.main
+
+      // Handle browser field if it's an object (remapping)
+      if (typeof mainFile === 'object') {
+        for (const key of Object.keys(mainFile)) {
+          if (typeof mainFile[key] === 'string') {
+            mainFile = mainFile[key]
+            break
+          }
+        }
+      }
+    }
+
+    return mainFile
   }
 
   /**
@@ -886,52 +977,9 @@ export class Kernel implements IKernel {
       const packagesData = await this.filesystem.fs.readFile('/etc/packages', 'utf-8')
       const packages = JSON.parse(packagesData)
       for (const pkg of packages) {
-        let mainFile = null
         const pkgJson = await this.filesystem.fs.readFile(`/usr/lib/${pkg.name}/${pkg.version}/package/package.json`, 'utf-8')
         const pkgData = JSON.parse(pkgJson)
-
-        if (pkgData.exports) {
-          const exportPaths = [
-            './browser',
-            '.',
-            './index',
-            './module',
-            './main'
-          ]
-          
-          for (const path of exportPaths) {
-            const entry = pkgData.exports[path]
-            if (typeof entry === 'string') {
-              mainFile = entry
-              break
-            } else if (typeof entry === 'object' && entry !== null) {
-              const subPaths = ['browser', 'module', 'default', 'import']
-              for (const subPath of subPaths) {
-                if (typeof entry[subPath] === 'string') {
-                  mainFile = entry[subPath]
-                  break
-                }
-              }
-
-              if (mainFile) break
-            }
-          }
-        }
-
-        // Fallback to legacy fields if exports didn't yield a result
-        if (!mainFile) {
-          mainFile = pkgData.browser || pkgData.module || pkgData.main
-
-          // Handle browser field if it's an object (remapping)
-          if (typeof mainFile === 'object' && mainFile !== null) {
-            for (const key of Object.keys(mainFile)) {
-              if (typeof mainFile[key] === 'string') {
-                mainFile = mainFile[key]
-                break
-              }
-            }
-          }
-        }
+        const mainFile = this.getPackageMainExport(pkgData)
 
         if (!mainFile) {
           this.log?.warn(`No main entry point found for package ${pkg.name}`)

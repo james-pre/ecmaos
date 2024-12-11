@@ -1,5 +1,5 @@
 {
-  "name": "@ecmaos/module-sample",
+  "name": "@ecmaos-modules/sample",
   "version": "0.1.2",
   "description": "Sample module for EcmaOS",
   "type": "module",
@@ -13,11 +13,14 @@
       "import": "./build/debug.js"
     }
   },
+  "files": [
+    "build"
+  ],
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug",
     "asbuild:release": "asc assembly/index.ts --target release",
     "asbuild": "pnpm run asbuild:debug && pnpm run asbuild:release",
-    "build": "pnpm run asbuild",
+    "build": "pnpm run asbuild && echo '!*' > build/.npmignore",
     "dev": "nodemon",
     "start": "pnpx serve -C .",
     "test": "node tests"

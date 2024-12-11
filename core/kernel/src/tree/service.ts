@@ -1,5 +1,5 @@
 import path from 'path'
-import type { Kernel, ServiceOptions } from '@ecmaos/types'
+import type { Kernel, Service as IService, ServiceOptions } from '@ecmaos/types'
 
 declare global {
   interface BackgroundFetchManager {
@@ -30,11 +30,12 @@ export const DefaultServiceOptions: ServiceOptions = {
   register: import.meta.env.NODE_ENV !== 'test'
 }
 
-export class Service {
+export class Service implements IService {
   private _fetches: Record<string, BackgroundFetchRegistration> = {}
   private _kernel: Kernel
   private _options: ServiceOptions
   private _registration?: ExtendedServiceWorkerRegistration
+  private _messageHandler?: (event: MessageEvent) => void
 
   get fetches() { return this._fetches }
   get options() { return this._options }
@@ -48,6 +49,60 @@ export class Service {
 
     navigator.serviceWorker?.ready.then(() => this.message(`Kernel ${this._kernel.id} has registered a Service Worker!`))
     if (options.register) this.register()
+    this.setupMessageHandler()
+  }
+
+  private setupMessageHandler() {
+    if (!('serviceWorker' in navigator)) return
+
+    const sendFile = async (event: MessageEvent) => {
+      const data = event.data
+      try {
+        event.source?.postMessage({
+          type: 'fs',
+          file: data.file,
+          data: await this._kernel.filesystem.fs.readFile(data.file)
+        })
+      } catch (error) {
+        this._kernel.log?.error(error instanceof Error ? error.message : 'Unknown error')
+        event.source?.postMessage({
+          type: 'fs',
+          file: data.file,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      }
+    }
+
+    this._messageHandler = async (event: MessageEvent) => {
+      if (event.source instanceof ServiceWorker) {
+        const data = event.data
+
+        try {
+          switch (data.type) {
+            case 'log':
+              this._kernel.log?.info(`[ServiceWorker] ${data.message}`)
+              break
+            case 'error':
+              this._kernel.log?.error(`[ServiceWorker] ${data.message}`)
+              break
+            case 'fs':
+              sendFile(event)
+              break
+          }
+        } catch (error) {
+          if (data.type === 'fs') {
+            this._kernel.log?.error(`[ServiceWorker] Error reading file ${data.file}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+            event.source?.postMessage({
+              type: 'fs',
+              file: data.file,
+              error: error instanceof Error ? error.message : 'Unknown error'
+            })
+          }
+        }
+      }
+    }
+
+    navigator.serviceWorker.addEventListener('message', this._messageHandler)
   }
 
   /**
@@ -117,11 +172,24 @@ export class Service {
     return registration
   }
 
+  /**
+   * Send a message to the Service Worker.
+   * 
+   * @param message - The message to send.
+   */
   async message(message: string) {
-    if ('serviceWorker' in navigator) this.registration?.active?.postMessage(message)
-    else throw new Error('Service Worker API not supported in this browser.')
+    if ('serviceWorker' in navigator) {
+      this.registration?.active?.postMessage({
+        type: 'kernel:message',
+        message,
+        kernelId: this._kernel.id
+      })
+    } else throw new Error('Service Worker API not supported in this browser.')
   }
 
+  /**
+   * Register the Service Worker.
+   */
   async register() {
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.register(this.options.path || '/swapi.js')
@@ -130,13 +198,24 @@ export class Service {
     } else throw new Error('Service Worker API not supported in this browser.')
   }
 
+  /**
+   * Unregister the Service Worker.
+   */
   async unregister() {
     if ('serviceWorker' in navigator) {
+      if (this._messageHandler) {
+        navigator.serviceWorker.removeEventListener('message', this._messageHandler)
+        this._messageHandler = undefined
+      }
+      
       const registrations = await navigator.serviceWorker.getRegistrations()
       for (const registration of registrations) await registration.unregister()
     } else throw new Error('Service Worker API not supported in this browser.')
   }
 
+  /**
+   * Update the Service Worker.
+   */
   async update() {
     if ('serviceWorker' in navigator) await this.registration?.update()
     else throw new Error('Service Worker API not supported in this browser.')

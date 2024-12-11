@@ -7,6 +7,7 @@ import type { DeviceDriver } from '@zenfs/core'
 import type { InitOptions } from 'i18next'
 import type { Notyf } from 'notyf'
 import type Module from 'node:module'
+import type { JSONSchemaForNPMPackageJsonFiles } from '@schemastore/package'
 
 import type {
   Auth,
@@ -168,6 +169,9 @@ export interface Kernel {
 
   /** Execute a command or program */
   execute(options: KernelExecuteOptions): Promise<number>
+
+  /** Get the main export from a package */
+  getPackageMainExport(pkgData: JSONSchemaForNPMPackageJsonFiles): string | null
 
   /** Show a system notification */
   notify(title: string, options?: object): Promise<Notification | void>

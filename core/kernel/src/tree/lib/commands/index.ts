@@ -1896,8 +1896,8 @@ export const su = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     return 1
   }
 
-  const cred = createCredentials(user)
-  useCredentials(cred)
+  shell.credentials = createCredentials(user)
+  useCredentials(shell.credentials)
 
   terminal.promptTemplate = `{user}:{cwd}${user.uid === 0 ? '#' : '$'} `
 }

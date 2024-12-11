@@ -4,8 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-pnpmfileChecksum: g5t73guyf72fmho4hxqmeb6yt4
-
 importers:
 
   .:
@@ -35,6 +33,9 @@ importers:
       '@ecmaos/config-typescript':
         specifier: workspace:^
         version: link:../../utils/config-typescript
+      '@schemastore/package':
+        specifier: ^0.0.10
+        version: 0.0.10
       '@types/command-line-args':
         specifier: ^5.2.3
         version: 5.2.3
@@ -62,6 +63,9 @@ packages:
   '@babel/runtime@7.26.0':
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
     engines: {node: '>=6.9.0'}
+
+  '@schemastore/package@0.0.10':
+    resolution: {integrity: sha512-D3LxMCnkgsb4LO5sDKf6E+yahM2SqpEHmkqMPDSJis5Cy/j2MgWo/g/iq0lECK0mrPWfx3hqKm2ZJlqxwbRJQA==}
 
   '@types/command-line-args@5.2.3':
     resolution: {integrity: sha512-uv0aG6R0Y8WHZLTamZwtfsDLVRnOa+n+n5rEvFWL5Na5gZ8V2Teab/duDPFzIIIhs9qizDpcavCusCLJZu62Kw==}
@@ -231,6 +235,8 @@ snapshots:
   '@babel/runtime@7.26.0':
     dependencies:
       regenerator-runtime: 0.14.1
+
+  '@schemastore/package@0.0.10': {}
 
   '@types/command-line-args@5.2.3': {}
 

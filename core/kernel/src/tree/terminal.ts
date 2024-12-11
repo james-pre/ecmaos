@@ -292,10 +292,11 @@ export class Terminal extends XTerm implements ITerminal {
     this._shell = options.shell || options.kernel.shell
     this._kernel = options.kernel
     this._commands = TerminalCommands(this._kernel, this._shell, this)
-    this._history = this._kernel.storage.local.getItem('history') ? JSON.parse(this._kernel.storage.local.getItem('history') || '[]') : []
+    this._history = this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) ? JSON.parse(this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) || '[]') : []
     this._historyPosition = this._history.length
 
     this.events.dispatch<TerminalCreatedEvent>(TerminalEvents.CREATED, { terminal: this })
+    this.element?.setAttribute('enterkeyhint', 'send')
   }
 
   mount(element: HTMLElement) {
@@ -400,7 +401,7 @@ export class Terminal extends XTerm implements ITerminal {
 
   // TODO: make more configurable and robust
   prompt(text: string = this._promptTemplate) {
-    const user = this._kernel.users.get(this._shell.credentials.uid ?? 0)
+    const user = this._kernel.users.get(this._shell.credentials.euid ?? 0)
 
     // @ts-expect-error
     return this.ansi.style[this.options.theme?.promptColor || 'green'] + text
@@ -471,8 +472,9 @@ export class Terminal extends XTerm implements ITerminal {
         if (this._cmd.trim().length > 0) {
           // Don't save history if the command begins with a space or is the same as the last command
           if (this._cmd[0] !== ' ' && this._cmd !== this._history[this._history.length - 1]) {
+            // TODO: Save to $HOME/.history instead and don't load entire history into kernel - index history file by line
             this._history.push(this._cmd)
-            try { this._kernel.storage.local.setItem('history', JSON.stringify(this._history)) }
+            try { this._kernel.storage.local.setItem(`history:${this._shell.credentials.uid}`, JSON.stringify(this._history)) }
             catch (error) { this._kernel.log?.error('Failed to save history', error) }
           }
 

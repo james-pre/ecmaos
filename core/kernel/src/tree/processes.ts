@@ -153,8 +153,8 @@ export class Process implements IProcess {
       uid: this.uid
     })
 
-    await this.stop(exitCode || 0)
-    return exitCode || 0
+    await this.stop(exitCode ?? 0)
+    return exitCode ?? 0
   }
 
   async stop(exitCode?: number) {

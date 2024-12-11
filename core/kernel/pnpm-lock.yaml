@@ -7,8 +7,6 @@ settings:
 overrides:
   ws: '>=8.17.1'
 
-pnpmfileChecksum: g5t73guyf72fmho4hxqmeb6yt4
-
 importers:
 
   .:
@@ -164,6 +162,9 @@ importers:
       '@eslint/js':
         specifier: ^9.12.0
         version: 9.15.0
+      '@schemastore/package':
+        specifier: ^0.0.10
+        version: 0.0.10
       '@types/ansi-escape-sequences':
         specifier: ^4.0.4
         version: 4.0.4
@@ -925,6 +926,9 @@ packages:
 
   '@rushstack/ts-command-line@4.23.1':
     resolution: {integrity: sha512-40jTmYoiu/xlIpkkRsVfENtBq4CW3R4azbL0Vmda+fMwHWqss6wwf/Cy/UJmMqIzpfYc2OTnjYP1ZLD3CmyeCA==}
+
+  '@schemastore/package@0.0.10':
+    resolution: {integrity: sha512-D3LxMCnkgsb4LO5sDKf6E+yahM2SqpEHmkqMPDSJis5Cy/j2MgWo/g/iq0lECK0mrPWfx3hqKm2ZJlqxwbRJQA==}
 
   '@shikijs/core@1.23.1':
     resolution: {integrity: sha512-NuOVgwcHgVC6jBVH5V7iblziw6iQbWWHrj5IlZI3Fqu2yx9awH7OIQkXIcsHsUmY19ckwSgUMgrqExEyP5A0TA==}
@@ -4505,6 +4509,8 @@ snapshots:
       string-argv: 0.3.2
     transitivePeerDependencies:
       - '@types/node'
+
+  '@schemastore/package@0.0.10': {}
 
   '@shikijs/core@1.23.1':
     dependencies:
