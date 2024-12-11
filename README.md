@@ -123,6 +123,9 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `Modules`
   - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
+  - They are specified during build via the `VITE_KERNEL_MODULES` environment variable
+    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/sample@0.1.2,@your/package@1.2.3`
+  - Versions must be exact and are mandatory - you cannot use NPM version specifiers
   - They can provide additional functionality, devices, commands, etc.
   - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
   - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
