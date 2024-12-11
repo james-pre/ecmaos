@@ -123,21 +123,27 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `Modules`
   - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
+  - They are specified during build via the `VITE_KERNEL_MODULES` environment variable
+    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/sample@0.1.2,@your/package@1.2.3`
+  - Versions must be exact and are mandatory - you cannot use NPM version specifiers
   - They can provide additional functionality, devices, commands, etc.
   - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
   - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
 
 - `Packages`
-  - Packages are [npm packages](https://www.npmjs.com) that are installed into the ecmaOS environment
+  - Packages are [NPM packages](https://www.npmjs.com) that are installed into the ecmaOS environment
   - They can be installed from the terminal using the `install` command, e.g. `# install jquery`
   - NPM version specifiers are supported, e.g.:
     - `# install jquery@3.7.1`
     - `# install jquery@^3.7.1`
     - `# install jquery@latest`
-  - [JSR](https://jsr.io) support is coming soon
+  - [JSR](https://jsr.io) may be used with the [NPM compatibility layer](https://jsr.io/docs/npm-compatibility):
+    - `# install @jsr/defaude__hello-jsr --registry https://npm.jsr.io`
 
 - `SWAPI`
   - The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)
+  - It allows for various operations including the `fs` route to fetch files via URL
+  - e.g., `# fetch /swapi/fs/home/user/hello.txt`
   - e.g., `# fetch /swapi/fake/person/fullName`
 
 - `Utils`
@@ -159,6 +165,7 @@ edit hello.txt
 env hello --set world ; env
 fetch https://ipecho.net/plain > /tmp/myip.txt
 fetch /xkcd-os.sixel # xterm.js includes sixel support
+fetch /swapi/fs/home/user/hello.txt # fetch a file from the filesystem
 fetch /swapi/fake/person/fullName # fetch a random person from the SWAPI
 install jquery
 ls /dev
