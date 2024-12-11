@@ -91,6 +91,11 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Devices may also be directly read/written using `fs` methods, and will behave accordingly (or have no effect if not supported)
   - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
 
+- `Generators`
+  - Generators are used to scaffold new apps, devices, modules, etc.
+  - They are located in the `turbo/generators` directory of the repository
+  - They are used by the `turbo gen` command, e.g. `turbo gen app`, `turbo gen device`, `turbo gen module`, etc.
+
 - `Jaffa`
   - Jaffa is a [Tauri](https://tauri.app) wrapper for the ecmaOS kernel
   - It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality

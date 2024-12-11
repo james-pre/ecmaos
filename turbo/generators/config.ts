@@ -56,4 +56,47 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       },
     ],
   })
+
+  plop.setGenerator('module', {
+    description: 'Creates a new module',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'What is the name of the new module?',
+      }
+    ],
+    actions: [
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/modules/{{ dashCase name }}/package.json',
+        templateFile: 'templates/module/package.json.hbs',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/modules/{{ dashCase name }}/assembly/index.ts',
+        templateFile: 'templates/module/assembly/index.ts.hbs',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/modules/{{ dashCase name }}/assembly/tsconfig.json',
+        templateFile: 'templates/module/assembly/tsconfig.json',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/modules/{{ dashCase name }}/tests/index.js',
+        templateFile: 'templates/module/tests/index.js',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/modules/{{ dashCase name }}/asconfig.json',
+        templateFile: 'templates/module/asconfig.json',
+      },
+      {
+        type: 'add',
+        path: '{{ turbo.paths.root }}/modules/{{ dashCase name }}/index.html',
+        templateFile: 'templates/module/index.html',
+      },
+    ],
+  })
 }

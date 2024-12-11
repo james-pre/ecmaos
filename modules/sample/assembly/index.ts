@@ -1,6 +1,6 @@
 export const author = 'Jay Mathis <code@mathis.network>'
 export const description = 'A sample module for ecmaOS'
-export const name = '@ecmaos/module-sample'
+export const name = '@ecmaos-modules/sample'
 export const version = '0.1.0'
 
 export let enabled: boolean = false
