@@ -86,7 +86,7 @@ export class Users {
     this._users.set(user.uid, user as User)
 
     // Fix user home permissions
-    try { this._options.kernel.filesystem.fsSync.chownSync(user.home, user.uid, user.gid) }
+    try { await this._options.kernel.filesystem.fs.chown(user.home, user.uid, user.gid) }
     catch {}
   }
 
