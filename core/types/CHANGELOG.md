@@ -1,5 +1,11 @@
 # @ecmaos/types
 
+## 0.2.2
+
+### Patch Changes
+
+- 99a1452: various updates to SWAPI, module loading, user credentials, and package management
+
 ## 0.2.1
 
 ### Patch Changes

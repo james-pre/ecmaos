@@ -1,5 +1,11 @@
 # @ecmaos/module-sample
 
+## 0.1.3
+
+### Patch Changes
+
+- 99a1452: various updates to SWAPI, module loading, user credentials, and package management
+
 ## 0.1.2
 
 ### Patch Changes
