@@ -7,6 +7,7 @@
  *
  */
 
+import ansi from 'ansi-escape-sequences'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import Module from 'node:module'
@@ -534,7 +535,7 @@ export class Kernel implements IKernel {
 
       initProcess.start()
       this._state = KernelState.RUNNING
-      this.terminal.write(this.terminal.prompt())
+      this.terminal.write(ansi.erase.inLine(2) + this.terminal.prompt())
       this.terminal.focus()
       this.terminal.listen()
     } catch (error) {
