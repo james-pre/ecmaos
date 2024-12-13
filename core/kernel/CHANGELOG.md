@@ -1,5 +1,11 @@
 # @ecmaos/kernel
 
+## 0.2.5
+
+### Patch Changes
+
+- 628a467: update README
+
 ## 0.2.4
 
 ### Patch Changes
