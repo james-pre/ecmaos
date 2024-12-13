@@ -219,6 +219,13 @@ cat /dev/random --bytes 10
 cat /dev/zero --bytes 10 > /dev/null
 ```
 
+## Code Execution Example
+
+```sh
+# echo "console.log('Hello, world!')" > /root/hello.js
+# load /root/hello.js
+```
+
 Note: many device implementations are incomplete, but provide a solid starting point
 
 ## Early Days
