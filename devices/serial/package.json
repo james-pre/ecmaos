@@ -1,7 +1,9 @@
 {
-  "name": "@ecmaos/device-serial",
+  "name": "@ecmaos-devices/serial",
   "version": "0.0.2",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

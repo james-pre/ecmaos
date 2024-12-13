@@ -1,7 +1,9 @@
 {
-  "name": "@ecmaos/device-usb",
+  "name": "@ecmaos-devices/usb",
   "version": "0.0.2",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

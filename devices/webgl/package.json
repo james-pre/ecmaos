@@ -1,7 +1,9 @@
 {
-  "name": "@ecmaos/device-webgl",
+  "name": "@ecmaos-devices/webgl",
   "version": "0.0.2",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

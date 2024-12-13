@@ -1,7 +1,9 @@
 {
-  "name": "@ecmaos/device-presentation",
+  "name": "@ecmaos-devices/presentation",
   "version": "0.0.2",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

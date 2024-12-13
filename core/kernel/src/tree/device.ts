@@ -6,19 +6,19 @@
  */
 
 // --- Default Devices ---
-import * as AudioDevice from '@ecmaos/device-audio'
-import * as BatteryDevice from '@ecmaos/device-battery'
-import * as BluetoothDevice from '@ecmaos/device-bluetooth'
-import * as GamepadDevice from '@ecmaos/device-gamepad'
-import * as GeoDevice from '@ecmaos/device-geo'
-import * as GPUDevice from '@ecmaos/device-gpu'
-import * as HIDDevice from '@ecmaos/device-hid'
-import * as MIDIDevice from '@ecmaos/device-midi'
-import * as PresentationDevice from '@ecmaos/device-presentation'
-import * as SensorsDevice from '@ecmaos/device-sensors'
-import * as SerialDevice from '@ecmaos/device-serial'
-import * as USBDevice from '@ecmaos/device-usb'
-import * as WebGLDevice from '@ecmaos/device-webgl'
+import * as AudioDevice from '@ecmaos-devices/audio'
+import * as BatteryDevice from '@ecmaos-devices/battery'
+import * as BluetoothDevice from '@ecmaos-devices/bluetooth'
+import * as GamepadDevice from '@ecmaos-devices/gamepad'
+import * as GeoDevice from '@ecmaos-devices/geo'
+import * as GPUDevice from '@ecmaos-devices/gpu'
+import * as HIDDevice from '@ecmaos-devices/hid'
+import * as MIDIDevice from '@ecmaos-devices/midi'
+import * as PresentationDevice from '@ecmaos-devices/presentation'
+import * as SensorsDevice from '@ecmaos-devices/sensors'
+import * as SerialDevice from '@ecmaos-devices/serial'
+import * as USBDevice from '@ecmaos-devices/usb'
+import * as WebGLDevice from '@ecmaos-devices/webgl'
 
 import type { KernelDevice } from '@ecmaos/types'
 

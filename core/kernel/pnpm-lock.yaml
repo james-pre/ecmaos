@@ -13,48 +13,48 @@ importers:
 
   .:
     dependencies:
+      '@ecmaos-devices/audio':
+        specifier: workspace:^
+        version: link:../../devices/audio
+      '@ecmaos-devices/battery':
+        specifier: workspace:^
+        version: link:../../devices/battery
+      '@ecmaos-devices/bluetooth':
+        specifier: workspace:^
+        version: link:../../devices/bluetooth
+      '@ecmaos-devices/gamepad':
+        specifier: workspace:^
+        version: link:../../devices/gamepad
+      '@ecmaos-devices/geo':
+        specifier: workspace:^
+        version: link:../../devices/geo
+      '@ecmaos-devices/gpu':
+        specifier: workspace:^
+        version: link:../../devices/gpu
+      '@ecmaos-devices/hid':
+        specifier: workspace:^
+        version: link:../../devices/hid
+      '@ecmaos-devices/midi':
+        specifier: workspace:^
+        version: link:../../devices/midi
+      '@ecmaos-devices/presentation':
+        specifier: workspace:^
+        version: link:../../devices/presentation
+      '@ecmaos-devices/sensors':
+        specifier: workspace:^
+        version: link:../../devices/sensors
+      '@ecmaos-devices/serial':
+        specifier: workspace:^
+        version: link:../../devices/serial
+      '@ecmaos-devices/usb':
+        specifier: workspace:^
+        version: link:../../devices/usb
+      '@ecmaos-devices/webgl':
+        specifier: workspace:^
+        version: link:../../devices/webgl
       '@ecmaos/bios':
         specifier: workspace:^
         version: link:../bios
-      '@ecmaos/device-audio':
-        specifier: workspace:^
-        version: link:../../devices/audio
-      '@ecmaos/device-battery':
-        specifier: workspace:^
-        version: link:../../devices/battery
-      '@ecmaos/device-bluetooth':
-        specifier: workspace:^
-        version: link:../../devices/bluetooth
-      '@ecmaos/device-gamepad':
-        specifier: workspace:^
-        version: link:../../devices/gamepad
-      '@ecmaos/device-geo':
-        specifier: workspace:^
-        version: link:../../devices/geo
-      '@ecmaos/device-gpu':
-        specifier: workspace:^
-        version: link:../../devices/gpu
-      '@ecmaos/device-hid':
-        specifier: workspace:^
-        version: link:../../devices/hid
-      '@ecmaos/device-midi':
-        specifier: workspace:^
-        version: link:../../devices/midi
-      '@ecmaos/device-presentation':
-        specifier: workspace:^
-        version: link:../../devices/presentation
-      '@ecmaos/device-sensors':
-        specifier: workspace:^
-        version: link:../../devices/sensors
-      '@ecmaos/device-serial':
-        specifier: workspace:^
-        version: link:../../devices/serial
-      '@ecmaos/device-usb':
-        specifier: workspace:^
-        version: link:../../devices/usb
-      '@ecmaos/device-webgl':
-        specifier: workspace:^
-        version: link:../../devices/webgl
       '@gera2ld/tarjs':
         specifier: ^0.3.1
         version: 0.3.1
