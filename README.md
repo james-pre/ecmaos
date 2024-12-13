@@ -63,6 +63,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `Apps`
   - These are full applications that are developed specifically to work with ecmaOS
+  - Refer to the full list of [official published apps on npm](https://www.npmjs.com/org/ecmaos-apps)
+  - See the [./APPS.md](./APPS.md) file for a list of community apps; submit a PR to add your app!
   - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
   - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
   - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/code`
@@ -86,6 +88,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Some builtin commands that exist now will be moved into separate apps over time
 
 - `Devices`
+  - Refer to the full list of [official devices on npm](https://www.npmjs.com/org/ecmaos-devices)
+  - See the [./DEVICES.md](./DEVICES.md) file for a list of community devices; submit a PR to add your device!
   - Devices get loaded on boot, e.g. `/dev/bluetooth`, `/dev/random`, `/dev/battery`, etc.
   - A device can support being "run" by a user, e.g. `# /dev/battery status`
   - Devices may also be directly read/written using `fs` methods, and will behave accordingly (or have no effect if not supported)
@@ -128,9 +132,11 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - Authenticated and encrypted connections with JWK/JWE/JOSE
 
 - `Modules`
+  - Refer to the full list of [official modules on npm](https://www.npmjs.com/org/ecmaos-modules)
+  - See the [./MODULES.md](./MODULES.md) file for a list of community modules; submit a PR to add your module!
   - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
   - They are specified during build via the `VITE_KERNEL_MODULES` environment variable
-    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/sample@0.1.2,@your/package@1.2.3`
+    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/boilerplate@0.1.2,@your/package@1.2.3`
   - Versions must be exact and are mandatory - you cannot use NPM version specifiers
   - They can provide additional functionality, devices, commands, etc.
   - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
