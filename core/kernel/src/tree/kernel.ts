@@ -7,7 +7,6 @@
  *
  */
 
-import ansi from 'ansi-escape-sequences'
 import chalk from 'chalk'
 import figlet from 'figlet'
 import Module from 'node:module'

@@ -2134,7 +2134,7 @@ export const video = async ({ kernel, shell, args }: CommandArgs) => {
     html: `<video src="${url}" autoplay controls style="width:100%;height:100%"></video>`,
     width: shouldMaximize ? innerWidth : videoWidth,
     height: shouldMaximize ? innerHeight : videoHeight,
-    maximized: shouldMaximize
+    max: shouldMaximize
   })
 }
 
