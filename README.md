@@ -230,7 +230,7 @@ load /root/hello.js
 
 ## App Development
 
-The [/apps](./apps) directory in the repository contains a number of examples of how to develop apps, but there are many approaches you could take.
+The `apps` directory in the repository contains a number of examples of how to develop apps, but there are many approaches you could take.
 
 - `@ecmaos-apps/boilerplate`: A minimal boilerplate app for developing new apps
 - `@ecmaos-apps/code`: A simple code editor app using [Monaco](https://microsoft.github.io/monaco-editor/); serves as a good reference for more complex apps

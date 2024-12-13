@@ -65,8 +65,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - These are full applications that are developed specifically to work with ecmaOS
   - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
   - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
-  - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/boilerplate`
-  - Run the installed app: `# /usr/bin/boilerplate arg1 arg2` *(absolute path not required)*
+  - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/code`
+  - Run the installed app (bins are linked to `/usr/bin`): `# code /root/hello.js`
   - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages
   - To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
   - Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
@@ -220,6 +220,22 @@ cat /dev/zero --bytes 10 > /dev/null
 ```
 
 Note: many device implementations are incomplete, but provide a solid starting point
+
+## Code Execution Example
+
+```sh
+echo "window.alert('Hello, world!')" > /root/hello.js
+load /root/hello.js
+```
+
+## App Development
+
+The `apps` directory in the repository contains a number of examples of how to develop apps, but there are many approaches you could take.
+
+- `@ecmaos-apps/boilerplate`: A minimal boilerplate app for developing new apps
+- `@ecmaos-apps/code`: A simple code editor app using [Monaco](https://microsoft.github.io/monaco-editor/); serves as a good reference for more complex apps
+
+Basically, your app's [bin](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#bin) file has a `main` (or default) function export that is passed the kernel reference and can use it to interact with the system as needed.
 
 ## Early Days
 
