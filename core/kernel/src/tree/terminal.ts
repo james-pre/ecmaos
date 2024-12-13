@@ -493,7 +493,7 @@ export class Terminal extends XTerm implements ITerminal {
 
         this._cmd = ''
         this._cursorPosition = 0
-        this.write(ansi.erase.inLine(2) + this.prompt())
+        this.write('\n' + ansi.erase.inLine(2) + this.prompt())
         break
       case 'Backspace':
         if (this._cursorPosition > 0) {
