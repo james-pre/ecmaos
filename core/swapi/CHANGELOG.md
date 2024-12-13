@@ -1,5 +1,11 @@
 # @ecmaos/swapi
 
+## 0.1.3
+
+### Patch Changes
+
+- f5e173c: add code editor app; misc improvements
+
 ## 0.1.2
 
 ### Patch Changes
