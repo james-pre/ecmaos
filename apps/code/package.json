@@ -1,0 +1,40 @@
+{
+  "name": "@ecmaos-apps/code",
+  "version": "0.1.0",
+  "description": "ecmaOS Code Editor",
+  "author": "Jay Mathis <code@mathis.network>",
+  "type": "module",
+  "bin": {
+    "code": "./dist/code.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/code.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && npm run mod:shebang",
+    "mod:shebang": "sed -i '1i#!ecmaos:bin:app:code' dist/code.js",
+    "preview": "vite preview",
+    "publish:dev": "npm run build && npm publish --registry=http://localhost:4873",
+    "republish:dev": "npm run unpublish:dev && npm run publish:dev",
+    "unpublish:dev": "npm unpublish @ecmaos-apps/code --registry=http://localhost:4873 --force"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@ecmaos/kernel": "workspace:^",
+    "@ecmaos/types": "workspace:^",
+    "@zenfs/core": "^1.6.6",
+    "monaco-editor": "^0.52.2",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vite-plugin-node-polyfills": "^0.22.0"
+  }
+}

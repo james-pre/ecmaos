@@ -121,7 +121,7 @@ export class Terminal extends XTerm implements ITerminal {
   private _commands: { [key: string]: TerminalCommand }
   private _cursorPosition: number = 0
   private _events: Events
-  private _history: Record<string, string[]> = {}
+  private _history: Record<number, string[]> = {}
   private _historyPosition: number = 0
   private _id: string = crypto.randomUUID()
   private _kernel: Kernel
@@ -292,7 +292,7 @@ export class Terminal extends XTerm implements ITerminal {
     this._shell = options.shell || options.kernel.shell
     this._kernel = options.kernel
     this._commands = TerminalCommands(this._kernel, this._shell, this)
-    this._history = this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) ? JSON.parse(this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) || '[]') : []
+    this._history[this._shell.credentials.uid] = this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) ? JSON.parse(this._kernel.storage.local.getItem(`history:${this._shell.credentials.uid}`) || '[]') : []
     this._historyPosition = this._history[this._shell.credentials.uid]?.length || 0
 
     this.events.dispatch<TerminalCreatedEvent>(TerminalEvents.CREATED, { terminal: this })
@@ -405,10 +405,10 @@ export class Terminal extends XTerm implements ITerminal {
 
     // @ts-expect-error
     return this.ansi.style[this.options.theme?.promptColor || 'green'] + text
-      .replace('{cwd}', this.cwd)
-      .replace('{uid}', user?.uid.toString() || '')
-      .replace('{gid}', user?.gid.toString() || '')
-      .replace('{user}', user?.username || '')
+      .replace('{cwd}', chalk.cyan(this.cwd))
+      .replace('{uid}', chalk.white(user?.uid.toString() || ''))
+      .replace('{gid}', chalk.white(user?.gid.toString() || ''))
+      .replace('{user}', chalk.white(user?.username || ''))
       + this.ansi.style.white
   }
 
@@ -473,8 +473,9 @@ export class Terminal extends XTerm implements ITerminal {
           const uid = this._shell.credentials.uid
           // Don't save history if the command begins with a space or is the same as the last command
           if (this._cmd[0] !== ' ' && this._cmd !== this._history[uid]?.[this._history[uid]?.length - 1]) {
-            // TODO: Save to $HOME/.history instead and don't load entire history into kernel - index history file by line
-            this._history[uid]?.push(this._cmd)
+            // TODO: Save to $HOME/.history instead and don't load entire history - index history file by line
+            this._history[uid] = this._history[uid] || []
+            this._history[uid].push(this._cmd)
             try { this._kernel.storage.local.setItem(`history:${uid}`, JSON.stringify(this._history[uid] || [])) }
             catch (error) { this._kernel.log?.error('Failed to save history', error) }
           }
@@ -484,17 +485,15 @@ export class Terminal extends XTerm implements ITerminal {
           try {
             this.events.dispatch<TerminalExecuteEvent>(TerminalEvents.EXECUTE, { terminal: this, command: this._cmd })
             const result = await this._shell.execute(this._cmd)
-            if (result === -1) throw new Error(`${this._kernel.i18n.t('kernel.commandNotFound', 'Command not found')}: ${this._cmd}`)
+            if (result === Infinity) throw new Error(`${this._kernel.i18n.t('kernel.commandNotFound', 'Command not found')}: ${this._cmd.split(' ')[0]}`)
           } catch (error) {
             this.writeln(chalk.red(`${error}`))
-            this.write(this.prompt())
           }
-        } else {
-          this.write(this.prompt())
         }
 
         this._cmd = ''
         this._cursorPosition = 0
+        this.write(this.prompt())
         break
       case 'Backspace':
         if (this._cursorPosition > 0) {

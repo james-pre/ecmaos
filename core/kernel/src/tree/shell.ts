@@ -58,7 +58,7 @@ export class Shell implements IShell {
     if (!options.kernel) throw new Error('Kernel is required')
     globalThis.shells?.set(this.id, this)
 
-    this._cwd = options.cwd
+    this._cwd = options.cwd || localStorage.getItem(`cwd:${this.credentials.uid}`) || DefaultShellOptions.cwd
     this._env = new Map([...Object.entries(DefaultShellOptions.env), ...Object.entries(options.env)])
     this._kernel = options.kernel
     this._terminal = options.terminal || options.kernel.terminal
@@ -123,10 +123,10 @@ export class Shell implements IShell {
 
             const { command, redirections } = this.parseRedirection(commandLine)
             const [commandName, ...args] = shellQuote.parse(command, this.envObject) as string[]
-            if (!commandName) return -1
+            if (!commandName) return Infinity
 
             const finalCommand = await this.resolveCommand(commandName)
-            if (!finalCommand) return -1
+            if (!finalCommand) return Infinity
 
             let inputStream = i === 0 
               ? this._terminal.getInputStream() 
@@ -204,11 +204,6 @@ export class Shell implements IShell {
               stdout: outputStream,
               stderr: this._terminal.stderr
             })
-
-            if (result === undefined) {
-              finalResult = -1
-              break
-            }
 
             if (result !== 0) {
               finalResult = result

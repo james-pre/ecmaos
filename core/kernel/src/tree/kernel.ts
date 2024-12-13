@@ -394,15 +394,8 @@ export class Kernel implements IKernel {
             const name = spec?.[1]
             const version = spec?.[2]
 
-            if (!name) {
-              this.log?.error(`Failed to load module ${mod}: Invalid package name format`)
-              continue
-            }
-
-            if (!version) {
-              this.log?.error(`Failed to load module ${mod}: No version specified`)
-              continue
-            }
+            if (!name) { this.log?.error(`Failed to load module ${mod}: Invalid package name format`); continue }
+            if (!version) { this.log?.error(`Failed to load module ${mod}: No version specified`); continue }
 
             this.log?.info(`Loading module ${name}@${version}`)
             const [scope, pkg] = name.split('/')
@@ -424,7 +417,7 @@ export class Kernel implements IKernel {
             const mainPath = path.join(pkgPath, 'package', mainFile)
 
             // Importing from a blob objectURL doesn't work for some reason, so use SWAPI
-            const module = await import(/* @vite-ignore */ `/swapi/fs/${mainPath}`) as KernelModule
+            const module = await import(/* @vite-ignore */ `/swapi/fs${mainPath}`) as KernelModule
             const modname = module.name?.value || mod
             module.init?.(this.id)
             this.modules.set(modname, module)
@@ -492,7 +485,10 @@ export class Kernel implements IKernel {
 
       const user = this.users.get(this.shell.credentials.uid ?? 0)
       if (!user) throw new Error(t('kernel.userNotFound', 'User not found'))
-      this.shell.cwd = user.uid === 0 ? '/' : (user.home || '/')
+
+      this.shell.cwd = localStorage.getItem(`cwd:${this.shell.credentials.uid}`) ?? (
+        user.uid === 0 ? '/' : (user.home || '/')
+      )
 
       // TODO: Customizable prompt templates loaded from fs
       if (user.uid !== 0) this.terminal.promptTemplate = `{user}:{cwd}$ `
@@ -539,6 +535,7 @@ export class Kernel implements IKernel {
 
       initProcess.start()
       this._state = KernelState.RUNNING
+      this.terminal.write(this.terminal.prompt())
       this.terminal.focus()
       this.terminal.listen()
     } catch (error) {
@@ -624,8 +621,6 @@ export class Kernel implements IKernel {
    */
   async execute(options: KernelExecuteOptions) {
     try {
-      const terminal = options.terminal || this.terminal
-
       if (!await this.filesystem.exists(options.command)) {
         this.log?.error(`File not found for execution: ${options.command}`)
         return -1
@@ -657,7 +652,7 @@ export class Kernel implements IKernel {
             }
           }; break
         case 'node': // we'll do what we can to try to make it run, but it may fail
-          exitCode = await this.executeNode(options)
+          exitCode = await this.executeNode(options) // TODO: Use WebContainer if possible
           break
         case 'script':
           exitCode = await this.executeScript(options)
@@ -667,7 +662,6 @@ export class Kernel implements IKernel {
       exitCode = exitCode ?? 0
       options.shell.env.set('?', exitCode.toString())
       this.events.dispatch<KernelExecuteEvent>(KernelEvents.EXECUTE, { command: options.command, args: options.args, exitCode })
-      if (header.type !== 'bin' || header.namespace !== 'app') terminal.write(ansi.erase.inLine(2) + terminal.prompt())
       return exitCode
     } catch (error) {
       console.error(error)
@@ -683,40 +677,57 @@ export class Kernel implements IKernel {
    * @returns Exit code of the app
    */
   async executeApp(options: KernelExecuteOptions): Promise<number> {
-    const blob = new Blob([await this.filesystem.fs.readFile(options.file!, 'utf-8')], { type: 'text/javascript' })
-    const url = URL.createObjectURL(blob)
-    const script = document.createElement('script')
+    try {
+      const contents = await this.filesystem.fs.readFile(options.file!, 'utf-8')
 
-    script.type = 'module'
-    script.textContent = `
-      import('${url}').then(async module => {
+      // Convert relative imports to SWAPI URLs
+      // I would love to just use import maps, but we need dynamic import maps
+      // This is probably not our long-term solution
+      const filePath = path.dirname(await this.filesystem.fs.readlink(options.file!))
+      const modifiedContents = contents.replace(
+        /from ['"]([^'"]+)['"]/g,
+        (match, importPath) => {
+          if (!importPath.startsWith('.')) return match
+          const resolvedPath = path.join(filePath, importPath)
+          const extensions = ['.js', '.css']
+          const withExtension = extensions.some(ext => resolvedPath.endsWith(ext))
+            ? resolvedPath
+            : `${resolvedPath}.js` // Default to .js if no extension specified
+
+          return `from "${location.protocol}//${location.host}/swapi/fs${withExtension}"`
+        }
+      )
+
+      const blob = new Blob([modifiedContents], { type: 'application/javascript' })
+      const url = URL.createObjectURL(blob)
+
+      try {
+        const module = await import(/* @vite-ignore */ url)
         const main = module?.main || module?.default
-        const kernel = globalThis.kernels.get('${options.kernel?.id || this.id}') || this
-        const shell = globalThis.shells.get('${options.shell?.id || this.shell.id}') || this.shell
-        const terminal = globalThis.terminals.get('${options.terminal?.id || this.terminal.id}') || this.terminal
 
-        // TODO: Streams
-        const process = kernel.processes.create({
-          args: ${JSON.stringify(options.args)},
-          command: '${options.command}',
-          file: '${options.file}',
-          kernel,
-          shell,
-          terminal,
-          uid: ${options.shell.credentials.uid},
-          gid: ${options.shell.credentials.gid},
-          entry: async (params) => {
-            if (main) await main(params)
-            terminal.write(terminal.prompt())
-          }
+        if (typeof main !== 'function') throw new Error('No main function found in module')
+
+        const process = this.processes.create({
+          args: options.args || [],
+          command: options.command,
+          kernel: this,
+          shell: options.shell || this.shell,
+          terminal: options.terminal || this.terminal,
+          uid: options.shell.credentials.uid,
+          gid: options.shell.credentials.gid,
+          entry: async (params) => await main(params)
         })
 
-        process.start()
-      })
-    `
-
-    document.head.appendChild(script)
-    return 0
+        await process.start()
+        return 0
+      } finally {
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      this.log?.error(`Failed to execute app: ${error}`)
+      options.terminal?.writeln(chalk.red((error as Error).message))
+      return -1
+    }
   }
 
   /**
@@ -785,7 +796,6 @@ export class Kernel implements IKernel {
       return -2
     } finally {
       deviceProcess = null
-      this.terminal.write(ansi.erase.inLine(2) + this.terminal.prompt())
     }
 
     return 0

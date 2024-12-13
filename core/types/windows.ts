@@ -10,21 +10,9 @@ export type WindowId = string | number
 /**
  * Options for configuring windows
  */
-export interface WindowOptions {
-  /** Window ID */
-  id?: WindowId
-  /** Window HTML content */
-  html?: string
-  /** Window width */
-  width?: number
-  /** Window height */
-  height?: number
-  /** Whether window is maximized */
-  maximized?: boolean
-  /** Window title */
-  title?: string
-  /** Whether window is modal */
-  modal?: boolean
+export interface WindowOptions extends WinBox.Params {
+  /** Window icon */
+  icon?: URL | string
 }
 
 /**

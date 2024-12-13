@@ -5,7 +5,7 @@ import semver from 'semver'
 import { CommandArgs } from './'
 
 const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
-  const [packageArg, registryArg] = (args as string[])
+  const [packageArg, registryArg, reinstallArg] = args as [string, string, boolean]
   if (!packageArg) {
     terminal.writeln(chalk.red('Usage: install <package-name>[@version]'))
     return 1
@@ -17,7 +17,7 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     return 1
   }
 
-  const registry = registryArg || 'https://registry.npmjs.org'
+  const registry = registryArg || shell.env.get('REGISTRY') || 'https://registry.npmjs.org'
   const packageName = spec[1]
   let version = spec[2] || 'latest'
 
@@ -37,6 +37,12 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
 
   if (version === 'latest') version = data['dist-tags'].latest
   else version = semver.maxSatisfying(Object.keys(data.versions), version) || version
+
+  if (reinstallArg) {
+    const pkgData = JSON.parse(await kernel.filesystem.fs.readFile(path.join('/usr/lib', packageName, version, 'package', 'package.json'), 'utf-8'))
+    for (const bin in pkgData.bin) await kernel.filesystem.fs.unlink(path.join('/usr/bin', bin))
+    await kernel.filesystem.fs.rm(path.join('/usr/lib', packageName, version), { recursive: true, force: true })
+  }
 
   const packagePath = path.join('/usr/lib', packageName, version, 'package', 'package.json')
   if (await kernel.filesystem.fs.exists(packagePath)) {
@@ -94,18 +100,27 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   // }
 
   // link any bins
-  // const packagePath = path.join('/usr/lib', packageName, version, 'package', 'package.json')
   const packageData = await kernel.filesystem.fs.readFile(packagePath, 'utf-8')
   const packageJson = JSON.parse(packageData)
   try {
     if (packageJson.bin) {
       if (typeof packageJson.bin === 'string') {
         const binPath = path.join('/usr/lib', packageName, version, 'package', packageJson.bin)
+        if (!await kernel.filesystem.fs.exists(binPath)) {
+          terminal.writeln(chalk.red(`${binPath} does not exist`))
+          return 1
+        }
+
         await kernel.filesystem.fs.symlink(binPath, path.join('/usr/bin', packageJson.name))
         terminal.writeln(chalk.green(`Linked ${packageJson.name} to ${path.join('/usr/bin', packageJson.name)}`))
       } else if (typeof packageJson.bin === 'object') {
         for (const bin in packageJson.bin) {
           const binPath = path.join('/usr/lib', packageName, version, 'package', packageJson.bin[bin])
+          if (!await kernel.filesystem.fs.exists(binPath)) {
+            terminal.writeln(chalk.red(`${binPath} does not exist`))
+            return 1
+          }
+
           await kernel.filesystem.fs.symlink(binPath, path.join('/usr/bin', bin))
           terminal.writeln(chalk.green(`Linked ${bin} to ${path.join('/usr/bin', bin)}`))
         }

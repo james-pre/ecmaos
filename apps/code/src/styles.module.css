@@ -1,0 +1,7 @@
+.window {
+  padding: 0;
+
+  :global(.wb-body) {
+    overflow: hidden;
+  }
+}

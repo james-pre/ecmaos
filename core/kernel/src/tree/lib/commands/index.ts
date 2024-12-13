@@ -328,11 +328,12 @@ export const TerminalCommands = (kernel: Kernel, shell: Shell, terminal: Termina
       options: [
         HelpOption,
         { name: 'package', type: String, typeLabel: '{underline package}', defaultOption: true, description: 'The package name and optional version (e.g. package@1.0.0)' },
-        { name: 'registry', type: String, description: 'The registry to use', defaultValue: 'https://registry.npmjs.org' }
+        { name: 'registry', type: String, description: 'The registry to use', defaultValue: 'https://registry.npmjs.org' },
+        { name: 'reinstall', type: Boolean, description: 'Reinstall the package if it is already installed' }
       ],
       run: async (argv: CommandLineOptions) => {
         const { default: install } = await import('./install')
-        return await install({ kernel, shell, terminal, args: [argv.package, argv.registry] })
+        return await install({ kernel, shell, terminal, args: [argv.package, argv.registry, argv.reinstall] })
       }
     }),
     load: new TerminalCommand({
@@ -819,8 +820,10 @@ export const cat = async ({ kernel, shell, process, args }: CommandArgs) => {
 export const cd = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   const destination = (args as string[])[0]
   const fullPath = destination ? path.resolve(shell.cwd, destination) : shell.cwd
-  if (await kernel.filesystem.fs.exists(fullPath)) shell.cwd = fullPath
-  else terminal.writeln(chalk.red(`${fullPath} not found`))
+  if (await kernel.filesystem.fs.exists(fullPath)) {
+    shell.cwd = fullPath
+    localStorage.setItem(`cwd:${shell.credentials.uid}`, fullPath)
+  } else terminal.writeln(chalk.red(`${fullPath} not found`))
 }
 
 export const chmod = async ({ kernel, shell, terminal, args }: CommandArgs) => {
@@ -1646,7 +1649,7 @@ export const reboot = async ({ kernel }: CommandArgs) => {
 export const rm = async ({ kernel, shell, args }: CommandArgs) => {
   const target = (args as string[])[0]
   const fullPath = target ? path.resolve(shell.cwd, target) : shell.cwd
-  if ((await kernel.filesystem.fs.stat(fullPath)).isDirectory()) await kernel.filesystem.fs.rmdir(fullPath)
+  if ((await kernel.filesystem.fs.stat(fullPath)).isDirectory()) await kernel.filesystem.fs.rmdir(fullPath, { recursive: true, force: true })
   else await kernel.filesystem.fs.unlink(fullPath)
   return 0
 }

@@ -48,8 +48,7 @@ app.get('/fs/:file{.*}', async (c) => {
       'html': 'text/html'
     }
 
-    const mimeType = extensions[file.split('.').pop() as keyof typeof extensions] || 'application/octet-stream'
-
+    const mimeType = c.req.query('mime') || extensions[file.split('.').pop() as keyof typeof extensions] || 'application/octet-stream'
     const response = new Response(fileData as BodyInit, {
       status: 200,
       headers: { 'Content-Type': mimeType }
@@ -79,6 +78,7 @@ self.addEventListener('message', (event) => {
 })
 
 self.addEventListener('activate', (event) => {
+  self.skipWaiting()
   event.waitUntil(
     (async () => {
       await self.clients.claim()
