@@ -437,7 +437,7 @@ export class Terminal extends XTerm implements ITerminal {
           this._cmd = ''
           this._cursorPosition = 0
           this.unlisten()
-          this.write('\n' + this.prompt())
+          this.write(this.prompt())
           this.listen()
           return
         case 'l':
