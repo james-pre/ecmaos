@@ -228,6 +228,7 @@ const main = async (params: ProcessEntryParams) => {
 
   win.mount(container)
   globalThis.editor = editor
+  terminal.blur()
   editor.focus()
 
   container.addEventListener('keydown', async (e) => {

@@ -27,5 +27,5 @@ export default async function ({ terminal }: { terminal: Terminal }) {
 export async function exit (canvas: HTMLCanvasElement, terminal: Terminal) {
   canvas.remove()
   terminal.listen()
-  terminal.focus()
+  // terminal.focus()
 }

@@ -49,5 +49,5 @@ export async function exit (interval: Timer, canvas: HTMLCanvasElement, terminal
   clearInterval(interval)
   canvas.remove()
   terminal.listen()
-  terminal.focus()
+  // terminal.focus()
 }
