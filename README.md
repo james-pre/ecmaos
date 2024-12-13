@@ -241,7 +241,7 @@ The `apps` directory in the repository contains a number of examples of how to d
 - `@ecmaos-apps/boilerplate`: A minimal boilerplate app for developing new apps
 - `@ecmaos-apps/code`: A simple code editor app using [Monaco](https://microsoft.github.io/monaco-editor/); serves as a good reference for more complex apps
 
-Basically, your app's [bin](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#bin) file has a `main` (or default) function export that is passed the kernel reference and can use it to interact with the system as needed.
+Basically, your app's [bin](https://docs.npmjs.com/cli/v10/configuring-npm/package-json#bin) file has a `main` (or default) function export that is passed the kernel reference and can use it to interact with the system as needed. A shebang line of `#!ecmaos:bin:app:myappname` is required at the top of the bin file to identify it as an app.
 
 ## Early Days
 
