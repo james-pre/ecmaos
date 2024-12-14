@@ -26,7 +26,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:docs": "typedoc && echo docs.ecmaos.sh > docs/CNAME",
-    "build:kernel": "turbo run build --filter=@ecmaos/kernel",
+    "build:kernel": "turbo run build --filter=@ecmaos/* --filter=@ecmaos-devices/*",
     "cp:readme": "cp README.md core/kernel/README.md",
     "dev": "turbo run dev",
     "dev:kernel": "turbo run dev --filter=@ecmaos/kernel",
