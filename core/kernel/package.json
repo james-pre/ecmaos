@@ -30,7 +30,10 @@
     "Lots of unfinished work; watch your step"
   ],
   "tips": [
-    "You can 'run' some devices that offer a CLI - for example, '/dev/battery --help'"
+    "You can 'run' some devices that offer a CLI - for example, '/dev/battery --help'",
+    "Use the 'install' command to install packages; e.g. install @ecmaos-apps/news",
+    "Use the 'news' command to see the latest news",
+    "Type 'ls /bin' to see all built-in commands"
   ],
   "type": "module",
   "files": [
