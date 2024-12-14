@@ -537,7 +537,7 @@ export class Kernel implements IKernel {
       this._state = KernelState.RUNNING
 
       if (!this.storage.local.getItem('first-boot')) {
-        const recommendedApps = import.meta.env['VITE_KERNEL_RECOMMENDED_APPS']
+        const recommendedApps = import.meta.env['VITE_RECOMMENDED_APPS']
         if (recommendedApps) {
           const apps = recommendedApps.split(',')
           this.terminal.writeln(chalk.yellow.bold(this.i18n.t('kernel.recommendedApps', 'Recommended apps:')))
