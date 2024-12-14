@@ -5,7 +5,7 @@
   "author": "Jay Mathis <code@mathis.network>",
   "type": "module",
   "bin": {
-    "code": "./dist/code.js"
+    "code": "dist/code.js"
   },
   "exports": {
     ".": {

@@ -1,11 +1,9 @@
 {
-  "name": "@ecmaos-apps/webamp",
+  "name": "@ecmaos-apps/news",
   "version": "0.1.0",
-  "description": "Winamp for the web",
   "type": "module",
   "bin": {
-    "webamp": "dist/index.js",
-    "winamp": "dist/index.js"
+    "news": "dist/index.js"
   },
   "exports": {
     ".": {
@@ -20,17 +18,15 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsc && esbuild src/index.ts --bundle --sourcemap --platform=neutral --format=esm --outfile=dist/index.js --banner:js=#!ecmaos:bin:app:webamp",
+    "build": "tsc",
     "dev": "tsc --watch",
     "publish:dev": "npm run build && npm publish --registry=http://localhost:4873",
     "republish:dev": "npm run unpublish:dev && npm run publish:dev",
-    "unpublish:dev": "npm unpublish @ecmaos-apps/webamp --registry=http://localhost:4873 --force"
+    "unpublish:dev": "npm unpublish @ecmaos-apps/news --registry=http://localhost:4873 --force"
   },
   "devDependencies": {
     "@ecmaos/config-typescript": "workspace:^",
     "@ecmaos/types": "workspace:^",
-    "esbuild": "^0.24.0",
-    "typescript": "^5.6.3",
-    "webamp": "0.0.0-next-b06490d"
+    "typescript": "^5.6.3"
   }
 }

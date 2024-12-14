@@ -4,7 +4,7 @@
   "version": "0.1.2",
   "type": "module",
   "bin": {
-    "boilerplate": "./dist/index.js"
+    "boilerplate": "dist/index.js"
   },
   "exports": {
     ".": {

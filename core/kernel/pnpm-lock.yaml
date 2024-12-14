@@ -7,8 +7,6 @@ settings:
 overrides:
   ws: '>=8.17.1'
 
-pnpmfileChecksum: g5t73guyf72fmho4hxqmeb6yt4
-
 importers:
 
   .:
