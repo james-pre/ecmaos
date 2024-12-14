@@ -535,6 +535,23 @@ export class Kernel implements IKernel {
 
       initProcess.start()
       this._state = KernelState.RUNNING
+
+      if (!this.storage.local.getItem('first-boot')) {
+        const recommendedApps = import.meta.env['VITE_KERNEL_RECOMMENDED_APPS']
+        if (recommendedApps) {
+          const apps = recommendedApps.split(',')
+          this.terminal.writeln(chalk.yellow.bold(this.i18n.t('kernel.recommendedApps', 'Recommended apps:')))
+          this.terminal.writeln(chalk.green(apps.map((app: string) => `- ${app}`).join('\n')))
+          this.terminal.write(chalk.green.bold(this.i18n.t('kernel.installRecommendedApps', 'Do you want to install the recommended apps? (Y/n)')))
+          const answer = await this.terminal.readline()
+          if (answer.toLowerCase()[0] === 'y' || answer === '') {
+            for (const app of apps) await this.shell.execute(`/bin/install --reinstall ${app}`)
+          }
+        }
+
+        this.storage.local.setItem('first-boot', Date.now().toString())
+      }
+
       this.terminal.write(ansi.erase.inLine(2) + this.terminal.prompt())
       this.terminal.focus()
       this.terminal.listen()

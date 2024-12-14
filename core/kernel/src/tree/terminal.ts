@@ -493,7 +493,7 @@ export class Terminal extends XTerm implements ITerminal {
 
         this._cmd = ''
         this._cursorPosition = 0
-        this.write('\n' + ansi.erase.inLine(2) + this.prompt())
+        this.write(ansi.erase.inLine(2) + this.prompt())
         break
       case 'Backspace':
         if (this._cursorPosition > 0) {
@@ -508,7 +508,7 @@ export class Terminal extends XTerm implements ITerminal {
         if (this._cursorPosition < this._cmd.length) {
           this._cmd = this._cmd.slice(0, this._cursorPosition) + this._cmd.slice(this._cursorPosition + 1)
           this.write(ansi.erase.inLine(2) + ansi.cursor.horizontalAbsolute(0))
-          
+
           if (this._multiLineMode) {
             const parts = this._cmd.split('#')
             if (parts.length > 1) {

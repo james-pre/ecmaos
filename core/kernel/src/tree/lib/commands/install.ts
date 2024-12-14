@@ -39,9 +39,11 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
   else version = semver.maxSatisfying(Object.keys(data.versions), version) || version
 
   if (reinstallArg) {
-    const pkgData = JSON.parse(await kernel.filesystem.fs.readFile(path.join('/usr/lib', packageName, version, 'package', 'package.json'), 'utf-8'))
-    for (const bin in pkgData.bin) await kernel.filesystem.fs.unlink(path.join('/usr/bin', bin))
-    await kernel.filesystem.fs.rm(path.join('/usr/lib', packageName, version), { recursive: true, force: true })
+    try {
+      const pkgData = JSON.parse(await kernel.filesystem.fs.readFile(path.join('/usr/lib', packageName, version, 'package', 'package.json'), 'utf-8'))
+      for (const bin in pkgData.bin) await kernel.filesystem.fs.unlink(path.join('/usr/bin', bin))
+      await kernel.filesystem.fs.rm(path.join('/usr/lib', packageName, version), { recursive: true, force: true })
+    } catch {}
   }
 
   const packagePath = path.join('/usr/lib', packageName, version, 'package', 'package.json')
