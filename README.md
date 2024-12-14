@@ -79,10 +79,6 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
   - Confusingly, the Kernel loads the BIOS — not the other way around
 
-- `Core`
-  - Core modules provide the system's essential functionality; this includes the kernel itself
-  - Other core modules include BIOS, Jaffa, Metal, SWAPI, as well as the main `@ecmaos/types` package
-
 - `Commands`
   - Commands are small utilities that aren't quite full Apps, provided by the shell
   - Some builtin commands that exist now will be moved into separate apps over time
