@@ -59,13 +59,15 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 - `Metal`: An API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
 - `SWAPI`: An API server running completely inside a service worker using [Hono](https://hono.dev)
 
-## Basic Overview
+## Basic Concepts
 
 ### Apps
 
+> [/apps](/apps)
+
 - These are full applications that are developed specifically to work with ecmaOS
 - Refer to the full list of [official published apps on npm](https://www.npmjs.com/org/ecmaos-apps)
-- See the [./APPS.md](./APPS.md) file for a list of community apps; submit a PR to add your app!
+- See the [APPS.md](/APPS.md) file for a list of community apps; submit a PR to add your app!
 - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
 - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
 - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/code`
@@ -76,6 +78,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ### BIOS
 
+> [/core/bios](/core/bios)
+
 - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
 - The BIOS has its own filesystem, located at `/bios` — this allows data to be copied in and out of the BIOS for custom code and utilities
 - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
@@ -83,13 +87,17 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ### Commands
 
+> [/core/kernel/src/tree/lib/commands](/core/kernel/src/tree/lib/commands)
+
 - Commands are small utilities that aren't quite full Apps, provided by the shell
 - Some builtin commands that exist now will be moved into separate apps over time
 
 ### Devices
 
+> [/devices](/devices)
+
 - Refer to the full list of [official devices on npm](https://www.npmjs.com/org/ecmaos-devices)
-- See the [./DEVICES.md](./DEVICES.md) file for a list of community devices; submit a PR to add your device!
+- See the [DEVICES.md](/DEVICES.md) file for a list of community devices; submit a PR to add your device!
 - Devices get loaded on boot, e.g. `/dev/bluetooth`, `/dev/random`, `/dev/battery`, etc.
 - A device can support being "run" by a user, e.g. `# /dev/battery status`
 - Devices may also be directly read/written using `fs` methods, and will behave accordingly (or have no effect if not supported)
@@ -97,16 +105,22 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ### Generators
 
+> [/turbo/generators](/turbo/generators)
+
 - Generators are used to scaffold new apps, devices, modules, etc.
 - They are located in the `turbo/generators` directory of the repository
 - They are used by the `turbo gen` command, e.g. `turbo gen app`, `turbo gen device`, `turbo gen module`, etc.
 
 ### Jaffa
 
+> [/core/jaffa](/core/jaffa)
+
 - Jaffa is a [Tauri](https://tauri.app) wrapper for the ecmaOS kernel
 - It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality
 
 ### Kernel
+
+> [/core/kernel](/core/kernel)
 
 - The kernel ties together the various components of the system into a cohesive whole
   - Authentication (WebAuthn)
@@ -132,13 +146,17 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ### Metal
 
+> [/core/metal](/core/metal)
+
 - Metal is an API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
 - Authenticated and encrypted connections with JWK/JWE/JOSE
 
 ### Modules
 
+> [/modules](/modules)
+
 - Refer to the full list of [official modules on npm](https://www.npmjs.com/org/ecmaos-modules)
-- See the [./MODULES.md](./MODULES.md) file for a list of community modules; submit a PR to add your module!
+- See the [MODULES.md](/MODULES.md) file for a list of community modules; submit a PR to add your module!
 - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
 - They are specified during build via the `VITE_KERNEL_MODULES` environment variable
   - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/boilerplate@0.1.0,@your/package@1.2.3`
@@ -160,12 +178,16 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ### SWAPI
 
+> [/core/swapi](/core/swapi)
+
 - The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)
 - It allows for various operations including the `fs` route to fetch files via URL
 - e.g., `# fetch /swapi/fs/home/user/hello.txt`
 - e.g., `# fetch /swapi/fake/person/fullName`
 
 ### Utils
+
+> [/utils](/utils)
 
 - Utilities and configuration used during development
 
@@ -313,7 +335,7 @@ turbo gen device # generate a new device template
 turbo gen module # generate a new module template
 ```
 
-Also see [turbo.json](./turbo.json) and [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
+Also see [turbo.json](./turbo.json) and [CONTRIBUTING.md](/CONTRIBUTING.md) for more information.
 
 ## Security Vulnerabilities
 
