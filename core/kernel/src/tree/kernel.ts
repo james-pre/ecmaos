@@ -12,6 +12,7 @@ import chalk from 'chalk'
 import figlet from 'figlet'
 import Module from 'node:module'
 import path from 'node:path'
+import semver from 'semver'
 
 import { JSONSchemaForNPMPackageJsonFiles } from '@schemastore/package'
 
@@ -410,11 +411,11 @@ export class Kernel implements IKernel {
             }
 
             // load its main export from package.json
-            const pkgJson = await this.filesystem.fs.readFile(`${pkgPath}/package/package.json`, 'utf-8')
+            const pkgJson = await this.filesystem.fs.readFile(`${pkgPath}/package.json`, 'utf-8')
             const pkgData = JSON.parse(pkgJson) as JSONSchemaForNPMPackageJsonFiles
             const mainFile = this.getPackageMainExport(pkgData)
             if (!mainFile) throw new Error(`Failed to load module ${name}@${version}: No main export found`)
-            const mainPath = path.join(pkgPath, 'package', mainFile)
+            const mainPath = path.join(pkgPath,  mainFile)
 
             // Importing from a blob objectURL doesn't work for some reason, so use SWAPI
             const module = await import(/* @vite-ignore */ `/swapi/fs${mainPath}`) as KernelModule
@@ -536,20 +537,22 @@ export class Kernel implements IKernel {
       initProcess.start()
       this._state = KernelState.RUNNING
 
-      if (!this.storage.local.getItem('first-boot')) {
+      // Install recommended apps if desired by user on first boot
+      if (!this.storage.local.getItem('ecmaos:first-boot')) {
         const recommendedApps = import.meta.env['VITE_RECOMMENDED_APPS']
         if (recommendedApps) {
           const apps = recommendedApps.split(',')
-          this.terminal.writeln(chalk.yellow.bold(this.i18n.t('kernel.recommendedApps', 'Recommended apps:')))
+          this.terminal.writeln('\n' + chalk.yellow.bold(this.i18n.t('kernel.recommendedApps', 'Recommended apps:')))
           this.terminal.writeln(chalk.green(apps.map((app: string) => `- ${app}`).join('\n')))
           this.terminal.write(chalk.green.bold(this.i18n.t('kernel.installRecommendedApps', 'Do you want to install the recommended apps? (Y/n)')))
+
           const answer = await this.terminal.readline()
           if (answer.toLowerCase()[0] === 'y' || answer === '') {
             for (const app of apps) await this.shell.execute(`/bin/install --reinstall ${app}`)
           }
         }
 
-        this.storage.local.setItem('first-boot', Date.now().toString())
+        this.storage.local.setItem('ecmaos:first-boot', Date.now().toString())
       }
 
       this.terminal.write(ansi.erase.inLine(2) + this.terminal.prompt())
@@ -696,26 +699,10 @@ export class Kernel implements IKernel {
   async executeApp(options: KernelExecuteOptions): Promise<number> {
     try {
       const contents = await this.filesystem.fs.readFile(options.file!, 'utf-8')
+      const binLink = await this.filesystem.fs.readlink(options.file!)
+      const filePath = path.dirname(binLink)
 
-      // Convert relative imports to SWAPI URLs
-      // I would love to just use import maps, but we need dynamic import maps
-      // This is probably not our long-term solution
-      const filePath = path.dirname(await this.filesystem.fs.readlink(options.file!))
-      const modifiedContents = contents.replace(
-        /from ['"]([^'"]+)['"]/g,
-        (match, importPath) => {
-          if (!importPath.startsWith('.')) return match
-          const resolvedPath = path.join(filePath, importPath)
-          const extensions = ['.js', '.css']
-          const withExtension = extensions.some(ext => resolvedPath.endsWith(ext))
-            ? resolvedPath
-            : `${resolvedPath}.js` // Default to .js if no extension specified
-
-          return `from "${location.protocol}//${location.host}/swapi/fs${withExtension}"`
-        }
-      )
-
-      const blob = new Blob([modifiedContents], { type: 'application/javascript' })
+      const blob = new Blob([await this.replaceImports(contents, filePath)], { type: 'text/javascript' })
       const url = URL.createObjectURL(blob)
 
       try {
@@ -820,6 +807,10 @@ export class Kernel implements IKernel {
 
   /**
    * Executes a node script (or tries to)
+   *
+   * @remarks
+   * Don't expect it to work; this will help develop further emulation layers
+   *
    * @param options - Execution options containing script path and shell
    * @returns Exit code of the script
    */
@@ -827,16 +818,31 @@ export class Kernel implements IKernel {
     if (!options.command) return -1
 
     try {
-      const code = await this.filesystem.fs.readFile(options.command, 'utf-8')
-      if (!code) return -1
+      const contents = await this.filesystem.fs.readFile(options.command, 'utf-8')
+      if (!contents) return -1
 
-      const blob = new Blob([code], { type: 'text/javascript' })
+      const binLink = await this.filesystem.fs.readlink(options.command)
+      const filePath = path.dirname(binLink)
+
+      const blob = new Blob([await this.replaceImports(contents, filePath)], { type: 'text/javascript' })
       const url = URL.createObjectURL(blob)
-      const script = document.createElement('script')
-      script.type = 'module'
-      script.src = url
-      document.head.appendChild(script)
+      const module = await import(/* @vite-ignore */ url)
 
+      const main = module?.main || module?.default
+      if (typeof main !== 'function') throw new Error('No main function found in module')
+
+      const process = this.processes.create({
+        args: options.args || [],
+        command: options.command,
+        kernel: this,
+        shell: options.shell || this.shell,
+        terminal: options.terminal || this.terminal,
+        uid: options.shell.credentials.uid,
+        gid: options.shell.credentials.gid,
+        entry: async () => await main()
+      })
+
+      await process.start()
       return 0
     } catch (error) {
       this.log?.error(`Failed to execute node script: ${error}`)
@@ -996,43 +1002,36 @@ export class Kernel implements IKernel {
   }
 
   /**
-   * Registers the packages.
+   * Registers the packages from /etc/packages that should be auto-loaded on boot.
    * @returns {Promise<void>} A promise that resolves when the packages are registered.
    */
   async registerPackages() {
     try {
       const packagesData = await this.filesystem.fs.readFile('/etc/packages', 'utf-8')
-      const packages = JSON.parse(packagesData)
+      const packages = packagesData.split('\n').filter(Boolean).filter(pkg => !pkg.startsWith('#'))
       for (const pkg of packages) {
-        const pkgJson = await this.filesystem.fs.readFile(`/usr/lib/${pkg.name}/${pkg.version}/package/package.json`, 'utf-8')
-        const pkgData = JSON.parse(pkgJson)
-        const mainFile = this.getPackageMainExport(pkgData)
+        const spec = pkg.match(/(@[^/]+\/[^@]+|[^@]+)(?:@([^/]+))?/)
+        const name = spec?.[1]
+        if (!name || !await this.filesystem.fs.exists(`/usr/lib/${name}`)) continue
+        const versions = await this.filesystem.fs.readdir(`/usr/lib/${name}`)
+        const version = semver.maxSatisfying(versions, spec?.[2] || '*') || spec?.[2] || '*'
+        const pkgData = await this.filesystem.fs.readFile(`/usr/lib/${name}/${version}/package.json`, 'utf-8')
+        const pkgJson = JSON.parse(pkgData)
+        const mainFile = this.getPackageMainExport(pkgJson)
+        if (!mainFile) continue
 
-        if (!mainFile) {
-          this.log?.warn(`No main entry point found for package ${pkg.name}`)
-          continue
-        }
-
+        const filePath = `/usr/lib/${name}/${version}/${mainFile}`
+        const fileContents = await this.filesystem.fs.readFile(filePath, 'utf-8')
+        const blob = new Blob([fileContents], { type: 'text/javascript' })
+        const url = URL.createObjectURL(blob)
         try {
-          const filePath = `/usr/lib/${pkg.name}/${pkg.version}/package/${mainFile}`
-          const fileContents = await this.filesystem.fs.readFile(filePath, 'utf-8')
-
-          const type = pkgData.type === 'module' || mainFile === pkgData.module ? 'module' : 'text/javascript'
-          const blob = new Blob([fileContents], { type })
-          const url = URL.createObjectURL(blob)
-
-          try {
-            this.log?.debug(`Loading package ${pkg.name} v${pkg.version}`)
-            const imports = await import(/* @vite-ignore */ url)
-
-            this.packages.set(pkg.name, imports as Module)
-          } catch (err) {
-            this.log?.error(`Failed to load package ${pkg.name} v${pkg.version}: ${err}`)
-          } finally {
-            URL.revokeObjectURL(url)
-          }
+          this.log?.info(`Loading package ${name} v${version}`)
+          const imports = await import(/* @vite-ignore */ url)
+          this.packages.set(name, imports as Module)
         } catch (err) {
-          this.log?.error(`Failed to read main file for package ${pkg.name} v${pkg.version}: ${err}`)
+          this.log?.error(`Failed to load package ${name} v${version}: ${err}`)
+        } finally {
+          URL.revokeObjectURL(url)
         }
       }
     } catch {}
@@ -1080,6 +1079,31 @@ export class Kernel implements IKernel {
         this.log?.warn(`Failed to write proc data: ${key}`, error)
       }
     }
+  }
+
+  /**
+   * Replaces imports in a script with SWAPI URLs
+   *
+   * @remarks
+   * I would love to just use import maps, but we need dynamic import maps
+   * This is probably not our long-term solution
+   *
+   * @param {string} contents - The script contents
+   * @returns {Promise<string>} The modified script contents
+   */
+  async replaceImports(contents: string, packagePath: string): Promise<string> {
+    const replacements: Record<string, string> = {}
+    const importRegex = /from ['"]([^'"]+)['"]/g
+    const matches = contents.match(importRegex)
+
+    for (const match of matches || []) {
+      const importPath = match.replace(/from ['"]|['"]/g, '')
+      const exists = await this.filesystem.fs.exists(`/usr/lib/${path.join(packagePath, importPath)}`)
+      if (exists) replacements[match] = `from "${location.protocol}//${location.host}/swapi/fs${path.join(packagePath, importPath)}"`
+    }
+
+    for (const [match, replacement] of Object.entries(replacements)) contents = contents.replace(match, replacement)
+    return contents
   }
 
   /**

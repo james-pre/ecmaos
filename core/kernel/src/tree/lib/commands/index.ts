@@ -1327,20 +1327,11 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     else return chalk.gray(`${owner?.username || stats.uid}:${owner?.username || stats.gid}`)
   }
 
+  // TODO: .mounts is deprecated - find a proper way
   const mounts = Array.from(kernel.filesystem.fsSync.mounts.entries() as [string, FileSystem][])
     .filter(([target]) => path.dirname(target) === fullPath && target !== '/')
 
-  // const files = entries
-  //   .map(entry => {
-  //     const target = path.resolve(fullPath, entry)
-  //     try { return { target, name: entry, stats: kernel.filesystem.fsSync.statSync(target) } }
-  //     catch (err) { kernel.log?.warn(err); return null }
-  //   })
-  //   .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
-  //   .filter(entry => !entry.stats.isDirectory())
-
   const filesMap = await Promise.all(entries
-    // .filter(entry => !entry.startsWith('/'))
     .map(async entry => {
       const target = path.resolve(fullPath, entry)
       return { target, name: entry, stats: await kernel.filesystem.fs.stat(target) }
@@ -1350,23 +1341,7 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     .filter(entry => !entry.stats.isDirectory())
     .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
 
-  // const directories = entries
-  //   .map(entry => {
-  //     const target = path.resolve(fullPath, entry)
-  //     try { return { target, name: entry, stats: kernel.filesystem.fsSync.statSync(target) } }
-  //     catch (err) { kernel.log?.warn(err); return null }
-  //   })
-  //   .filter(entry => entry && entry.stats.isDirectory())
-  //   .concat(mounts.map(([target]) => ({
-  //     target,
-  //     name: path.basename(target),
-  //     stats: { isDirectory: () => true, mtime: new Date(), mode: 0o755 } as Stats
-  //   })))
-  //   .filter((entry, index, self) => self.findIndex(e => e?.name === entry?.name) === index)
-  //   .filter((entry): entry is NonNullable<typeof entry> => entry !== null && entry !== undefined)
-
   const directoryMap = await Promise.all(entries
-    // .filter(entry => entry.startsWith('/'))
     .map(async entry => {
       const target = path.resolve(fullPath, entry)
       return { target, name: entry, stats: await kernel.filesystem.fs.stat(target) }
@@ -1419,6 +1394,7 @@ export const ls = async ({ kernel, shell, terminal, args }: CommandArgs) => {
             const version = kdevice?.device.pkg?.version || ''
             if (device) return `${description ? `${description}:` : ''}${version ? `v${version}:` : ''}M${device.major ?? '?'},m${device.minor ?? '?'}`
           }
+
           return ''
         })()
       ]

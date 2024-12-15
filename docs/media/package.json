@@ -1,6 +1,6 @@
 {
   "name": "ecmaos",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "ecmaOS: Micro-kernel and framework for web technologies",
   "homepage": "https://github.com/ecmaos/ecmaos#readme",
   "license": "MIT+Apache-2.0",
@@ -26,9 +26,9 @@
   "scripts": {
     "build": "turbo run build",
     "build:docs": "typedoc && echo docs.ecmaos.sh > docs/CNAME",
-    "build:kernel": "turbo run build --filter=@ecmaos/kernel",
+    "build:kernel": "turbo run build --filter=@ecmaos/* --filter=@ecmaos-devices/*",
     "cp:readme": "cp README.md core/kernel/README.md",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --concurrency=20",
     "dev:kernel": "turbo run dev --filter=@ecmaos/kernel",
     "dev:docs": "pnpm cp:readme && concurrently nodemon \"pnpx serve -l 30444 ./docs\"",
     "fix": "prettier --write \"**/*.{ts,tsx,md}\"",

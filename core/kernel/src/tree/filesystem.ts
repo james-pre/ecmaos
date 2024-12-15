@@ -123,19 +123,30 @@ export class Filesystem {
     const tarball = await this.fs.readFile(tarballPath)
     const decompressed = pako.ungzip(tarball)
     const tar = await TarReader.load(decompressed)
-    for (const file of tar.fileInfos) {
-      try { await this.fs.mkdir(path.join(extractPath, file.name.endsWith('/') ? file.name : path.dirname(file.name)), { mode: 0o755, recursive: true }) }
-      catch {}
 
-      if (file.name.endsWith('/')) continue
+    const hasPackageDir = tar.fileInfos.some(file => file.name.startsWith('package/'))
+    const stripPrefix = hasPackageDir ? 'package/' : ''
+
+    for (const file of tar.fileInfos) {
+      if (hasPackageDir && !file.name.startsWith(stripPrefix)) continue
+
+      const relativePath = hasPackageDir ? file.name.slice(stripPrefix.length) : file.name
+      if (!relativePath) continue
 
       try {
+        if (relativePath.endsWith('/')) {
+          await this.fs.mkdir(path.join(extractPath, relativePath), { mode: 0o755, recursive: true })
+          continue
+        }
+
+        await this.fs.mkdir(path.join(extractPath, path.dirname(relativePath)), { mode: 0o755, recursive: true })
+
         const blob = tar.getFileBlob(file.name)
         const binaryData = await blob.arrayBuffer().then(buffer => new Uint8Array(buffer))
-        const filePath = path.join(extractPath, file.name)
+        const filePath = path.join(extractPath, relativePath)
         await this.fs.writeFile(filePath, binaryData, { encoding: 'binary', mode: 0o644 })
       } catch (error) {
-        console.error(`Failed to extract file ${file.name}: ${error}`)
+        console.error(`Failed to extract file ${file.name}: ${error}`) 
       }
     }
   }

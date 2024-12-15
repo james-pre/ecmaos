@@ -40,13 +40,13 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
 
   if (reinstallArg) {
     try {
-      const pkgData = JSON.parse(await kernel.filesystem.fs.readFile(path.join('/usr/lib', packageName, version, 'package', 'package.json'), 'utf-8'))
+      const pkgData = JSON.parse(await kernel.filesystem.fs.readFile(path.join('/usr/lib', packageName, version, 'package.json'), 'utf-8'))
       for (const bin in pkgData.bin) await kernel.filesystem.fs.unlink(path.join('/usr/bin', bin))
       await kernel.filesystem.fs.rm(path.join('/usr/lib', packageName, version), { recursive: true, force: true })
     } catch {}
   }
 
-  const packagePath = path.join('/usr/lib', packageName, version, 'package', 'package.json')
+  const packagePath = path.join('/usr/lib', packageName, version, 'package.json')
   if (await kernel.filesystem.fs.exists(packagePath)) {
     terminal.writeln(chalk.green(`${packageName} v${version} is already installed`))
     return 0
@@ -77,37 +77,26 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
 
   // TODO: Support user packages installed to user's home?
   const extractPath = `/usr/lib/${data.name}/${version}`
-  if (await kernel.filesystem.fs.exists(extractPath)) await kernel.filesystem.fs.rm(extractPath, { recursive: true })
 
   await kernel.filesystem.fs.mkdir(extractPath, { mode: 0o755, recursive: true })
   await kernel.filesystem.extractTarball(`/tmp/${tarballFilename}`, extractPath)
   await kernel.filesystem.fs.unlink(`/tmp/${tarballFilename}`)
   terminal.writeln(chalk.green(`Installed ${data.name} v${version} to ${extractPath}`))
 
-  // const packageEntry = { name: packageName, version: version }
-
-  // try {
-  //   let packages = []
-  //   try {
-  //     const packagesData = await kernel.filesystem.fs.readFile('/etc/packages', 'utf-8')
-  //     if (packagesData) packages = JSON.parse(packagesData)
-  //   } catch {}
-
-  //   if (!packages.find((p: { name: string, version: string }) => p.name === packageName && p.version === version)) {
-  //     packages.push(packageEntry)
-  //     await kernel.filesystem.fs.writeFile('/etc/packages', JSON.stringify(packages, null, 2))
-  //   }
-  // } catch (error) {
-  //   terminal.writeln(chalk.red(`Failed to update /etc/packages: ${error}`))
-  // }
-
-  // link any bins
   const packageData = await kernel.filesystem.fs.readFile(packagePath, 'utf-8')
   const packageJson = JSON.parse(packageData)
-  try {
+
+  try { // execute preinstall script
+    if (packageJson.scripts?.['ecmaos:preinstall']) await shell.execute(packageJson.scripts['ecmaos:preinstall'])
+  } catch (error) {
+    terminal.writeln(chalk.red(`Failed to execute preinstall script for ${packageName}@${version}: ${error}`))
+    return 1
+  }
+
+  try { // link any bins
     if (packageJson.bin) {
       if (typeof packageJson.bin === 'string') {
-        const binPath = path.join('/usr/lib', packageName, version, 'package', packageJson.bin)
+        const binPath = path.join('/usr/lib', packageName, version, packageJson.bin)
         if (!await kernel.filesystem.fs.exists(binPath)) {
           terminal.writeln(chalk.red(`${binPath} does not exist`))
           return 1
@@ -117,7 +106,7 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
         terminal.writeln(chalk.green(`Linked ${packageJson.name} to ${path.join('/usr/bin', packageJson.name)}`))
       } else if (typeof packageJson.bin === 'object') {
         for (const bin in packageJson.bin) {
-          const binPath = path.join('/usr/lib', packageName, version, 'package', packageJson.bin[bin])
+          const binPath = path.join('/usr/lib', packageName, version, packageJson.bin[bin])
           if (!await kernel.filesystem.fs.exists(binPath)) {
             terminal.writeln(chalk.red(`${binPath} does not exist`))
             return 1
@@ -132,12 +121,23 @@ const install = async ({ kernel, shell, terminal, args }: CommandArgs) => {
     terminal.writeln(chalk.red(`Failed to link bins for ${packageName}@${version}: ${error}`))
   }
 
-  // install dependencies
-  if (packageJson.dependencies) {
-    for (const dependency in packageJson.dependencies) {
-      const packageSpec = `${dependency}${packageJson.dependencies[dependency] ? `@${packageJson.dependencies[dependency]}` : ''}`
-      await install({ kernel, shell, terminal, args: [packageSpec, registryArg] })
+  try { // install dependencies
+    if (packageJson.dependencies) {
+      for (const dependency in packageJson.dependencies) {
+        const packageSpec = `${dependency}${packageJson.dependencies[dependency] ? `@${packageJson.dependencies[dependency]}` : ''}`
+        await install({ kernel, shell, terminal, args: [packageSpec, registryArg] })
+      }
     }
+  } catch (error) {
+    terminal.writeln(chalk.red(`Failed to install dependencies for ${packageName}@${version}: ${error}`))
+    return 1
+  }
+
+  try { // execute postinstall script
+    if (packageJson.scripts?.['ecmaos:postinstall']) await shell.execute(packageJson.scripts['ecmaos:postinstall'])
+  } catch (error) {
+    terminal.writeln(chalk.red(`Failed to execute postinstall script for ${packageName}@${version}: ${error}`))
+    return 1
   }
 }
 

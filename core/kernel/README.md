@@ -79,10 +79,6 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
   - Confusingly, the Kernel loads the BIOS — not the other way around
 
-- `Core`
-  - Core modules provide the system's essential functionality; this includes the kernel itself
-  - Other core modules include BIOS, Jaffa, Metal, SWAPI, as well as the main `@ecmaos/types` package
-
 - `Commands`
   - Commands are small utilities that aren't quite full Apps, provided by the shell
   - Some builtin commands that exist now will be moved into separate apps over time
@@ -136,8 +132,8 @@ The goal is to create a kernel and supporting apps that tie together modern web 
   - See the [./MODULES.md](./MODULES.md) file for a list of community modules; submit a PR to add your module!
   - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
   - They are specified during build via the `VITE_KERNEL_MODULES` environment variable
-    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/boilerplate@0.1.2,@your/package@1.2.3`
-  - Versions must be exact and are mandatory - you cannot use NPM version specifiers
+    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/boilerplate@0.1.0,@your/package@1.2.3`
+  - Versions must be pinned and are mandatory - you cannot use NPM version specifiers
   - They can provide additional functionality, devices, commands, etc.
   - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
   - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
@@ -160,6 +156,20 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 - `Utils`
   - Utilities and configuration used during development
+
+## Important Files and Directories
+
+- `/bin/`: Built-in commands
+- `/bios/`: The BIOS filesystem
+- `/boot/init`: A script that runs on boot
+- `/dev/`: All devices are here
+- `/etc/packages`: A list of installed packages to load on boot
+- `/home/`: Contains user home directories
+- `/proc/`: A directory containing various dynamic system information
+- `/root/`: The home directory for the root user
+- `/usr/bin/`: Executable packages get linked here
+- `/usr/lib/`: All installed packages are here
+- `/var/log/kernel.log`: The kernel log
 
 ## Command Examples
 
@@ -252,8 +262,9 @@ Things to keep in mind:
 - Things have changed a lot since the tests were written, so they need to be updated and fixed
 - The kernel is designed to be run in an environment with a DOM (i.e. a browser)
 - Many features are only available on Chromium-based browsers, and many more behind feature flags
+- There will be a lot of technical challenges to overcome, and many things will first be implemented in a non-optimal way
 - Command interfaces won't match what you might be used to from a traditional Linux environment; not all commands and options are supported. Over time, Linuxish commands will be fleshed out and made to behave in a more familiar way.
-- Globbing doesn't work in the terminal yet
+- Globbing doesn't work in the terminal yet, [but is supported at the filesystem level](https://zenfs.dev/core/functions/fs.promises.glob.html)
 
 ## Development
 
@@ -269,9 +280,9 @@ git clone https://github.com/ecmaos/ecmaos.git
 cd ecmaos && pnpm install
 
 # Run the dev server
-pnpm run dev
+pnpm run dev:kernel
 
-# Run the docs server
+# Run the docs server (optional)
 pnpm run dev:docs
 
 # Build
@@ -285,7 +296,9 @@ pnpm run test:bench
 pnpm run test:ui
 
 # Generate modules
+turbo gen app # generate a new app template
 turbo gen device # generate a new device template
+turbo gen module # generate a new module template
 ```
 
 Also see [turbo.json](./turbo.json) and [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
