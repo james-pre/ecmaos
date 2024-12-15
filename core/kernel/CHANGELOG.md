@@ -1,5 +1,11 @@
 # @ecmaos/kernel
 
+## 0.2.6
+
+### Patch Changes
+
+- b7bd827: various updates to package installation and loading
+
 ## 0.2.5
 
 ### Patch Changes
