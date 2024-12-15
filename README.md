@@ -61,101 +61,113 @@ The goal is to create a kernel and supporting apps that tie together modern web 
 
 ## Basic Overview
 
-- `Apps`
-  - These are full applications that are developed specifically to work with ecmaOS
-  - Refer to the full list of [official published apps on npm](https://www.npmjs.com/org/ecmaos-apps)
-  - See the [./APPS.md](./APPS.md) file for a list of community apps; submit a PR to add your app!
-  - An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
-  - Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
-  - They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/code`
-  - Run the installed app (bins are linked to `/usr/bin`): `# code /root/hello.js`
-  - During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages
-  - To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
-  - Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
+### Apps
 
-- `BIOS`
-  - The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
-  - The BIOS has its own filesystem, located at `/bios` — this allows data to be copied in and out of the BIOS for custom code and utilities
-  - The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
-  - Confusingly, the Kernel loads the BIOS — not the other way around
+- These are full applications that are developed specifically to work with ecmaOS
+- Refer to the full list of [official published apps on npm](https://www.npmjs.com/org/ecmaos-apps)
+- See the [./APPS.md](./APPS.md) file for a list of community apps; submit a PR to add your app!
+- An app is an npm package, in which the bin file has a shebang line of `#!ecmaos:bin:app:myappname`
+- Its default export (or exported `main` function) will be called with the `ProcessEntryParams` object
+- They can be installed from the terminal using the `install` command, e.g. `# install @ecmaos-apps/code`
+- Run the installed app (bins are linked to `/usr/bin`): `# code /root/hello.js`
+- During development, it can be useful to run a [Verdaccio](https://github.com/verdaccio/verdaccio) server to test local packages
+- To publish to Verdaccio, run `# npm publish --registry http://localhost:4873` in your app's development environment
+- Then to install from your local registry, run `# install @myscope/mypackage --registry http://localhost:4873`
 
-- `Commands`
-  - Commands are small utilities that aren't quite full Apps, provided by the shell
-  - Some builtin commands that exist now will be moved into separate apps over time
+### BIOS
 
-- `Devices`
-  - Refer to the full list of [official devices on npm](https://www.npmjs.com/org/ecmaos-devices)
-  - See the [./DEVICES.md](./DEVICES.md) file for a list of community devices; submit a PR to add your device!
-  - Devices get loaded on boot, e.g. `/dev/bluetooth`, `/dev/random`, `/dev/battery`, etc.
-  - A device can support being "run" by a user, e.g. `# /dev/battery status`
-  - Devices may also be directly read/written using `fs` methods, and will behave accordingly (or have no effect if not supported)
-  - An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
+- The BIOS is a C++ module compiled to WebAssembly with [Emscripten](https://emscripten.org) providing performance-critical functionality
+- The BIOS has its own filesystem, located at `/bios` — this allows data to be copied in and out of the BIOS for custom code and utilities
+- The main idea is that data and custom code can be loaded into it from the OS for WASM-native performance, as well as providing various utilities
+- Confusingly, the Kernel loads the BIOS — not the other way around
 
-- `Generators`
-  - Generators are used to scaffold new apps, devices, modules, etc.
-  - They are located in the `turbo/generators` directory of the repository
-  - They are used by the `turbo gen` command, e.g. `turbo gen app`, `turbo gen device`, `turbo gen module`, etc.
+### Commands
 
-- `Jaffa`
-  - Jaffa is a [Tauri](https://tauri.app) wrapper for the ecmaOS kernel
-  - It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality
+- Commands are small utilities that aren't quite full Apps, provided by the shell
+- Some builtin commands that exist now will be moved into separate apps over time
 
-- `Kernel`
-  - The kernel ties together the various components of the system into a cohesive whole
-    - Authentication (WebAuthn)
-    - Components (Web Components/Custom Elements)
-    - Devices
-    - DOM
-    - Events (CustomEvents)
-    - Filesystem (ZenFS)
-    - Internationalization (i18next)
-    - Interval Manager (setInterval)
-    - Log Manager (tslog)
-    - Memory Manager (Abstractions)
-    - Process Manager
-    - Protocol Handlers (web+ecmaos://...)
-    - Service Worker Manager
-    - Shell
-    - Storage (IndexedDB, localStorage, sessionStorage, etc.)
-    - Terminal (xterm.js)
-    - User Manager
-    - WASM Loader
-    - Window Manager (WinBox)
-    - Workers (Web Workers)
+### Devices
 
-- `Metal`
-  - Metal is an API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
-  - Authenticated and encrypted connections with JWK/JWE/JOSE
+- Refer to the full list of [official devices on npm](https://www.npmjs.com/org/ecmaos-devices)
+- See the [./DEVICES.md](./DEVICES.md) file for a list of community devices; submit a PR to add your device!
+- Devices get loaded on boot, e.g. `/dev/bluetooth`, `/dev/random`, `/dev/battery`, etc.
+- A device can support being "run" by a user, e.g. `# /dev/battery status`
+- Devices may also be directly read/written using `fs` methods, and will behave accordingly (or have no effect if not supported)
+- An individual device module can provide multiple device drivers, e.g. `/dev/usb` provides `/dev/usb-mydevice-0001-0002`
 
-- `Modules`
-  - Refer to the full list of [official modules on npm](https://www.npmjs.com/org/ecmaos-modules)
-  - See the [./MODULES.md](./MODULES.md) file for a list of community modules; submit a PR to add your module!
-  - Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
-  - They are specified during build via the `VITE_KERNEL_MODULES` environment variable
-    - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/boilerplate@0.1.0,@your/package@1.2.3`
-  - Versions must be pinned and are mandatory - you cannot use NPM version specifiers
-  - They can provide additional functionality, devices, commands, etc.
-  - They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
-  - Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
+### Generators
 
-- `Packages`
-  - Packages are [NPM packages](https://www.npmjs.com) that are installed into the ecmaOS environment
-  - They can be installed from the terminal using the `install` command, e.g. `# install jquery`
-  - NPM version specifiers are supported, e.g.:
-    - `# install jquery@3.7.1`
-    - `# install jquery@^3.7.1`
-    - `# install jquery@latest`
-  - [JSR](https://jsr.io) may be used with the [NPM compatibility layer](https://jsr.io/docs/npm-compatibility):
-    - `# install @jsr/defaude__hello-jsr --registry https://npm.jsr.io`
+- Generators are used to scaffold new apps, devices, modules, etc.
+- They are located in the `turbo/generators` directory of the repository
+- They are used by the `turbo gen` command, e.g. `turbo gen app`, `turbo gen device`, `turbo gen module`, etc.
 
-- `SWAPI`
-  - The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)
-  - It allows for various operations including the `fs` route to fetch files via URL
-  - e.g., `# fetch /swapi/fs/home/user/hello.txt`
-  - e.g., `# fetch /swapi/fake/person/fullName`
+### Jaffa
 
-- `Utils`
-  - Utilities and configuration used during development
+- Jaffa is a [Tauri](https://tauri.app) wrapper for the ecmaOS kernel
+- It's used to tie the kernel into a desktop or mobile environment, allowing for native functionality
+
+### Kernel
+
+- The kernel ties together the various components of the system into a cohesive whole
+  - Authentication (WebAuthn)
+  - Components (Web Components/Custom Elements)
+  - Devices
+  - DOM
+  - Events (CustomEvents)
+  - Filesystem (ZenFS)
+  - Internationalization (i18next)
+  - Interval Manager (setInterval)
+  - Log Manager (tslog)
+  - Memory Manager (Abstractions)
+  - Process Manager
+  - Protocol Handlers (web+ecmaos://...)
+  - Service Worker Manager
+  - Shell
+  - Storage (IndexedDB, localStorage, sessionStorage, etc.)
+  - Terminal (xterm.js)
+  - User Manager
+  - WASM Loader
+  - Window Manager (WinBox)
+  - Workers (Web Workers)
+
+### Metal
+
+- Metal is an API server for allowing connections to physical systems from ecmaOS using [Hono](https://hono.dev)
+- Authenticated and encrypted connections with JWK/JWE/JOSE
+
+### Modules
+
+- Refer to the full list of [official modules on npm](https://www.npmjs.com/org/ecmaos-modules)
+- See the [./MODULES.md](./MODULES.md) file for a list of community modules; submit a PR to add your module!
+- Modules are dynamically loaded into the kernel at boot and can be enabled or disabled
+- They are specified during build via the `VITE_KERNEL_MODULES` environment variable
+  - e.g. `VITE_KERNEL_MODULES=@ecmaos-modules/boilerplate@0.1.0,@your/package@1.2.3`
+- Versions must be pinned and are mandatory - you cannot use NPM version specifiers
+- They can provide additional functionality, devices, commands, etc.
+- They offer a [common interface](./core/types/modules.ts) for interacting with the kernel
+- Generally they should be written in [AssemblyScript](https://www.assemblyscript.org), but this isn't required
+
+### Packages
+
+- Packages are [NPM packages](https://www.npmjs.com) that are installed into the ecmaOS environment
+- They can be installed from the terminal using the `install` command, e.g. `# install jquery`
+- NPM version specifiers are supported, e.g.:
+  - `# install jquery@3.7.1`
+  - `# install jquery@^3.7.1`
+  - `# install jquery@latest`
+- [JSR](https://jsr.io) may be used with the [NPM compatibility layer](https://jsr.io/docs/npm-compatibility):
+  - `# install @jsr/defaude__hello-jsr --registry https://npm.jsr.io`
+
+### SWAPI
+
+- The SWAPI is an API server running completely inside a service worker using [Hono](https://hono.dev)
+- It allows for various operations including the `fs` route to fetch files via URL
+- e.g., `# fetch /swapi/fs/home/user/hello.txt`
+- e.g., `# fetch /swapi/fake/person/fullName`
+
+### Utils
+
+- Utilities and configuration used during development
 
 ## Important Files and Directories
 
